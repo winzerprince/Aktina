@@ -28,10 +28,10 @@ This section outlines the product ideas currently under consideration or in earl
 ### 3. Mobile & Smart Devices
 
 *   **Tna 25 Series**
-    *   Tna 25 Pro
-    *   Tna 25 Max
-    *   Tna 25 Mini
-    *   Tna 25 Edge
+    *   Tina 25 Pro
+    *   Tina 25 Max
+    *   Tina 25 Mini
+    *   Tina 25 Edge
 *   **Akta 25 Series**
     *   Akta 25 Pro
     *   Akta 25 Mini
@@ -44,21 +44,66 @@ This section outlines the product ideas currently under consideration or in earl
 
 This section is reserved for new product concepts and innovations as they emerge from brainstorming sessions, market research, and strategic discussions.
 
-### [New Product Category/Line 1]
-*   [Idea 1.1]
-    *   [Variant 1.1.1]
-    *   [Variant 1.1.2]
-*   [Idea 1.2]
+### 1. Smartphones
+*   **AktinaPhone Series**
+    *   AktinaPhone Pro (Flagship)
+    *   AktinaPhone Neo (Mid-range)
+    *   AktinaPhone Lite (Budget)
+*   **Kinatix Series** 
+    *   Kinatix Elite (Flagship)
+    *   Kinatix Plus (Mid-range)
+    *   Kinatix Go (Budget)
 
-### [New Product Category/Line 2]
-*   [Idea 2.1]
-*   [Idea 2.2]
-    *   [Variant 2.2.1]
+### 2. Tablets
+*   **AktinaTab Media Series**
+    *   AktinaTab Media Pro
+    *   AktinaTab Media Ultra
+*   **AktinaTab Edu Series**
+    *   AktinaTab Edu Plus
+    *   AktinaTab Edu Mini
+*   **AktinaTab Work Series**
+    *   AktinaTab Work Pro
+    *   AktinaTab Work Fold (Foldable)
 
-### Open Brainstorming / Uncategorized Ideas
-*   [Idea A]
-*   [Idea B]
-*   [Idea C]
+### 3. Laptops
+*   **AktiBook Series**
+    *   AktiBook Air (Ultrabook)
+    *   AktiBook Pro (Performance)
+    *   AktiBook Enterprise (Business)
+*   **KinaBook Series**
+    *   KinaBook Legion (Gaming)
+    *   KinaBook Studio (Creative)
+    *   KinaBook Scholar (Education)
+
+### 4. Smartwatches & Fitness Trackers
+*   **TikTina Series** (Smartwatches)
+    *   TikTina Watch Elite
+    *   TikTina Watch Sport
+    *   TikTina Watch Essential
+*   **AktinaFit Series** (Fitness Trackers)
+    *   AktinaFit Band
+    *   AktinaFit Ring
+    *   AktinaFit Clip
+
+### 5. Audio Devices
+*   **KinaBuds Series** (Wireless Earbuds)
+    *   KinaBuds Pro (Noise-canceling)
+    *   KinaBuds Sport (Water-resistant)
+    *   KinaBuds Lite (Budget)
+*   **AktinaSound Series** (Over-ear Headphones)
+    *   AktinaSound Studio (Professional)
+    *   AktinaSound Ultra (Premium noise-canceling)
+    *   AktinaSound Flow (Everyday)
+*   **KinaWave Series** (Bluetooth Speakers)
+    *   KinaWave Party (High-volume)
+    *   KinaWave Pocket (Portable)
+    *   KinaWave Home (Smart speaker)
+
+### 6. Open Brainstorming / Uncategorized Ideas
+*   AktinaCast (Streaming device)
+*   KinaVision (Smart glasses)
+*   AktinaHome (Smart home ecosystem)
+*   TinaTrack (Pet/item trackers)
 
 ---
 *This document will be updated regularly to reflect the dynamic nature of product development at Aktina.*
