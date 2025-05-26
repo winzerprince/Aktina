@@ -6,7 +6,7 @@
 This Software Design Document (SDD) provides a comprehensive and detailed description of the Aktina Supply Chain & Product Management Platform. It is intended for all stakeholders, including developers, architects, project managers, business analysts, and system administrators, to ensure a shared understanding of the system’s design, structure, and operational context. The document aims to facilitate effective communication, guide implementation, and support future maintenance and enhancements.
 
 ### 1.2 Scope
-The Aktina platform is an integrated, enterprise-grade solution designed to manage the full lifecycle of supply chain operations for a technology hardware company. The scope includes supplier onboarding and validation, multi-level inventory and order management, product lifecycle management, workforce and operations coordination, analytics, and machine learning-driven intelligence. The platform is extensible to support new product lines and business models as outlined in the evolving product roadmap.
+The Aktina platform is an integrated, enterprise-grade solution designed to manage the full lifecycle of supply chain operations for a technology hardware company. The scope includes vendor validation, multi-level inventory and order management, product lifecycle management, workforce and operations coordination, analytics, and machine learning-driven intelligence. The platform is extensible to support new product lines and business models as outlined in the evolving product roadmap.
 
 ### 1.3 Overview
 This document is organized according to the IEEE SDD template, providing:
@@ -130,6 +130,11 @@ Each module and submodule is described in terms of its purpose, responsibilities
     - *User Actions:* Login, request password reset.
     - *Roles with Access:* All roles.
     - *Components:* Login form, password reset link, error/feedback messages.
+  - **SignUp Page:**
+    - *Description:* Entry point from login via signup button. Allows signup with google, email, email verifcation.
+    - *User Actions:* Signup.
+    - *Roles with Access:* All roles.
+    - *Components:*Signup buttion, user form, login link, error/feedback messages.
   - **User Profile Page:**
     - *Description:* Displays and allows editing of user profile information and password.
     - *User Actions:* View/edit profile, change password, view session history.
@@ -354,38 +359,32 @@ A detailed requirements traceability matrix is provided, mapping all functional 
 - Network: Reliable broadband, secure VPN for remote access
 
 ### 8.2 Frameworks and Libraries
-- Backend: Laravel (core platform), Spring Boot (vendor validation), FastAPI (ML services)
-- Frontend: Vue.js (SPA), Tailwind CSS (styling), Chart.js/ApexCharts (visualization)
-- ML: scikit-learn, pandas, numpy (data processing), MLflow (model management)
-- Messaging: RabbitMQ (asynchronous communication)
-- Caching: Redis (performance optimization)
+- **Backend:**
+  - **Laravel** (core platform, RESTful APIs, RBAC, ORM, validation), **Spring Boot** (vendor validation, workflow automation, compliance microservices), **FastAPI** (machine learning services, real-time inference, lightweight APIs)
+  - *Rationale:* Laravel provides rapid development, robust security, and a large ecosystem for core business logic. Spring Boot is chosen for its enterprise-grade reliability, modularity, and Java ecosystem integration, ideal for compliance and validation workflows. FastAPI is selected for its high performance, async support, and seamless integration with Python ML libraries.
+- **Frontend:**
+  - **Vue.js** (SPA, dynamic dashboards, component-based UI), **Tailwind CSS** (utility-first styling, rapid prototyping, accessibility), **Chart.js/ApexCharts** (data visualization, interactive analytics)
+  - *Rationale:* Vue.js offers a reactive, maintainable, and scalable UI framework, supporting modular development and real-time updates. Tailwind CSS ensures consistent, accessible, and responsive design. Chart.js and ApexCharts provide flexible, visually rich analytics components.
+- **Machine Learning:**
+  - **scikit-learn**, **pandas**, **numpy** (data processing, model training), **MLflow** (model lifecycle management, experiment tracking)
+  - *Rationale:* These libraries are industry standards for data science, enabling robust feature engineering, model development, and reproducibility. MLflow centralizes model tracking and deployment.
+- **Messaging & Eventing:**
+  - **RabbitMQ** (asynchronous communication, decoupled microservices, event-driven workflows)
+  - *Rationale:* RabbitMQ enables reliable, scalable messaging between services, supporting real-time notifications, workflow triggers, and system integration.
+- **Caching & Performance:**
+  - **Redis** (in-memory caching, session storage, pub/sub)
+  - *Rationale:* Redis accelerates data access, reduces database load, and supports real-time features such as notifications and analytics.
+- **Database:**
+  - **MySQL** (relational data, transactional integrity), **File Storage** (documents, media), **Feature Store** (ML features)
+  - *Rationale:* MySQL is chosen for its maturity, reliability, and strong transactional support. File storage and feature stores enable efficient handling of unstructured and ML-specific data.
+- **Security:**
+  - **OAuth2/OpenID Connect** (authentication), **JWT** (stateless sessions), **HTTPS/TLS** (encryption), **input validation libraries**
+  - *Rationale:* These technologies ensure secure authentication, data privacy, and compliance with industry standards (GDPR, ISO 27001).
+- **DevOps & Deployment:**
+  - **Docker** (containerization), **CI/CD pipelines** (automated testing, deployment), **Kubernetes** (scalability, orchestration), **Prometheus/Grafana** (monitoring, alerting)
+  - *Rationale:* Containerization and orchestration enable scalable, portable deployments. CI/CD ensures rapid, reliable releases. Monitoring tools provide operational visibility and reliability.
+- **Interoperability:**
+  - **RESTful APIs**, **OpenAPI/Swagger** (API documentation), **Webhooks** (event integration), **External API connectors** (logistics, compliance, market data)
+  - *Rationale:* Open standards and documented APIs ensure seamless integration with third-party systems, partners, and future modules.
 
-### 8.3 Machine Learning Algorithms
-- **Demand Forecasting:** Utilizes ensemble regression models (Random Forest, Gradient Boosting, LSTM) to predict product demand based on historical sales, market trends, and seasonality. Models are retrained periodically and evaluated for accuracy and bias.
-- **Customer Segmentation:** Employs RFM (Recency, Frequency, Monetary) analysis and KMeans clustering to group customers by behavior and value. Segments inform marketing, sales, and support strategies.
-- **Anomaly Detection:** Applies Isolation Forest and Autoencoder neural networks to identify unusual patterns in inventory, orders, and supplier performance. Alerts are generated for review and action.
-
-### 8.4 User Roles and Access
-A comprehensive table details each user role, accessible pages, available components, and permissions. For example:
-- **Vendor:** Accesses application and profile pages; can submit applications, upload documents, and view status.
-- **Supplier:** Accesses dashboard, orders, and profile; can view orders, upload compliance docs, and respond to audits.
-- **Procurement Manager:** Accesses dashboard, orders, suppliers; can create/approve orders, manage suppliers, and view analytics.
-- **Inventory Manager:** Accesses inventory, orders, dashboard; can update stock, manage locations, and view analytics.
-- **Production Manager:** Accesses products, BOM, inventory; can manage products, BOM, and production tracking.
-- **Account Officer:** Accesses orders, suppliers, analytics; can approve payments and view financials.
-- **Customer:** Accesses orders, profile; can place/view orders and update profile.
-- **Sales Manager:** Accesses dashboard, orders, analytics; can view sales, manage orders, and export data.
-- **Auditor/Compliance Officer:** Accesses suppliers, orders, analytics; can view logs, generate reports, and perform compliance checks.
-
-### 8.5 Glossary
-A full glossary of business and technical terms, acronyms, and abbreviations used throughout the document.
-
-### 8.6 Entity-Relationship Diagrams
-Visual diagrams illustrating the relationships between all major entities, including products, components, suppliers, orders, users, and analytics data.
-
-### 8.7 Alternative Architecture Analysis
-Discussion of alternative architectural approaches considered, with rationale for the selected design.
-
----
-
-This SDD provides a detailed, holistic, and non-implementation-specific description of the Aktina platform, supporting both current operations and future growth.
+All technologies are selected for their maturity, community support, extensibility, and proven success in enterprise environments. The stack is designed for modularity, scalability, and ease of maintenance, supporting both current needs and future growth.
