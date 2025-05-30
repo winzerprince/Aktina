@@ -1,0 +1,910 @@
+COLLEGE OF
+COMPUTING AND
+INFORMATION
+SCIENCES
+BY G-28
+JUNE 2024
+MATHEMATICS CHALLENGE
+Supervised by: Mr. Brian MuchakeNameRegistration NumberStudent Number
+Nakalema Julian23/13388/EVE2300713388
+Walusimbi Ashraf23/18466/EVE2300718466
+Kayiwa Rahim23/09499/EVE2300709499
+Namembwa Sherry23/14586/EVE2300714586
+Nsubuga Ibrahim23/24436/EVE2300724436Software Design Document for The Mathematics Challenge
+Table of Contents
+List of tables ........................................................................................................................................................................... iii
+List of Figures ........................................................................................................................................................................ iv
+1.1Purpose ................................................................................................................................................................... 1
+1.2Scope:...................................................................................................................................................................... 1
+1.2.1 Description ............................................................................................................................................................ 1
+1.2.2 Goals ...................................................................................................................................................................... 1
+1.2.3 Objectives .............................................................................................................................................................. 1
+1.2.4 Benefits .................................................................................................................................................................. 1
+1.3 Overview....................................................................................................................................................................... 2
+1.4 Reference Material....................................................................................................................................................... 2
+1.5 Definitions and acronyms ............................................................................................................................................ 2
+2.SYSTEM OVERVIEW...................................................................................................................................................... 4
+2.1 Functionalities .............................................................................................................................................................. 4
+2.2 Context ......................................................................................................................................................................... 4
+2.2 Design ........................................................................................................................................................................... 4
+3. SYSTEM ARCHITECTURE........................................................................................................................................... 6
+3.1 Architectural Design ..................................................................................................................................................... 6
+3.2 Decomposition Description.......................................................................................................................................... 9
+3.3 Design Rationale......................................................................................................................................................... 12
+4. DATA DESIGN ............................................................................................................................................................... 13
+4.1 Data Description ......................................................................................................................................................... 13
+4.2 Data Dictionary........................................................................................................................................................... 16
+5. COMPONENT DESIGN ................................................................................................................................................ 19
+5.1 Objects, their Member Functions and pseudocodes ................................................................................................ 19
+5.1.1 Administrator ...................................................................................................................................................... 19
+5.1.2 SchoolRepresentative ......................................................................................................................................... 20
+5.1.3 Participant ........................................................................................................................................................... 21
+5.1.4 Challenge ............................................................................................................................................................. 22
+6.1 Overview of User Interface ........................................................................................................................................ 23
+6.3 Screen Objects and Actions........................................................................................................................................ 27
+7. APPENDICES ................................................................................................................................................................. 29
+Appendix A: Glossary ....................................................................................................................................................... 29
+Appendix B: System Requirements ................................................................................................................................. 29
+iSoftware Design Document for The Mathematics Challenge
+Appendix C: Database Schema ........................................................................................................................................ 29
+Appendix D: Use Case Diagrams ...................................................................................................................................... 30
+Appendix F: Activity Diagrams ......................................................................................................................................... 30
+Appendix I: Screen Prototypes ........................................................................................................................................ 31
+Appendix J: Contact Information ..................................................................................................................................... 31
+Appendix K: References ................................................................................................................................................... 31
+iiSoftware Design Document for The Mathematics Challenge
+List of tables
+Table 1: Document Overview ................................................................................................................................................ 2
+Table 2 : Definitions ............................................................................................................................................................... 2
+Table 3: Acronyms .................................................................................................................................................................. 3
+Table 4: Administrator .......................................................................................................................................................... 16
+Table 5: Answer .................................................................................................................................................................... 16
+Table 6: Attempt ................................................................................................................................................................... 16
+Table 7: Participant ............................................................................................................................................................... 16
+Table 8: Representative......................................................................................................................................................... 17
+Table 9: Question .................................................................................................................................................................. 18
+Table 10: Challenge .............................................................................................................................................................. 18
+Table 11: Result .................................................................................................................................................................... 18
+Table 12: Screen Objects And actions .................................................................................................................................. 27
+iiiSoftware Design Document for The Mathematics Challenge
+List of Figures
+Figure 3.1 1: Client-Server pattern ......................................................................................................................................... 6
+Figure 3.1 2: Repository Pattern ............................................................................................................................................. 7
+Figure 3.1 3: The Modular Program Structure ........................................................................................................................ 8
+Figure 3.2 1: Class diagram for the system ............................................................................................................................ 9
+Figure 3.2 2: Activity diagram for the system ...................................................................................................................... 10
+Figure 3.2 3: Use case diagram ............................................................................................................................................. 12
+Figure 4.1 1: ERD for the system ......................................................................................................................................... 14
+Figure 6.2 1: CLI login page ................................................................................................................................................. 23
+Figure 6.2 2: CLI login screen for participants ..................................................................................................................... 24
+Figure 6.2 3: CLI participant registration screen .................................................................................................................. 25
+Figure 6.2 4: CLI login screen for representatives ................................................................................................................ 26
+Figure 6.2 5: Login form for administrators ......................................................................................................................... 26
+Figure 6.2 6: View Challenge screen .................................................................................................................................... 27
+iv1.INTRODUCTION
+1.1Purpose
+The purpose of this Software Design Document is to outline the architecture and system design for the
+mathematics competition web system, intended for developers, project managers, and stakeholders involved in
+the project.
+1.2
+Scope:
+This section has the description, goals, objectives, and benefits of the project.
+1.2.1 Description
+This Mathematics competition web system is a platform designed to host a national mathematics competition for
+primary school students. The key features of this system are school management, participant registration and
+question management.
+1.2.2 Goals
+To promote fair competition: Since there is random question selection, all participants have equal opportunities.
+To provide valuable feedback: The system gives participants immediate results and feedback on their
+performance.
+To generate reports: The system provides a detailed report to every participant at the end of the challenge.
+To manage questions: The system allows administrators to upload and manage a number of questions and
+answers.
+To increase interoperability of the programs that are to be in the system.
+To improve engagement: To engage pupils in mathematics through a competitive platform.
+1.2.3 Objectives
+To design the system.
+To implement.
+To test.
+To deploy.
+1.2.4 Benefits
+It enhances learning of pupils: This is through practice and competition enabling pupils gain better mathematical
+skills.
+1Software Design Document for The Mathematics Challenge
+It motivates and recognizes pupils: There is a chance to be recognized as a top performer, promoting confidence
+and motivation.
+It increases engagement: The pupils are encouraged to participate in extracurricular activities promoting a well-
+rounded education.
+It provides equal opportunities: This project provides equal opportunities for all pupils to participate and excel.
+1.3 Overview
+Table 1: Document Overview
+This table describes the overview of the document.
+Component
+System Architecture
+Data Design
+Data Flow Diagrams
+Security Considerations
+Interaction Diagrams
+Description
+Detailed architecture of the system, including front
+end, back end, and database components.
+In-depth data structures and schema design.
+Visual representations of data flow within the system
+Measures taken to ensure system security and protect
+user data
+Diagrams illustrating how system components interact
+1.4 Reference Material
+[1] I. Sommerville, “Software Engineering” 10th ed. Boston, MA, USA: Pearson, 2016.
+[2] L. Bass, P. Clements, and R. Kazman. “Software Architecture in Practice” 2nd ed. Addison Wesley, 2003.
+1.5 Definitions and acronyms
+Table 2 : Definitions
+This table defines the terms used in the document.
+TERMDEFINITION
+AdministratorA user with privileges to manage the system, including uploading schools, questions, and
+answers, setting challenge parameters, and viewing analytics.
+AnswerThe correct response to a question, also uploaded by the administrator, along with the
+corresponding marks.
+ApplicationThe process through which participants register for the competition and await validation
+from their school representative.
+2Software Design Document for The Mathematics Challenge
+Attempt
+Challenge
+CLI
+Participant
+Report
+Representative
+Question
+Web System
+The act of a participant trying to answer a set of questions in a challenge. Each participant
+can make up to three attempts per challenge.
+A set of questions that participants attempt to answer within a specified time frame.
+Command-Line Interface; a text-based user interface used by participants and
+representatives to interact with the system.
+A primary school pupil registered to take part in the mathematics competition.
+A document generated after a challenge, detailing a participant’s performance, which is
+sent to the participant and their school representative.
+A designated individual from a registered school responsible for validating participant
+registrations.
+An individual problem or exercise uploaded by the administrator to be included in
+challenges.
+The backend system built using the Laravel framework that handles the business logic and
+database interactions.
+Table 3: Acronyms
+This table describes the acronyms used in the document.
+Acronym
+API
+CLI
+HTML
+HTTP
+MVC
+MySQL
+PDF
+PHP
+RTM
+SDD
+SMTP
+SQL
+Full Form
+Application Programming Interface
+Command-Line Interface
+Hyper Text Markup Language
+HyperText Transfer Protocol
+Model-View-Controller
+MySQL Database Management System
+Portable Document Format
+PHP: Hypertext Preprocessor
+Requirements Traceability Matrix
+Software Design Document
+Simple Mail Transfer Protocol
+Structured Query Language
+3Software Design Document for The Mathematics Challenge
+2.SYSTEM OVERVIEW
+The schools are struggling with means of promoting mathematics skills among pupils nationally.
+The solution is the web system to promote fairness and enhance learning.
+This section gives a general description of the functionality, context, design and background of our project.
+2.1 Functionalities
+School and participant registration: Administrators register school by entering details such as name, district,
+school registration number, email of representative and name of representative. The participants register using a
+CLI by providing personal information and the school registration number, and the registration is validated by
+the school representatives.
+Challenge Participation: Registered students can log in, view available challenges, and participate in them
+within the set time frame.
+Question Management: Administrators upload a number of questions and their answers via excel files. For each
+challenge attempt, 10 questions are selected from a number of 100 questions to ensure fairness.
+Scoring: Participants receive instant feedback on their performance after each challenge attempt. Detailed
+performance reports via PDF are automatically generated.
+Performance analytics: the system provides the most correctly answered, school rankings, best and participants.
+Email notifications: all participants receive pdfs of the correct answers in their emails, the schools also receive
+registration confirmations
+2.2 Context
+This competition system operates within the educational context of primary schools involves multiple
+stakeholders like administrators, school representatives and participants. It targets a national reach where it aims
+to be accessible to all primary school students across the country, regardless of location.
+2.2 Design
+System architecture: The Mathematics Challenge system employs a client-server architecture to facilitate
+interaction between users and the backend services. The backend services are developed using Java, utilizing
+socket programming for real-time communication. The web interface is built using PHP with the Laravel
+framework, providing a user-friendly platform accessible via standard web browsers. Data management is
+handled through MySQL, ensuring efficient storage and retrieval of competition-related data.
+4Software Design Document for The Mathematics Challenge
+Component design: The design of the Mathematics Challenge system incorporates several subsystems like the
+user management sub-system which handles user registration, data management sub-system which manages
+storage and security of all system data.
+Data management: The system utilizes a structured database schema to organize competition-related data into
+tables, each corresponding to specific entities such as schools, participants, challenges, questions, and answers.
+Data flow diagrams illustrate how data moves through the system, ensuring transparency and efficiency in data
+processing.
+Security considerations: Security is paramount in the design of the Mathematics Challenge system. The system
+implements robust authentication and authorization mechanisms to safeguard user data and system integrity.
+2.3 Background Information:
+Technological Framework: The system is built using Java for backend services, including socket programming
+for real-time communication, and PHP with the Laravel framework for web-based interactions. Data is managed
+using MySQL, and version control is handled through GitHub.
+Development Context: The project is a collaborative effort, likely involving multiple developers, each focusing
+on different aspects of the system to bring it to a success. This system represents a blend of educational objectives
+with modern technology to create an engaging and beneficial experience for students and educators alike. This
+demonstrates the use of digital platforms to enhance learning and academic competition.
+5Software Design Document for The Mathematics Challenge
+3. SYSTEM ARCHITECTURE
+3.1 Architectural Design
+This section describes the design patterns chosen to develop the project and the modular program structure of the
+subsystems and how they interact with each other. The architectural design patterns chosen are:
+Client-Server pattern: Used when data in a shared database has to be accessed from a range of locations
+Figure 3.1 1: Client-Server pattern
+Repository pattern: This pattern describes how a set of interacting components can share data.
+6Software Design Document for The Mathematics Challenge
+Figure 3.1 2: Repository Pattern
+The Repository pattern consists of the above seven components and described below;
+Database Server: To store all the databases such as Schools, Questions, Answers, Participants, Challenge
+Parameters, Reports, and Analytics.
+Application Server: To handle the logic of registering participants, uploading questions/answers, setting
+challenge parameters, attempting challenges, generating reports, and performing analytics.
+Web Server: To serve the web pages and interfaces that allow pupils, school representatives, and administrators
+to interact with the system.
+File Storage System: For storing uploaded files like questions.xlsx, answers.xlsx, and image_file.png.
+Email Server: To send notifications and reports to pupils and school representatives.
+Backup System: For regular backups of databases and important files to prevent data loss.
+Security Components: Such as firewalls and encryption services to protect sensitive data and ensure safe
+transactions within the system.
+Model-View-Control (MVC): This architecture separates presentation and interaction from the system data. The
+system is structured into three logical components that interact with each other. And the Model component
+manages the system data and associated operations on that data. The View component defines and manages how
+the data is presented to the user. The Controller component manages user interaction.
+The Modular Program Structure
+7Software Design Document for The Mathematics Challenge
+Figure 3.1 3: The Modular Program Structure
+User Management sub-system: Its responsibilities are to handle user registration, authentication and
+authorization for participants and school representatives. It interacts with the data management sub-system to
+store and retrieve user information during registration.
+Data Management sub-system: Its responsibilities are to manage storage and security of all system data.
+Reporting Management sub-system: Its responsibilities are to generate reports and participant performance
+analytics. It retrieves data from the data management sub-system to generate performance reports which are then
+circulated by the notification sub-system.
+Challenge Management sub-system: Its responsibilities are to facilitate the process of participants attempting
+challenges, presenting questions and tracking progress. It configures challenges by interacting with the user
+management sub-system to schedule and manage participants.
+Question management sub-system: Its responsibilities are to manage the uploading, storing, and random
+selection of questions. It works with the data management sub-system to store uploaded questions and answers,
+and to fetch the questions during challenge attempts.
+Notification sub-system: Its responsibilities are to manage the sending of email notifications and reports to
+participants. It sends email notifications and reports by interfacing with the reporting management sub-system
+and retrieving user information from the data management sub-system.
+8Software Design Document for The Mathematics Challenge
+3.2 Decomposition Description
+Class diagram: It represents classes, their attributes, methods and relationships among the objects in the
+system.
+Figure 3.2 1: Class diagram for the system
+9Activity diagram: It represents the flow of activities or actions in a system.
+Figure 3.2 2: Activity diagram for the system
+10Use case diagram: It represents a visual representation of the interactions between actors and the system.
+11Software Design Document for The Mathematics Challenge
+Figure 3.2 3: Use case diagram
+3.3 Design Rationale
+This section shows the critical issues of the architectural patterns chosen and explains why we didn’t choose some
+patterns.
+Client-Server Pattern: The principal advantage of this pattern is that servers can be distributed across a network.
+The issues about this pattern are each service is a single point of failure and so is susceptible to denial-of-service
+attacks or server failure, performance may be unpredictable because it depends on the network as well as the
+system and management problems may arise if servers are owned by different organizations.
+Repository Pattern: The advantages of this pattern are the components can be independent; they do not need to
+know of the existence of other components, changes made by one component can be propagated to all components
+and all data can be managed consistently as it is all in one place. The issues about this pattern are the repository
+is a single point of failure so problems in the repository affect the whole system and distributing the repository
+across several computers may be difficult.
+MVC: The advantages of this pattern are it allows the data to change independently of its representation and vice
+versa and supports presentation of the same data in different ways, with changes made in one representation
+shown in all of them. The issues about this pattern are it may involve additional code and code complexity when
+the data model and interactions are simple.
+Layered Pattern: The issues about this pattern are that performance can be a problem because of multiple levels
+of interpretation of a service request as it is processed at each layer.
+Pipe and filter pattern: The issues about this pattern are the format for data transfer has to be agreed between
+communicating transformations. This increases system overhead and may mean that it is impossible to reuse
+architectural components that use incompatible data structures.
+12Software Design Document for The Mathematics Challenge
+4. DATA DESIGN
+4.1 Data Description
+This talks about the transformation of the information domain into data structures and the major entities of the
+system.
+The information domain model developed during the analysis phase is transformed into data structures. Data
+structures organize, process, and store data efficiently, ensuring effective software implementation. There are
+different types of data structures which include arrays, linked lists, stacks, queues, trees and Graphs. Arrays are
+static data structures that store elements of the same data type. Used for efficient random access and simple data
+organization.
+Linked Lists are dynamic data structures where elements (nodes) are linked together. Useful for dynamic memory
+allocation and flexible data storage.
+Stack Follows the Last-In-First-Out (LIFO) principle. Used for function calls, expression evaluation, and
+backtracking.
+Queues Follow the First-In-First-Out (FIFO) principle. Used for scheduling, resource management, and breadth-
+first search.
+Trees are hierarchical data structures with a root node and child nodes. Used for representing hierarchical
+relationships and efficient searching.
+Graphs consist of nodes (vertices) connected by edges. Used for modelling complex relationships, network
+analysis, and optimization problems.
+Data objects, attributes, and relationships depicted in the entity relationship diagram below form the basis for data
+design.
+13Software Design Document for The Mathematics Challenge
+Figure 4.1 1: ERD for the system
+Data dictionary also plays a crucial role in defining data structures.
+Transformation of the system’s information domain to data structures also includes data cleaning, integration and
+reduction. These preprocessing steps are crucial for achieving accurate and reliable results in our system. These
+steps include activities such as;
+Converting Entities to Tables: The main entities such as pupils, schools, challenges, questions, and answers are
+transformed into tables in a relational database.
+Converting Attributes to Columns: Each attribute of an entity, like a pupil’s name or a question’s difficulty
+level, becomes a column within the respective table.
+14Software Design Document for The Mathematics Challenge
+Converting Relationships to Foreign Keys: Relationships between entities, like pupils belonging to schools,
+are represented using foreign keys that link tables together.
+Major Data/System Entities:
+Pupils: Stored in a database table called “Pupils” with attributes like ID, name, email, school ID, and login
+credentials.
+Schools: Stored in a database table called “Schools” with details such as school ID, name, district, and
+representative information.
+Challenges: Stored in a database table called “Challenges” with information on challenge ID, start and end dates,
+duration, and associated questions.
+Questions and Answers: Stored in two separate excel files, with each question linked to its possible answers and
+correct answer.
+Processing and Organization:
+Data Processing: When a challenge is attempted, the system retrieves a set of questions from the questions table,
+processes the pupil’s answers, and calculates scores based on the answers table.
+Data Organization: Data is organized to facilitate quick retrieval for common operations, such as fetching a
+pupil’s past challenge attempts or generating school ranking reports.
+Databases and Data Storage Items:
+MySQL Database: The primary database management system used for storing all persistent data.
+User Profiles: A secure storage for user authentication data, including hashed passwords.
+Challenge Data: Includes tables for storing challenge parameters, questions, and participant scores.
+Analytics Data: Stores historical data for analytics purposes, such as question difficulty levels and school
+performance metrics.
+The system’s design ensures that data is stored in a structured manner, allowing for efficient data manipulation
+and retrieval, which is essential for the real-time and interactive nature of the mathematics challenges. The use of
+relational databases also facilitates complex queries and reporting, which are crucial for the analytics component
+of the system.
+15Software Design Document for The Mathematics Challenge
+4.2 Data Dictionary
+Data entities include Users, Questions, Challenges, and Scores, stored in a relational database for integrity and
+efficient retrieval.
+Table 4: Administrator
+This table describes the attributes, their datatypes, sizes, constraints and descriptions of entity Administrator.
+Field name
+administratorIdData type
+VARCHARSize
+25Constraint
+Primary Key, Not Null
+nameVARCHAR30Not Null
+emailVARCHAR45Not Null
+schoolRegNoVARCHAR25Foreign Key,Not Null
+Description
+This uniquely identifies the
+administrator.
+This is the name of the
+administrator.
+This is the email of the
+administrator.
+This identifies the school the
+administrator uploads.
+Table 5: Answer
+This table describes the attributes, their datatypes, sizes, constraints and descriptions of entity Answer.
+Field name
+answerIidData type
+INT
+Size
+10
+questionIdForeign key, 10
+Not Null
+Constraint
+Primary Key
+Foreign Key, Not Null
+Description
+This uniquely identifies each
+answer.
+This identifies the question to a
+particular answer.
+Table 6: Attempt
+This table describes the attributes, their datatypes, sizes, constraints and descriptions of entity Attempt.
+Field name
+attemptIdData type
+VARCHARSize
+10
+Constraint
+Description
+Primary Key, NOT This
+uniquely
+NULL
+identifies
+each
+attempt.
+Foreign key, Not This identifies the
+Null
+participant
+who
+does an attempt.
+Not Null
+Identifies
+the
+challenge done for
+each attempt.
+participantIdVARCHAR30challengeIdVARCHAR10startTimeVARCHAR10Not Null
+endTimeVARCHAR10Not Null
+Identifies the start
+time for the attempt.
+Identifies the end time
+for the attempt.
+Table 7: Participant
+16Software Design Document for The Mathematics Challenge
+This table describes the attributes, their datatypes, sizes, constraints and descriptions of entity Participant.
+Field name
+participantId
+challengeIdData type
+VARCHAR
+VARCHARSize
+30
+10
+resultIdVARCHAR10
+username
+firstName
+lastName
+emailVARCHAR
+VARCHAR
+VARCHAR
+VARCHAR30
+15
+15
+45
+dateOfBirth
+schoolRegNoDATE
+VARCHAR25
+25
+statusVARCHAR10
+Constraint
+Description
+Primary key, Not Null This uniquely identifies the participant.
+Foreign Key, Not Null This identifies the challenge a participant
+does.
+Foreign Key, Not Null This identifies the result the participant
+gets.
+Unique, Not Null
+This is the username of the participant.
+Not Null
+First name of the participant.
+Not Null
+Last name of the participant.
+Unique, Not Null, Email address of the participant.
+Valid Email Format
+Not Null
+Date of birth of the participant.
+Foreign Key, Not Null The registration number of the
+participants’ school.
+Not Null (values: It tracks participants’ progress.
+"pending",
+"confirmed",
+"rejected)
+Table 8: Representative
+This table describes the attributes, their datatypes, sizes, constraints and descriptions of entity Representative.
+Field name
+representativeIdData type
+VARCHARSize
+30
+representativeNameVARCHAR30
+representativeEmailVARCHAR45
+schoolRegNoVARCHAR25
+Constraint
+Description
+Primary Key,Not Null This
+identifies
+the
+representative of that
+school.
+NOT NULL
+This is the name of the
+representative.
+Not Null, Valid Email This is the email address of
+Format
+the representative.
+Foreign Key, Not This uniquely identifies
+Null
+the
+school
+of
+the
+representative.
+Table 4.2 3: School
+This table describes the attributes, their datatypes, sizes, constraints and descriptions of entity School.
+Field name
+schoolRegNoData type
+VARCHARSize
+25Constraint
+Primary Key, Not Null
+nameVARCHAR30Not Null
+districtVARCHAR20Not Null
+Description
+This uniquely identifies the
+school.
+This is the name of the
+school.
+This is the district where the
+school is located.
+17Software Design Document for The Mathematics Challenge
+representativeId
+VARCHAR
+30
+Foreign Key,Not Null
+This
+identifies
+the
+representative of that school.
+Table 9: Question
+Field name
+questionId
+answerIdData type
+Size
+VARCHAR 10
+VARCHAR 10Constraint
+Primary Key, NOT NULL
+Foreign key, Not Null
+marksINTNot Null
+4
+Description
+This uniquely identifies each question.
+This identifies the answer to a
+particular question.
+Identifies the marks allocated to a
+particular question.
+Table 10: Challenge
+This table describes the attributes, their datatypes, sizes, constraints and descriptions of entity Challenge.
+Field name
+challengeIDData type
+Size
+VARCHAR 10
+questionIdVARCHAR 10
+startDateDATE
+12
+endDateDATE
+12
+durationTIME
+6
+numberOfQuestionsINT
+3
+Constraint
+Primary Key
+Description
+This
+uniquely identifies
+each
+challenge.
+Foreign Key, This identifies the questions attempted
+Not Null
+for each challenge.
+Not Null
+This identifies the start of the
+challenge.
+Not Null
+This identifies the end of the
+challenge.
+Not Null
+This is the time the challenge takes to
+close.
+Not Null
+This is the number of questions one
+can attempt.
+Table 11: Result
+This table describes the attributes, their datatypes, sizes, constraints and descriptions of entity Result.
+Field name
+resultIdData type
+VARCHARSize
+10
+challengeIDVARCHAR10
+scoreINT4
+Constraint
+Primary Key
+Description
+This uniquely identifies each
+result sent.
+Foreign Key, Not This identifies each challenge.
+Null
+Not Null
+Tracks progress overtime.
+18Software Design Document for The Mathematics Challenge
+5. COMPONENT DESIGN
+This breakdown of objects and their member functions covers the main functionalities of the system. Each
+pseudocode block provides a clear and systematic way of describing the procedures and logic required for the
+system to operate as described.
+5.1 Objects, their Member Functions and pseudocodes
+5.1.1 Administrator
+uploadSchools(schools: database)
+Start
+Read schools from the database
+Validate each school
+Add validated school to the database
+End
+uploadQuestions(questions: ExcelFile, answers: ExcelFile)
+Start
+Read questions from the questions Excel file
+Read answers and marks from the answers Excel file
+End
+SetChallengeParameters(startDate: Date, endDate: Date, duration: Time, questionCount: Int)
+Start
+Validate the parameters
+Save the parameters in the database
+End
+sendReports()
+Start
+Generate PDF reports for each participant
+19Software Design Document for The Mathematics Challenge
+Send the reports via email to each participant
+End
+recognizeWinners()
+Start
+Identify top two participants
+Display their names and scores on the website
+End
+5.1.2 SchoolRepresentative
+login(username: String, password: String)
+Start
+Validate credentials
+Create a session if valid
+End
+confirmApplicant(username: String, confirm: Boolean)
+Start
+If confirm is true
+move participant from pending to confirmed in the database and send confirmation email
+else
+move participant to rejected in the database and send rejection email
+End
+20Software Design Document for The Mathematics Challenge
+5.1.3 Participant
+register(username: String, firstname: String, lastname: String, email: String, dateOfBirth: Date,
+school(RegNumber: String, image: File)
+Start
+Validate registration details
+Check school registration number
+If school registration number matches
+add participant to pending list and send confirmation request to school representative
+End
+viewChallenges()
+Start
+Fetch all open challenges
+Display list of challenges
+End
+attemptChallenge(challengeNumber: Int)
+Start
+Fetch random questions for the challenge
+Present questions one by one to the participant
+Track remaining questions and time
+Evaluate participant's answers
+Generate and display score and report at the end
+End
+21Software Design Document for The Mathematics Challenge
+5.1.4 Challenge
+displayQuestions()
+Start
+Randomly select questions from the pool
+Display questions to the participant
+End
+evaluateAnswer(questionId: Int, answer: String)
+Start
+If answer is correct
+award marks for the question
+else if answer is "-"
+award 0 marks for the question
+else
+deduct 3 marks for incorrect answer
+End
+generateReport(participantId: Int)
+Start
+Collect all responses from the participant
+Calculate total score and time taken
+Generate PDF report with detailed performance
+Send the report to the participant via email
+End
+22Software Design Document for The Mathematics Challenge
+6. HUMAN INTERFACE DESIGN
+6.1 Overview of User Interface
+From the user’s perspective, the Mathematics Challenge Web System is designed to be intuitive and user-friendly,
+allowing for easy navigation through its features. Here’s an overview of how users will interact with the system:
+Registration: Users can register through a simple form, entering their details such as username, name, email, and
+school registration number.
+View Challenges: Once logged in, users can view available challenges with details like dates, duration, and
+number of questions.
+Attempt Challenges: Users select a challenge to attempt and are presented with questions one at a time with
+options to answer or skip.
+Feedback: After each answer submission, immediate feedback is provided indicating correctness and updated
+scores.
+Reports: Post-challenge, users receive a detailed report showing their performance on each question and overall
+score.
+The interface will guide users through each step with clear instructions and provide real-time feedback to ensure
+they understand their progress and results. This approach aims to create an engaging experience that encourages
+learning and participation.
+6.2 CLI Screenshots:
+Login Page:
+Figure 6.2 1: CLI login page
+23Software Design Document for The Mathematics Challenge
+Options:
+Participant Login: Allows registered participants to access their accounts.
+School Representative Login: Grants access for school representatives to manage participant registrations.
+Exit: Closes the application.
+CLI for Participants Login Screen
+Figure 6.2 2: CLI login screen for participants
+Welcome Message: Greets users and sets the context for interaction.
+Options:
+Register: Initiates the registration process where users input their details.
+View Challenges: Displays available competitions for participation and directs participants to the web browser to attempt
+challenge.
+Exit: Allows users to exit the application.
+To continue with the registration;
+24Software Design Document for The Mathematics Challenge
+Figure 6.2 3: CLI participant registration screen
+Fields:
+Username: Field for entering a unique username.
+First Name: Field for entering the participant's first name.
+Last Name: Field for entering the participant's last name.
+Email Address: Field for entering the participant's email address.
+Date of Birth: Field for entering the participant's date of birth in the format YYYY-MM-DD.
+Image Upload: Field for uploading an image file (e.g., image_file.png) for identification purposes.
+Register Button: Initiates the registration process for the participant.
+Buttons:
+Register: Submits the registration form.
+Cancel: Cancels the registration process.
+School Representative Login:
+25Software Design Document for The Mathematics Challenge
+Figure 6.2 4: CLI login screen for representatives
+Username: Field for entering the school representative's username.
+Password: Field for entering the corresponding password.
+Login Button: Initiates the login process for school representatives.
+Administrator Login:
+Figure 6.2 5: Login form for administrators
+26Software Design Document for The Mathematics Challenge
+Username: Field for entering the administrator's username.
+Password: Field for entering the corresponding password.
+Login Button: Initiates the login process for administrators.
+View Challenge screen:
+Figure 6.2 6: View Challenge screen
+6.3 Screen Objects and Actions
+Table 12: Screen Objects And actions
+This tables shows the objects on the system’s screen and their actions.
+Object
+Login button on the login screen
+Username Field on login screen
+Password Field on login screen
+Registration link on the login screen
+Username field on the registration field
+First Name Field on the registration
+screen
+Last Name Field on the registration
+screen
+Email Address Field on the registration
+screen
+Date of Birth Picker on the registration
+screen
+School Registration Number Field on
+the registration screen
+Image Upload Button on the
+registration screen
+Action
+Click
+Type
+Type
+Click
+Type
+TypeResult
+Submits credentials for submitting
+TypeAdds the last name in the database
+TypeAdds the email in the database
+SelectAdds the date of birth in the database
+TypeAdds the school registration number in the database
+ClickEnables user to add a png image
+Takes the user to the registration screen
+Adds the username in the database
+Adds the first name in the database
+27Software Design Document for The Mathematics Challenge
+Submit Button on the registration Click
+screen
+View Challenges Button
+Click
+Attempt Challenge Button
+ClickIt submits details to create a new user.
+View Reports ButtonDisplays reports of past challenge attempts and
+scores.
+Click
+Opens the list of available challenges.
+Initiates the process to start attempting a challenge.
+28Software Design Document for The Mathematics Challenge
+7. APPENDICES
+Appendix A: Glossary
+Administrator: The person responsible for managing the system, including uploading questions and answers,
+setting challenge parameters, and viewing reports.
+School Representative: A designated individual from each school who validates participant registrations and
+manages school-related data within the system.
+Participant: A primary school student who registers for and participates in the mathematics competition.
+Challenge: A set of 10 randomly selected questions from a pool of 100 questions that participants must answer
+within a specified time frame.
+Command Line Interface (CLI): A text-based user interface used by participants and school representatives to
+interact with the system.
+Web Interface: A graphical user interface used by administrators to manage the system, upload data, and view
+reports.
+Appendix B: System Requirements
+Hardware Requirements:
+
+
+
+Server with sufficient processing power to handle multiple simultaneous users.
+Reliable internet connection for all users.
+Client machines capable of running Java-based CLI applications and accessing web-based interfaces.
+Software Requirements:
+
+
+
+
+Java Development Kit (JDK) for developing the CLI and server components.
+PHP and Laravel framework for developing the web interface.
+MySQL or any other relational database management system for storing data.
+Email server for sending notifications and reports.
+Performance Requirements:
+
+
+The system should support concurrent logins and operations from multiple users without significant performance
+degradation.
+The server should be capable of generating and sending reports in PDF format in a timely manner.
+Appendix C: Database Schema
+Participant Table:
+Fields: user_id, username, firstname, lastname, email, date_of_birth, school_reg_no
+29Software Design Document for The Mathematics Challenge
+Administrator table:
+Fields: administratorId, name,email,school_regNo
+School Table:
+Fields: school_regNo, name, district, representativeId
+Representative:
+Fields: representativeId, representative_name, representative_email, school_regNo
+Question Table:
+Fields: question_id, content, answer_id, marks
+Answer Table:
+Fields: answer_id, question_id, correctAnswer
+Challenge Table:
+Fields: challenge_id, start_date, end_date, duration, number_of_questions, question_id
+Report Table:
+Fields: report_id, participantId, challenge_id, score
+Appendix D: Use Case Diagrams
+Administrator Use Case: Actors: Administrator Use Cases: Upload questions and answers, set challenge
+parameters, view reports
+School Representative Use Case: Actors: School Representative Use Cases: Validate participant registration, view
+applicants, confirm/reject participants
+Participant Use Case: Actors: Participant Use Cases: Register, view challenges, attempt challenge, view report
+Appendix F: Activity Diagrams
+User Registration Activity Diagram: Steps: User inputs registration details, system validates details, system sends
+confirmation email, school representative confirms/rejects registration.
+Challenge Attempt Activity Diagram: Steps: User logs in, selects challenge, answers questions, submits answers,
+system calculates score, system generates and sends report.
+30Software Design Document for The Mathematics Challenge
+Appendix I: Screen Prototypes
+CLI Screens: Screens for user registration, challenge selection, question display, and report viewing.
+Web Interface Screens: Screens for administrator dashboard, question and answer upload, challenge parameter
+settings, and report generation.
+Appendix J: Contact Information
+For any inquiries regarding the project, please contact:
+Project Coordinator: [Coordinator's Name] Email: coordinator@example.com Phone: +1-234-567-890
+Technical Support: [Support Team Name] Email: support@example.com Phone: +1-987-654-321
+Appendix K: References
+IEEE Recommended Practice for Software Design Descriptions. Available at: IEEE SDD
+Laravel Documentation. Available at: Laravel Docs
+Java SE Documentation. Available at: Java SE Docs
+MySQL Documentation. Available at: MySQL Docs
+31
