@@ -28,7 +28,9 @@
       - [1.2.3 Objectives](#123-objectives)
       - [1.2.4 Benefits](#124-benefits)
     - [1.3 Overview](#13-overview)
+    - [1.3 Overview](#13-overview-1)
     - [1.4 Reference Material](#14-reference-material)
+    - [1.4 Reference Material](#14-reference-material-1)
     - [1.5 Definitions and Acronyms](#15-definitions-and-acronyms)
   - [2. SYSTEM OVERVIEW](#2-system-overview)
     - [2.1 Functionalities](#21-functionalities)
@@ -40,9 +42,13 @@
     - [3.3 Design Rationale](#33-design-rationale)
   - [4. DATA DESIGN](#4-data-design)
     - [4.1 Data Description](#41-data-description)
+      - [Entity Overview](#entity-overview)
     - [4.2 Data Dictionary](#42-data-dictionary)
+    - [Database Performance Optimization](#database-performance-optimization)
   - [5. COMPONENT DESIGN](#5-component-design)
     - [5.1 Core System Objects and Member Functions](#51-core-system-objects-and-member-functions)
+  - [5. COMPONENT DESIGN](#5-component-design-1)
+    - [5.1 Core System Objects and Member Functions](#51-core-system-objects-and-member-functions-1)
   - [6. HUMAN INTERFACE DESIGN](#6-human-interface-design)
     - [6.1 Overview of User Interface](#61-overview-of-user-interface)
     - [6.2 Screen Images](#62-screen-images)
@@ -400,16 +406,24 @@ The Aktina SCM system relies on the following core entities:
 14. **BillOfMaterials** - Component specifications for product assembly
 15. **WorkforceAllocations** - Staff assignments to locations and production lines
 16. **VendorApplications** - Supplier onboarding documentation and validation process
-17. **ValidationReports** - Automated vendor validation results and scoring
-18. **QualityControls** - Quality checkpoints and test results throughout production
-19. **ShipmentTracking** - Logistics tracking for orders in transit
-20. **DemandForecasts** - Predictive models for future product demand
-21. **CustomerSegments** - Classification of customer behaviors and preferences
-22. **AnalyticsReports** - Predefined reporting templates and historical results
-23. **MLModels** - Machine learning model metadata and performance metrics
-24. **FeatureData** - Extracted and transformed data features for ML applications
-25. **AuditLogs** - System-wide activity tracking for compliance and security
-26. **Notifications** - User alerts and communications with delivery tracking
+17. **DemandForecasts** - Predictive models for future product demand
+18. **MLModels** - Machine learning model metadata and performance metrics
+19. **CustomerSegments** - Classification of customer behaviors and preferences
+20. **QualityControls** - Quality checkpoints and test results throughout production
+21. **ShipmentTracking** - Logistics tracking for orders in transit
+22. **AuditLogs** - System-wide activity tracking for compliance and security
+23. **FeatureData** - Extracted and transformed data features for ML applications
+24. **SalesTransactions** - Detailed transaction records for sales analytics and ML training
+25. **DemandHistory** - Historical demand patterns for forecasting algorithm development
+26. **CustomerBehaviorMetrics** - Customer behavior analytics and segmentation data
+27. **SupplierPerformanceMetrics** - Comprehensive supplier performance tracking and analytics
+28. **ModelPredictions** - Storage and tracking of ML model predictions and accuracy
+29. **FeatureStore** - Centralized feature management for machine learning operations
+30. **ExternalDataSources** - Integration points for external market and economic data
+31. **ExternalDataPoints** - External data values for enhanced prediction algorithms
+32. **AnalyticsCache** - Performance optimization for analytics dashboard queries
+33. **TrainingDatasets** - Managed datasets for machine learning model training and validation
+34. **Transportation** - Transportation tracking with workers, vehicles, and logistics details
 
 ### 4.2 Data Dictionary
 
@@ -886,7 +900,207 @@ The following tables describe the core database entities, their attributes, data
 | created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
 | updated_at | TIMESTAMP | - | Not Null | Last modification timestamp |
 
-The database schema presented above provides comprehensive support for all functional modules of the Aktina Supply Chain Management System, with particular attention to data needs for analytics and machine learning capabilities. The schema implements appropriate temporal attributes, relationship structures, and specialized entities that facilitate both operational requirements and advanced analytical processing.
+**Table 24: SalesTransactions**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| transaction_id | VARCHAR | 36 | Primary Key, Not Null | Unique transaction identifier |
+| order_id | VARCHAR | 36 | Foreign Key, Not Null | References Orders table |
+| product_id | VARCHAR | 36 | Foreign Key, Not Null | References Products table |
+| customer_id | VARCHAR | 36 | Foreign Key, Not Null | References Users/Companies table |
+| quantity_sold | INT | - | Not Null | Quantity sold in transaction |
+| unit_price | DECIMAL | 10,2 | Not Null | Price per unit at time of sale |
+| total_amount | DECIMAL | 12,2 | Not Null | Total transaction amount |
+| discount_applied | DECIMAL | 10,2 | Default 0.00 | Discount amount applied |
+| profit_margin | DECIMAL | 5,2 | Null | Profit margin percentage |
+| sales_channel | VARCHAR | 50 | Not Null | Channel: 'wholesale', 'retail', 'direct' |
+| geography | VARCHAR | 100 | Not Null | Geographic region of sale |
+| season | VARCHAR | 20 | Not Null | Season when sale occurred |
+| promotion_id | VARCHAR | 36 | Foreign Key, Null | Any promotion applied |
+| transaction_date | TIMESTAMP | - | Not Null | Date/time of transaction |
+| created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
+
+**Table 25: DemandHistory**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| demand_record_id | VARCHAR | 36 | Primary Key, Not Null | Unique demand record identifier |
+| product_id | VARCHAR | 36 | Foreign Key, Not Null | References Products table |
+| location_id | VARCHAR | 36 | Foreign Key, Not Null | References Locations table |
+| period_start | DATE | - | Not Null | Start of demand period |
+| period_end | DATE | - | Not Null | End of demand period |
+| actual_demand | INT | - | Not Null | Actual demand quantity |
+| forecasted_demand | INT | - | Null | Previously forecasted demand |
+| variance | DECIMAL | 10,2 | Null | Difference between actual and forecast |
+| external_factors | JSON | - | Null | Weather, holidays, promotions, etc. |
+| created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
+
+**Table 26: CustomerBehaviorMetrics**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| behavior_id | VARCHAR | 36 | Primary Key, Not Null | Unique behavior record identifier |
+| customer_id | VARCHAR | 36 | Foreign Key, Not Null | References Users/Companies table |
+| analysis_period | VARCHAR | 20 | Not Null | Period analyzed (e.g., 'Q1_2024', 'monthly') |
+| total_orders | INT | - | Not Null | Total orders in period |
+| total_spend | DECIMAL | 12,2 | Not Null | Total amount spent |
+| average_order_value | DECIMAL | 10,2 | Not Null | Average order value |
+| purchase_frequency | DECIMAL | 5,2 | Not Null | Average days between purchases |
+| preferred_categories | JSON | - | Null | Product categories with purchase counts |
+| seasonal_patterns | JSON | - | Null | Seasonal buying behavior |
+| payment_behavior | JSON | - | Null | Payment method preferences and timing |
+| loyalty_score | DECIMAL | 5,2 | Null | Calculated customer loyalty score |
+| churn_risk | DECIMAL | 5,3 | Null | Probability of customer churn |
+| lifetime_value | DECIMAL | 12,2 | Null | Calculated customer lifetime value |
+| segment_id | VARCHAR | 36 | Foreign Key, Null | References CustomerSegments table |
+| created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
+
+**Table 27: SupplierPerformanceMetrics**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| performance_id | VARCHAR | 36 | Primary Key, Not Null | Unique performance record identifier |
+| supplier_id | VARCHAR | 36 | Foreign Key, Not Null | References Suppliers table |
+| evaluation_period | VARCHAR | 20 | Not Null | Period evaluated (e.g., 'Q1_2024') |
+| total_orders | INT | - | Not Null | Total orders in period |
+| on_time_deliveries | INT | - | Not Null | Number of on-time deliveries |
+| on_time_percentage | DECIMAL | 5,2 | Not Null | On-time delivery percentage |
+| quality_score | DECIMAL | 5,2 | Not Null | Average quality rating |
+| defect_rate | DECIMAL | 5,3 | Not Null | Defect rate percentage |
+| average_lead_time | DECIMAL | 5,1 | Not Null | Average lead time in days |
+| lead_time_variance | DECIMAL | 5,2 | Not Null | Lead time consistency score |
+| communication_score | DECIMAL | 5,2 | Null | Communication effectiveness rating |
+| cost_competitiveness | DECIMAL | 5,2 | Null | Price competitiveness score |
+| capacity_utilization | DECIMAL | 5,2 | Null | Supplier capacity utilization |
+| innovation_score | DECIMAL | 5,2 | Null | Innovation and improvement score |
+| overall_rating | DECIMAL | 5,2 | Not Null | Composite performance rating |
+| risk_score | DECIMAL | 5,3 | Null | Calculated risk score |
+| created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
+
+**Table 28: ModelPredictions**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| prediction_id | VARCHAR | 36 | Primary Key, Not Null | Unique prediction identifier |
+| model_id | VARCHAR | 36 | Foreign Key, Not Null | References MLModels table |
+| entity_type | VARCHAR | 50 | Not Null | Type of entity being predicted (product, customer, supplier) |
+| entity_id | VARCHAR | 36 | Not Null | ID of the entity being predicted |
+| prediction_value | JSON | - | Not Null | Prediction results in structured format |
+| confidence_score | DECIMAL | 5,3 | Null | Prediction confidence (0-1) |
+| prediction_date | TIMESTAMP | - | Not Null | When prediction was made |
+| actual_value | JSON | - | Null | Actual observed value (for accuracy measurement) |
+| created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
+
+**Table 29: FeatureStore**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| feature_id | VARCHAR | 36 | Primary Key, Not Null | Unique feature identifier |
+| entity_type | VARCHAR | 50 | Not Null | Type: 'product', 'customer', 'supplier', 'order' |
+| entity_id | VARCHAR | 36 | Not Null | ID of the entity |
+| feature_name | VARCHAR | 100 | Not Null | Name of the feature |
+| feature_value | DECIMAL | 15,5 | Null | Numeric feature value |
+| feature_text | TEXT | - | Null | Text feature value |
+| feature_json | JSON | - | Null | Complex feature data |
+| feature_date | DATE | - | Not Null | Date the feature represents |
+| created_at | TIMESTAMP | - | Not Null | Feature creation timestamp |
+| model_version | VARCHAR | 20 | Null | Model version that uses this feature |
+
+**Table 30: ExternalDataSources**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| source_id | VARCHAR | 36 | Primary Key, Not Null | Unique source identifier |
+| source_name | VARCHAR | 100 | Not Null | Name of external data source |
+| source_type | VARCHAR | 50 | Not Null | Type: 'economic', 'weather', 'market', 'industry' |
+| api_endpoint | VARCHAR | 255 | Null | API endpoint URL |
+| refresh_frequency | VARCHAR | 20 | Not Null | How often data is updated |
+| last_updated | TIMESTAMP | - | Null | Last successful data pull |
+| status | ENUM | - | Not Null | Values: 'active', 'inactive', 'error' |
+| created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
+
+**Table 31: ExternalDataPoints**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| datapoint_id | VARCHAR | 36 | Primary Key, Not Null | Unique datapoint identifier |
+| source_id | VARCHAR | 36 | Foreign Key, Not Null | References ExternalDataSources |
+| data_date | DATE | - | Not Null | Date the data represents |
+| metric_name | VARCHAR | 100 | Not Null | Name of the metric |
+| metric_value | DECIMAL | 15,5 | Not Null | Value of the metric |
+| geographic_scope | VARCHAR | 100 | Null | Geographic area (country, region) |
+| created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
+
+**Table 32: AnalyticsCache**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| cache_id | VARCHAR | 36 | Primary Key, Not Null | Unique cache identifier |
+| report_type | VARCHAR | 100 | Not Null | Type of cached report |
+| entity_id | VARCHAR | 36 | Null | Entity the cache is for (if applicable) |
+| user_role | VARCHAR | 20 | Null | User role the cache is for |
+| time_period | VARCHAR | 50 | Not Null | Time period of the data |
+| cache_data | JSON | - | Not Null | Cached analytics data |
+| expires_at | TIMESTAMP | - | Not Null | Cache expiration time |
+| created_at | TIMESTAMP | - | Not Null | Cache creation timestamp |
+
+**Table 33: TrainingDatasets**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| dataset_id | VARCHAR | 36 | Primary Key, Not Null | Unique dataset identifier |
+| model_type | VARCHAR | 50 | Not Null | Type of ML model |
+| dataset_name | VARCHAR | 100 | Not Null | Descriptive name |
+| data_source_query | TEXT | - | Not Null | SQL query to generate dataset |
+| feature_columns | JSON | - | Not Null | List of feature columns |
+| target_column | VARCHAR | 100 | Null | Target variable column |
+| training_period_start | DATE | - | Not Null | Start date of training data |
+| training_period_end | DATE | - | Not Null | End date of training data |
+| record_count | INT | - | Not Null | Number of records in dataset |
+| created_at | TIMESTAMP | - | Not Null | Dataset creation timestamp |
+
+**Table 34: Transportation**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| transportation_id | VARCHAR | 36 | Primary Key, Not Null | Unique transportation record identifier |
+| order_id | VARCHAR | 36 | Foreign Key, Not Null | References Orders table |
+| driver_id | VARCHAR | 36 | Foreign Key, Not Null | References Users table (transportation worker) |
+| vehicle_id | VARCHAR | 36 | Foreign Key, Not Null | References Vehicles table |
+| route_id | VARCHAR | 36 | Foreign Key, Null | References Routes table if predefined route |
+| transportation_type | ENUM | - | Not Null | Values: 'pickup', 'delivery', 'transfer', 'return' |
+| origin_location_id | VARCHAR | 36 | Foreign Key, Not Null | References Locations table (pickup location) |
+| destination_location_id | VARCHAR | 36 | Foreign Key, Not Null | References Locations table (delivery location) |
+| planned_departure | TIMESTAMP | - | Not Null | Scheduled departure time |
+| actual_departure | TIMESTAMP | - | Null | Actual departure time |
+| planned_arrival | TIMESTAMP | - | Not Null | Scheduled arrival time |
+| actual_arrival | TIMESTAMP | - | Null | Actual arrival time |
+| status | ENUM | - | Not Null | Values: 'scheduled', 'in_progress', 'completed', 'delayed', 'cancelled' |
+| distance_km | DECIMAL | 8,2 | Null | Transportation distance in kilometers |
+| fuel_cost | DECIMAL | 10,2 | Null | Fuel cost for transportation |
+| driver_hours | DECIMAL | 5,2 | Null | Driver hours for labor cost calculation |
+| transportation_cost | DECIMAL | 10,2 | Null | Total transportation cost |
+| cargo_weight | DECIMAL | 10,3 | Null | Weight of cargo being transported |
+| cargo_volume | DECIMAL | 10,3 | Null | Volume of cargo in cubic meters |
+| special_requirements | JSON | - | Null | Special handling requirements (temperature, fragile, etc.) |
+| tracking_updates | JSON | - | Null | Real-time location and status updates |
+| delivery_confirmation | JSON | - | Null | Delivery receipt and signature information |
+| notes | TEXT | - | Null | Additional transportation notes |
+| created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
+| updated_at | TIMESTAMP | - | Not Null | Last modification timestamp |
+
+### Database Performance Optimization
+
+The extended database schema incorporates performance-critical indexes designed to support machine learning operations and real-time analytics:
+
+- **Sales Transaction Indexing**: Optimized indexes on product_id and transaction_date for fast demand analysis queries
+- **Customer Behavior Analysis**: Composite indexes on customer_id and analysis_period for efficient segmentation processing  
+- **Supplier Performance Tracking**: Specialized indexes on supplier_id and evaluation_period for performance metric calculations
+- **Feature Store Optimization**: Multi-column indexes on entity_type, entity_id, and feature_date for ML feature retrieval
+- **Prediction History Access**: Optimized access patterns for model_id and prediction_date combinations
+- **External Data Integration**: Efficient querying capabilities for source_id and data_date combinations
+
+The comprehensive database schema presented above provides robust support for all functional modules of the Aktina Supply Chain Management System, with enhanced capabilities for analytics and machine learning operations. The schema implements appropriate temporal attributes, relationship structures, and specialized entities that facilitate both operational requirements and advanced analytical processing while maintaining data integrity and performance at scale.
 | supplier_id | VARCHAR | 36 | Primary Key, Not Null | Unique supplier identifier |
 | user_id | VARCHAR | 36 | Foreign Key, Not Null | References Users table |
 | company_name | VARCHAR | 255 | Not Null | Official company name |
@@ -1101,11 +1315,154 @@ Begin
 End
 ```
 
-**5.1.5 Vendor Validation Service Objects**
+**5.1.5 Machine Learning Service Objects**
+
+**DemandPredictor Object**
+
+The DemandPredictor implements algorithms for demand forecasting using time series analysis and machine learning models to predict future product demand patterns.
+
+```
+Function: Predict Future Demand
+Begin
+    Get sales history for product (last 24 months)
+    If less than 12 months of data available
+        Return error "Not enough historical data"
+    
+    Extract useful patterns from sales history
+    
+    Load previously trained prediction model
+    If no model available
+        Create new model based on sales patterns
+        Save model for future use
+    
+    Create empty list for predictions
+    For each month in forecast period
+        Estimate future conditions based on patterns
+        Add prediction to list
+    
+    Save all predictions to database
+    Return success with prediction list
+End
+```
+
+**CustomerSegmentationService Object**
+
+The CustomerSegmentationService analyzes customer behavior patterns to identify distinct customer segments and predict customer lifetime value.
+
+```
+Function: Segment Customers
+Begin
+    Get customer behavior data for analysis period
+    If insufficient customer data available
+        Return error "Insufficient data for segmentation"
+    
+    Extract features including purchase frequency, order value, product preferences
+    Calculate Recency, Frequency, Monetary (RFM) scores
+    
+    Load trained clustering model
+    If no existing model available
+        Train new K-means clustering model
+        Determine optimal number of clusters
+        Save model for future use
+    
+    Apply clustering model to customer features
+    Assign customers to segments
+    Calculate segment characteristics and value metrics
+    
+    Save segment assignments to database
+    Return success with segment details
+End
+```
+
+**InventoryOptimizer Object**
+
+The InventoryOptimizer uses reinforcement learning and optimization algorithms to determine optimal stock levels and reorder strategies.
+
+```
+Function: Optimize Inventory Levels
+Begin
+    Get demand forecast for product
+    Get supplier lead time data
+    Get cost structure parameters
+    
+    Calculate demand variability from historical data
+    Calculate lead time variability from supplier performance
+    
+    Determine safety stock level using service level targets
+    Calculate reorder point as (average demand * lead time) + safety stock
+    Calculate Economic Order Quantity (EOQ) based on cost parameters
+    
+    Apply machine learning model to refine recommendations
+    Consider seasonal patterns and promotional schedules
+    
+    Save optimization results to database
+    Return reorder point, order quantity, safety stock levels
+End
+```
+
+**SupplierPerformancePredictor Object**
+
+The SupplierPerformancePredictor evaluates supplier reliability and predicts future performance using classification models and neural networks.
+
+```
+Function: Predict Supplier Performance
+Begin
+    Get historical supplier performance data
+    Get external risk factors for supplier location
+    Get financial stability indicators
+    
+    Extract performance features including delivery timeliness, quality scores, communication effectiveness
+    Combine features with external risk and financial data
+    
+    Load trained performance prediction model
+    If no model available
+        Train new neural network model
+        Validate model accuracy
+        Save model for future use
+    
+    Apply model to feature vector
+    Calculate performance score and risk assessment
+    Generate recommendations for supplier management
+    
+    Save prediction results to database
+    Return performance score, risk assessment, recommendations
+End
+```
+
+**MLModelManager Object**
+
+The MLModelManager coordinates training, deployment, and monitoring of all machine learning models within the system.
+
+```
+Function: Train Model
+Begin
+    Get training dataset for specified model type
+    Validate data quality and completeness
+    
+    Split data into training and validation sets
+    Apply feature engineering transformations
+    
+    Initialize model with specified algorithm type
+    Train model using training dataset
+    Evaluate model performance on validation set
+    
+    If performance meets accuracy thresholds
+        Save trained model with version information
+        Update model metadata in database
+        Deploy model for prediction use
+    Else
+        Log training failure details
+        Return error with performance metrics
+    
+    Return success with model performance details
+End
+```
+
+**5.1.6 Vendor Validation Service Objects**
 
 **VendorValidator Object**
 
-The VendorValidator processes supplier applications and performs automated validation.
+The VendorValidator processes supplier applications and performs automated validation using document analysis and scoring algorithms.
 
 ```
 Function: Validate Vendor Application
@@ -1147,7 +1504,7 @@ Begin
 End
 ```
 
-**5.1.6 Communication and Chat Objects**
+**5.1.7 Communication and Chat Objects**
 
 **ChatBotService Object**
 
@@ -1310,7 +1667,7 @@ graph TB
 
 - **Tab 3 (Production)**: Production line management including line configuration, scheduling tools, capacity planning, and Bill of Materials creation and modification.
 
-- **Tab 4 (Analytics)**: Production analytics dashboard with efficiency metrics, trend analysis, bottleneck identification, and performance benchmarking.
+- **Tab 4 (Analytics)**: Production analytics dashboard providing comprehensive insights into manufacturing operations. The analytics interface presents core production metrics including Overall Equipment Effectiveness (OEE), line utilization rates, and throughput metrics across all production lines. Capacity analysis tools visualize current versus planned production capacity, identify bottlenecks in real-time, and track resource utilization efficiency. Quality metrics section displays defect rates by production line, first-pass yield percentages, and quality control checkpoint results to ensure manufacturing standards. Lead time analysis provides detailed views of production cycle times, setup times, and changeover efficiency metrics. Inventory analytics complement production data with stock level optimization insights, turnover rates, dead stock identification, and optimal reorder point recommendations. Demand versus supply comparisons show forecast accuracy rates, stockout incidents, and safety stock adequacy across product lines. Cost analysis tools present inventory carrying costs, obsolescence costs, and storage efficiency metrics. Supplier performance analytics track delivery performance including on-time delivery rates, lead time variance, and quality ratings for all suppliers. Cost trend analysis reveals price variance patterns, total cost of ownership calculations, and supplier reliability scores. Predictive analytics capabilities include production forecasting based on current orders and capacity, maintenance predictions showing equipment failure probability and optimal maintenance scheduling, and resource planning forecasts for workforce requirements and material needs.
 
 - **Tab 5 (AI Chat)**: Integrated AI assistant for production-related queries, optimization recommendations, and predictive insights.
 
@@ -1352,7 +1709,7 @@ graph TB
 
 - **Tab 2 (Distribution)**: Supply center staffing management with tools for optimizing worker distribution across locations, managing transportation logistics staff, and coordinating production support teams.
 
-- **Tab 3 (Analytics)**: Workforce analytics including productivity trends, capacity planning, training needs assessment, and performance benchmarking across teams.
+- **Tab 3 (Analytics)**: Workforce analytics providing comprehensive insights into human resource management across all Aktina operations. The workforce distribution analytics section displays current versus optimal staffing levels by location and shift, skills analysis including gap identification and training needs assessment, and allocation efficiency metrics showing worker utilization rates and cross-training effectiveness. Performance metrics tracking encompasses productivity measurements showing output per worker, efficiency trends by team, absenteeism pattern analysis including attendance rates and seasonal variations with impact assessments, and individual and team performance rating trends over time. Capacity planning analytics include demand forecasting for workforce requirements based on production schedules, seasonal analysis of staffing needs during peak and low seasons, and cost optimization metrics tracking labor cost per unit, overtime analysis, and temporary worker usage patterns. Predictive analytics capabilities provide turnover prediction models showing employee retention likelihood and recruitment planning insights, training return on investment analysis measuring skill development impact on productivity, and workload balancing algorithms for optimal task distribution across teams. The analytics dashboard also features real-time workforce allocation tracking, skills matching algorithms for optimal job assignments, and workforce efficiency benchmarking against industry standards.
 
 - **Tab 4 (AI Chat)**: AI-powered assistant for workforce optimization, predictive staffing recommendations, and HR policy guidance.
 
@@ -1388,11 +1745,11 @@ graph TB
 
 - **Tab 0 (Home)**: Executive dashboard with company-wide KPIs, revenue overview, operational status, and critical system alerts requiring administrative attention.
 
-- **Tab 1 (Economics)**: Financial analytics including revenue trends, cost analysis, profit margins, and budget versus actual performance tracking.
+- **Tab 1 (Economics)**: Financial analytics providing comprehensive business intelligence for executive decision-making. Revenue analytics present detailed sales trends, profit margin analysis, and cost center performance tracking across all business units. The revenue trends section visualizes sales volume patterns, seasonal variations, and growth rates with predictive modeling for future revenue projections. Cost analysis tools offer detailed operational expense breakdowns, supply chain cost optimization insights, and return on investment calculations for major business initiatives. Budget versus actual performance tracking includes variance analysis, spending pattern identification, and cost control metrics with real-time alerts for budget overruns. Profitability analysis provides detailed margin analysis by product category, customer segment, and geographical region, enabling strategic pricing decisions and market positioning optimization.
 
-- **Tab 2 (Performance)**: Comprehensive performance analytics covering system performance, business process efficiency, and comparative benchmarking.
+- **Tab 2 (Performance)**: Comprehensive performance analytics covering system efficiency and business process optimization. System performance metrics include platform uptime monitoring, response time analysis, user activity patterns, and system resource utilization across all components. Business process efficiency analytics track end-to-end process cycle times, automation benefits measurement, and operational bottleneck identification with recommended improvements. Risk assessment tools provide supply chain disruption risk analysis, financial exposure assessments, and scenario modeling for business continuity planning. The performance dashboard includes comparative benchmarking against industry standards, process improvement tracking, and efficiency trend analysis.
 
-- **Tab 3 (Predictions)**: AI-generated strategic insights, market trend analysis, and predictive recommendations for business planning.
+- **Tab 3 (Predictions)**: Strategic intelligence platform delivering AI-generated business insights and market analysis. Market trend analysis provides industry benchmarking data, competitive positioning assessments, and market share evolution tracking with predictive insights for future market conditions. Customer analytics section presents satisfaction score trends, retention rate analysis, and market share performance with segmentation insights. Growth metrics analytics include expansion opportunity identification, scalability indicator assessment, and investment return projections. The predictions interface integrates cross-functional analytics with company-wide KPI dashboards, departmental performance comparisons, and integrated business intelligence. Compliance monitoring tools track regulatory adherence, audit trail analysis, and compliance risk assessment. Innovation metrics provide research and development investment return analysis, time-to-market improvement tracking, and technology adoption impact assessments.
 
 - **Tab 4 (AI Chat)**: Executive-level AI assistant providing strategic insights, data analysis, and decision support recommendations.
 
@@ -1408,7 +1765,7 @@ The wholesaler interface focuses on order management, retailer relationship mana
 
 - **Tab 2 (Retailers)**: Retailer relationship management including retailer directory, performance tracking, territory management, and new retailer onboarding.
 
-- **Tab 3 (Analytics)**: Business analytics including sales trends, market analysis, retailer performance comparisons, and territory optimization.
+- **Tab 3 (Analytics)**: Business analytics providing comprehensive insights into distribution operations and market performance. Sales performance analytics track revenue trends including sales volume patterns, seasonal variations, and growth rate analysis across all product categories and geographic regions. Product performance metrics identify best and worst selling items, category analysis, and market positioning insights with comparative analysis against competitors. Customer analytics deliver detailed retailer performance assessments including sales by retailer, payment pattern analysis, and growth potential identification. Geographic analysis tools visualize regional sales trends, market penetration rates, and territory optimization opportunities. Customer segmentation analytics provide retailer categorization systems with tailored strategy recommendations based on performance characteristics and market potential. Inventory management analytics include comprehensive turnover analysis showing product rotation rates and slow-moving inventory identification, demand pattern recognition including seasonal trends and promotional impact assessment, and optimization opportunity identification with stock level recommendations and reorder strategy improvements. Financial analytics encompass profitability analysis by product and retailer, margin analysis across different customer segments, cash flow monitoring including payment cycle tracking and collection efficiency metrics, and cost management tools covering distribution costs and operational efficiency measurements.
 
 - **Tab 4 (Communications)**: Communication channels with Aktina liaison team and integrated AI support for operational queries.
 
