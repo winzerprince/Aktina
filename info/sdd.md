@@ -118,23 +118,52 @@ The implementation of the Aktina Supply Chain Management System will deliver the
 
 ### 1.3 Overview
 
-The Aktina Supply Chain Management System employs a hybrid architectural approach that combines layered architecture, microservices, and event-driven patterns to create a scalable and maintainable platform. The system is built on a Laravel PHP framework for the core application, with Python microservices handling machine learning and analytics functions, and Java services managing vendor validation processes.
+### 1.3 Overview
 
-The system architecture supports six distinct user roles, each with specialized interfaces and functionality. Data flows through the system via RESTful APIs and event-driven messaging, ensuring real-time synchronization across all components. The platform incorporates machine learning capabilities for demand prediction and customer segmentation, providing intelligent recommendations to optimize supply chain operations.
+This Software Design Document is organized into eight main sections, providing comprehensive technical specifications for the Aktina Supply Chain Management System:
 
-Security is implemented through role-based access control, encrypted communications, and comprehensive audit logging. The system is designed for high availability and scalability, supporting concurrent users across multiple geographical locations.
+**1. Introduction** (pages 1-5): Establishes the purpose, scope, and context of the system, including goals, objectives, and benefits of implementation.
 
+**2. System Overview** (pages 6-10): Describes the core functionalities, business context, and overall design philosophy of the supply chain management platform.
+
+**3. System Architecture** (pages 11-18): Details the architectural design, system decomposition, and design rationale, including diagrams of the hybrid architecture approach.
+
+**4. Data Design** (pages 19-26): Specifies data structures, relationships, and the database schema that supports the system's functionality.
+
+**5. Component Design** (pages 27-35): Outlines core system objects, member functions, and interactions between components with pseudocode examples.
+
+**6. Human Interface Design** (pages 36-45): Illustrates the user interface design for each role, including dashboard layouts and screen images.
+
+**7. Requirements Matrix** (pages 46-48): Maps functional and non-functional requirements to specific system components and verification methods.
+
+**8. Appendices** (pages 49-60): Provides supplementary materials including glossary, system requirements, database schema, and reference diagrams.
+
+The document serves as the primary technical reference for developers implementing the system and stakeholders evaluating the design approach.
+
+
+
+### 1.4 Reference Material
 ### 1.4 Reference Material
 
 The design and development of this system reference the following standards and documentation:
 
-- IEEE Std 1016-1998: IEEE Recommended Practice for Software Design Descriptions
-- IEEE Std 830-1998: IEEE Recommended Practice for Software Requirements Specifications  
-- Laravel Framework Documentation (Version 10.x)
-- RESTful Web Services Design Principles (Fielding, 2000)
-- Microservices Architecture Patterns (Newman, 2015)
-- Machine Learning Engineering Best Practices (Sculley et al., 2015)
-- Supply Chain Management Systems Analysis (Chopra & Meindl, 2016)
+[1] IEEE Standards Association, "IEEE Standard for Information Technology—Systems Design—Software Design Descriptions," IEEE Std 1016-2009, July 2009. [Online]. Available: https://standards.ieee.org/ieee/1016/5254/
+
+[2] IEEE Standards Association, "IEEE Recommended Practice for Software Requirements Specifications," IEEE Std 830-1998, Oct. 1998. [Online]. Available: https://standards.ieee.org/ieee/830/2481/
+
+[3] Taylor Otwell, "Laravel Documentation," Laravel.com, 2023. [Online]. Available: https://laravel.com/docs/10.x
+
+[4] R. T. Fielding, "Architectural Styles and the Design of Network-based Software Architectures," University of California, Irvine, 2000. [Online]. Available: https://www.ics.uci.edu/~fielding/pubs/dissertation/top.htm
+
+[5] S. Newman, "Building Microservices: Designing Fine-Grained Systems," O'Reilly Media, Feb. 2021. [Online]. Available: https://www.oreilly.com/library/view/building-microservices-2nd/9781492034018/
+
+[6] D. Sculley et al., "Hidden Technical Debt in Machine Learning Systems," Google, Inc., 2015. [Online]. Available: https://proceedings.neurips.cc/paper_files/paper/2015/file/86df7dcfd896fcaf2674f757a2463eba-Paper.pdf
+
+[7] S. Chopra and P. Meindl, "Supply Chain Management: Strategy, Planning, and Operation," Pearson, 2022. [Online]. Available: https://www.pearson.com/en-us/subject-catalog/p/supply-chain-management-strategy-planning-and-operation/P200000003037
+
+[8] Redis Ltd., "Redis Documentation," Redis.io, 2023. [Online]. Available: https://redis.io/documentation
+
+[9] Vue.js, "Vue.js 3 Documentation," Vuejs.org, 2023. [Online]. Available: https://vuejs.org/guide/introduction.html
 
 ### 1.5 Definitions and Acronyms
 
@@ -227,7 +256,7 @@ The Aktina Supply Chain Management System implements a hybrid architectural appr
 ```mermaid
 graph TB
     subgraph "Presentation Layer"
-        UI[User Interface - Vue.js]
+        UI[User Interface - Blade & Livewire]
         API[REST API Gateway]
     end
     
@@ -250,6 +279,7 @@ graph TB
     end
     
     UI --> API
+    UI --> Laravel
     API --> Laravel
     Laravel --> Auth
     Laravel --> Workflow
@@ -262,6 +292,8 @@ graph TB
 ```
 
 **Service Architecture** The microservices layer provides specialized functionality that complements the core Laravel application. The Python machine learning service handles predictive analytics, demand forecasting, and customer segmentation using scikit-learn and pandas libraries. The Java vendor validation service processes PDF documents, performs financial analysis, and manages compliance verification workflows. The AI chat service provides natural language processing capabilities for automated customer support.
+
+**Frontend Architecture** The presentation layer leverages Laravel Blade templating engine combined with Livewire for dynamic, reactive user interfaces without requiring complex JavaScript frameworks. This server-first approach provides seamless real-time updates, simplified state management, and progressive enhancement while maintaining tight integration with Laravel's backend capabilities. Livewire components enable modular UI development with efficient DOM updates and minimal client-server round trips.
 
 **Integration Framework** Service communication occurs through well-defined REST APIs with JSON message formats, ensuring platform independence and facilitating future service replacements or upgrades. Event-driven messaging using message queues enables asynchronous processing for non-critical operations, improving system responsiveness and enabling horizontal scaling.
 
@@ -346,6 +378,39 @@ The data architecture for the Aktina Supply Chain Management System employs a co
 
 **Data Security and Privacy** Sensitive data elements implement field-level encryption where required, particularly for financial information and personal identifiable information (PII). The schema includes appropriate audit trails for all data modifications, supporting compliance requirements and forensic analysis capabilities.
 
+**Analytics and Machine Learning Support** The data model incorporates specialized entities and attributes designed to support advanced analytics and machine learning capabilities. Historical transaction data, behavioral patterns, and performance metrics are captured with appropriate timestamps to enable time-series analysis. Feature-rich entities include predefined attributes for common ML algorithms, while maintaining extensibility through JSON-based feature stores for rapid model evolution.
+
+#### Entity Overview
+
+The Aktina SCM system relies on the following core entities:
+
+1. **Users** - System users across all six roles with authentication and profile information
+2. **UserRoles** - Role definitions with associated permissions for the RBAC system
+3. **Companies** - Organization records for suppliers, wholesalers, and retailers
+4. **Products** - Finished goods and raw materials managed within the supply chain
+5. **ProductCategories** - Hierarchical categorization of products
+6. **Orders** - Transaction records between supply chain participants
+7. **OrderItems** - Line items within orders with quantity and pricing information
+8. **Inventory** - Stock level tracking across multiple locations
+9. **InventoryMovements** - Historical record of all inventory changes
+10. **Locations** - Supply centers, warehouses, and retail locations
+11. **Suppliers** - Extended supplier information with validation and performance data
+12. **ProductionLines** - Manufacturing lines with capacity and capability attributes
+13. **ProductionSchedules** - Temporal allocation of resources to production tasks
+14. **BillOfMaterials** - Component specifications for product assembly
+15. **WorkforceAllocations** - Staff assignments to locations and production lines
+16. **VendorApplications** - Supplier onboarding documentation and validation process
+17. **ValidationReports** - Automated vendor validation results and scoring
+18. **QualityControls** - Quality checkpoints and test results throughout production
+19. **ShipmentTracking** - Logistics tracking for orders in transit
+20. **DemandForecasts** - Predictive models for future product demand
+21. **CustomerSegments** - Classification of customer behaviors and preferences
+22. **AnalyticsReports** - Predefined reporting templates and historical results
+23. **MLModels** - Machine learning model metadata and performance metrics
+24. **FeatureData** - Extracted and transformed data features for ML applications
+25. **AuditLogs** - System-wide activity tracking for compliance and security
+26. **Notifications** - User alerts and communications with delivery tracking
+
 ### 4.2 Data Dictionary
 
 The following tables describe the core database entities, their attributes, data types, constraints, and relationships within the Aktina Supply Chain Management System.
@@ -363,11 +428,28 @@ The following tables describe the core database entities, their attributes, data
 | phone_number | VARCHAR | 20 | Null | Contact phone number |
 | company_id | VARCHAR | 36 | Foreign Key, Null | References Companies table for external users |
 | status | ENUM | - | Not Null | Values: 'active', 'inactive', 'pending', 'suspended' |
+| profile_image | VARCHAR | 255 | Null | Path to user's profile image |
+| language_preference | VARCHAR | 10 | Not Null, Default 'en-US' | Preferred language code |
+| timezone | VARCHAR | 50 | Not Null, Default 'UTC' | User's timezone for date/time display |
+| login_count | INT | - | Not Null, Default 0 | Total number of successful logins |
+| access_pattern | JSON | - | Null | Behavioral pattern data for security analytics |
 | created_at | TIMESTAMP | - | Not Null | Account creation timestamp |
 | updated_at | TIMESTAMP | - | Not Null | Last modification timestamp |
 | last_login | TIMESTAMP | - | Null | Last successful login timestamp |
 
-**Table 2: Products**
+**Table 2: UserRoles**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| role_id | VARCHAR | 20 | Primary Key, Not Null | Role identifier code |
+| role_name | VARCHAR | 50 | Unique, Not Null | Human-readable role name |
+| description | TEXT | - | Null | Role description and purpose |
+| permission_set | JSON | - | Not Null | RBAC permissions encoded in JSON |
+| is_system_role | BOOLEAN | - | Not Null, Default FALSE | Flag for system-defined vs custom roles |
+| created_at | TIMESTAMP | - | Not Null | Role creation timestamp |
+| updated_at | TIMESTAMP | - | Not Null | Last modification timestamp |
+
+**Table 3: Products**
 
 | Field Name | Data Type | Size | Constraint | Description |
 |------------|-----------|------|------------|-------------|
@@ -379,11 +461,32 @@ The following tables describe the core database entities, their attributes, data
 | unit_price | DECIMAL | 10,2 | Not Null | Base unit price in USD |
 | weight | DECIMAL | 8,3 | Null | Product weight in kilograms |
 | dimensions | JSON | - | Null | Product dimensions (length, width, height) |
+| is_raw_material | BOOLEAN | - | Not Null, Default FALSE | Flag for raw materials vs finished products |
+| has_bom | BOOLEAN | - | Not Null, Default FALSE | Flag indicating if product has BOM |
+| lead_time_days | INT | - | Null | Average lead time for procurement/production |
+| min_order_quantity | INT | - | Not Null, Default 1 | Minimum order quantity |
+| shelf_life_days | INT | - | Null | Shelf life for perishable products |
+| seasonality_pattern | JSON | - | Null | Historical seasonality data for forecasting |
+| popularity_score | DECIMAL | 5,2 | Null | Calculated popularity score for recommendations |
+| image_url | VARCHAR | 255 | Null | Product image URL |
 | status | ENUM | - | Not Null | Values: 'active', 'discontinued', 'development' |
 | created_at | TIMESTAMP | - | Not Null | Product creation timestamp |
 | updated_at | TIMESTAMP | - | Not Null | Last modification timestamp |
 
-**Table 3: Orders**
+**Table 4: ProductCategories**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| category_id | VARCHAR | 36 | Primary Key, Not Null | Unique category identifier (UUID format) |
+| parent_id | VARCHAR | 36 | Foreign Key, Null | Self-reference for hierarchical categories |
+| category_name | VARCHAR | 100 | Not Null | Category display name |
+| description | TEXT | - | Null | Category description |
+| level | INT | - | Not Null | Depth level in category hierarchy (0=root) |
+| path | VARCHAR | 255 | Not Null | Materialized path for efficient hierarchy traversal |
+| created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
+| updated_at | TIMESTAMP | - | Not Null | Last modification timestamp |
+
+**Table 5: Orders**
 
 | Field Name | Data Type | Size | Constraint | Description |
 |------------|-----------|------|------------|-------------|
@@ -395,15 +498,41 @@ The following tables describe the core database entities, their attributes, data
 | status | ENUM | - | Not Null | Values: 'pending', 'accepted', 'processing', 'shipped', 'delivered', 'cancelled' |
 | total_amount | DECIMAL | 12,2 | Not Null | Total order value in USD |
 | currency | VARCHAR | 3 | Not Null, Default 'USD' | ISO currency code |
+| tax_amount | DECIMAL | 10,2 | Not Null, Default 0.00 | Tax applied to order |
+| discount_amount | DECIMAL | 10,2 | Not Null, Default 0.00 | Discount applied to order |
+| shipping_cost | DECIMAL | 10,2 | Not Null, Default 0.00 | Shipping and handling cost |
+| payment_terms | VARCHAR | 50 | Not Null | Payment terms code |
+| payment_status | ENUM | - | Not Null | Values: 'unpaid', 'partial', 'paid', 'refunded' |
+| shipping_method | VARCHAR | 50 | Null | Shipping method identifier |
+| shipping_address | JSON | - | Not Null | Structured shipping address data |
+| priority | ENUM | - | Not Null, Default 'normal' | Values: 'low', 'normal', 'high', 'urgent' |
 | order_date | TIMESTAMP | - | Not Null | Order placement timestamp |
 | required_date | DATE | - | Null | Requested delivery date |
 | shipped_date | TIMESTAMP | - | Null | Actual shipment timestamp |
 | delivered_date | TIMESTAMP | - | Null | Delivery confirmation timestamp |
 | notes | TEXT | - | Null | Additional order notes |
+| source_channel | VARCHAR | 50 | Null | Order source (web, mobile, EDI, etc.) |
 | created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
 | updated_at | TIMESTAMP | - | Not Null | Last modification timestamp |
 
-**Table 4: Inventory**
+**Table 6: OrderItems**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| order_item_id | VARCHAR | 36 | Primary Key, Not Null | Unique order item identifier (UUID format) |
+| order_id | VARCHAR | 36 | Foreign Key, Not Null | References Orders table |
+| product_id | VARCHAR | 36 | Foreign Key, Not Null | References Products table |
+| quantity | INT | - | Not Null, > 0 | Ordered quantity |
+| unit_price | DECIMAL | 10,2 | Not Null | Price per unit at time of order |
+| tax_rate | DECIMAL | 6,4 | Not Null, Default 0.0000 | Tax rate applied to item |
+| discount_percent | DECIMAL | 5,2 | Not Null, Default 0.00 | Discount percentage applied |
+| line_total | DECIMAL | 12,2 | Not Null | Total line item amount including tax/discount |
+| status | ENUM | - | Not Null | Values: 'pending', 'allocated', 'backordered', 'shipped' |
+| allocated_from_location | VARCHAR | 36 | Foreign Key, Null | Inventory location for fulfillment |
+| created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
+| updated_at | TIMESTAMP | - | Not Null | Last modification timestamp |
+
+**Table 7: Inventory**
 
 | Field Name | Data Type | Size | Constraint | Description |
 |------------|-----------|------|------------|-------------|
@@ -415,15 +544,349 @@ The following tables describe the core database entities, their attributes, data
 | quantity_in_transit | INT | - | Not Null, >= 0 | Quantity currently being shipped |
 | reorder_point | INT | - | Not Null, >= 0 | Minimum quantity before reorder |
 | reorder_quantity | INT | - | Not Null, > 0 | Standard reorder quantity |
+| bin_location | VARCHAR | 50 | Null | Warehouse bin/shelf location code |
 | last_count_date | DATE | - | Null | Last physical inventory count date |
 | cost_per_unit | DECIMAL | 10,2 | Not Null | Current cost per unit |
+| safety_stock_level | INT | - | Not Null, Default 0 | Buffer stock quantity |
+| max_stock_level | INT | - | Null | Maximum desired stock quantity |
+| average_daily_usage | DECIMAL | 10,2 | Null | Average daily consumption for forecasting |
+| variance | DECIMAL | 10,3 | Null | Statistical variance in usage for ML models |
 | created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
 | updated_at | TIMESTAMP | - | Not Null | Last modification timestamp |
 
-**Table 5: Suppliers**
+**Table 8: InventoryMovements**
 
 | Field Name | Data Type | Size | Constraint | Description |
 |------------|-----------|------|------------|-------------|
+| movement_id | VARCHAR | 36 | Primary Key, Not Null | Unique movement identifier (UUID format) |
+| inventory_id | VARCHAR | 36 | Foreign Key, Not Null | References Inventory table |
+| product_id | VARCHAR | 36 | Foreign Key, Not Null | References Products table |
+| location_id | VARCHAR | 36 | Foreign Key, Not Null | References Locations table |
+| reference_id | VARCHAR | 36 | Null | Related document ID (order, transfer, etc.) |
+| reference_type | VARCHAR | 50 | Null | Type of reference document |
+| movement_type | ENUM | - | Not Null | Values: 'receipt', 'issue', 'transfer', 'adjustment', 'return' |
+| quantity | INT | - | Not Null | Quantity moved (positive or negative) |
+| unit_cost | DECIMAL | 10,2 | Not Null | Cost per unit at time of movement |
+| total_cost | DECIMAL | 12,2 | Not Null | Total cost of movement |
+| from_location_id | VARCHAR | 36 | Foreign Key, Null | Source location for transfers |
+| to_location_id | VARCHAR | 36 | Foreign Key, Null | Destination location for transfers |
+| performed_by | VARCHAR | 36 | Foreign Key, Not Null | User who performed the movement |
+| notes | TEXT | - | Null | Movement notes or explanation |
+| created_at | TIMESTAMP | - | Not Null | Movement timestamp |
+
+**Table 9: Locations**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| location_id | VARCHAR | 36 | Primary Key, Not Null | Unique location identifier (UUID format) |
+| location_code | VARCHAR | 20 | Unique, Not Null | Short location reference code |
+| location_name | VARCHAR | 100 | Not Null | Location name |
+| location_type | ENUM | - | Not Null | Values: 'warehouse', 'production', 'retail', 'supplier' |
+| parent_location_id | VARCHAR | 36 | Foreign Key, Null | Parent location for hierarchical structures |
+| address | TEXT | - | Not Null | Physical address |
+| city | VARCHAR | 100 | Not Null | City name |
+| state | VARCHAR | 50 | Null | State/province |
+| postal_code | VARCHAR | 20 | Not Null | Postal/ZIP code |
+| country | VARCHAR | 2 | Not Null | ISO country code |
+| latitude | DECIMAL | 10,7 | Null | Geographic latitude for mapping |
+| longitude | DECIMAL | 10,7 | Null | Geographic longitude for mapping |
+| timezone | VARCHAR | 50 | Not Null, Default 'UTC' | Location timezone |
+| capacity_sqm | DECIMAL | 10,2 | Null | Storage capacity in square meters |
+| operating_hours | JSON | - | Null | Operating hours by day of week |
+| status | ENUM | - | Not Null | Values: 'active', 'inactive', 'maintenance' |
+| manager_id | VARCHAR | 36 | Foreign Key, Null | References Users table for location manager |
+| created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
+| updated_at | TIMESTAMP | - | Not Null | Last modification timestamp |
+
+**Table 10: Suppliers**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| supplier_id | VARCHAR | 36 | Primary Key, Not Null | Unique supplier identifier |
+| user_id | VARCHAR | 36 | Foreign Key, Not Null | References Users table |
+| company_name | VARCHAR | 255 | Not Null | Official company name |
+| tax_id | VARCHAR | 50 | Unique, Null | Tax identification number |
+| address | TEXT | - | Not Null | Complete business address |
+| contact_person | VARCHAR | 100 | Not Null | Primary contact person name |
+| phone | VARCHAR | 20 | Not Null | Business phone number |
+| email | VARCHAR | 255 | Not Null | Business email address |
+| website | VARCHAR | 255 | Null | Company website URL |
+| validation_status | ENUM | - | Not Null | Values: 'pending', 'verified', 'rejected', 'suspended' |
+| financial_rating | VARCHAR | 10 | Null | Financial stability rating |
+| compliance_status | ENUM | - | Not Null | Values: 'compliant', 'non_compliant', 'under_review' |
+| quality_rating | DECIMAL | 3,1 | Null | Quality rating (0.0-5.0) |
+| delivery_rating | DECIMAL | 3,1 | Null | Delivery reliability rating (0.0-5.0) |
+| average_lead_time | INT | - | Null | Average lead time in days |
+| on_time_delivery_rate | DECIMAL | 5,2 | Null | Percentage of on-time deliveries |
+| defect_rate | DECIMAL | 5,2 | Null | Percentage of defective items |
+| payment_terms | VARCHAR | 50 | Null | Standard payment terms |
+| minimum_order_value | DECIMAL | 10,2 | Null | Minimum order value required |
+| preferred_supplier | BOOLEAN | - | Not Null, Default FALSE | Flag for preferred supplier status |
+| performance_history | JSON | - | Null | Historical performance metrics for ML analysis |
+| created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
+| updated_at | TIMESTAMP | - | Not Null | Last modification timestamp |
+
+**Table 11: Companies**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| company_id | VARCHAR | 36 | Primary Key, Not Null | Unique company identifier (UUID format) |
+| company_name | VARCHAR | 255 | Not Null | Official company name |
+| company_type | ENUM | - | Not Null | Values: 'supplier', 'wholesaler', 'retailer', 'partner' |
+| registration_number | VARCHAR | 50 | Unique, Null | Business registration number |
+| tax_id | VARCHAR | 50 | Unique, Null | Tax identification number |
+| address | TEXT | - | Not Null | Primary business address |
+| city | VARCHAR | 100 | Not Null | City |
+| state | VARCHAR | 50 | Null | State/province |
+| postal_code | VARCHAR | 20 | Not Null | Postal/ZIP code |
+| country | VARCHAR | 2 | Not Null | ISO country code |
+| phone | VARCHAR | 20 | Not Null | Primary business phone |
+| email | VARCHAR | 255 | Not Null | Primary business email |
+| website | VARCHAR | 255 | Null | Company website URL |
+| logo_url | VARCHAR | 255 | Null | Company logo URL |
+| primary_contact_id | VARCHAR | 36 | Foreign Key, Null | References Users table for primary contact |
+| industry | VARCHAR | 100 | Null | Industry classification |
+| year_established | INT | 4 | Null | Year company was established |
+| annual_revenue | DECIMAL | 14,2 | Null | Annual revenue in USD |
+| employee_count | INT | - | Null | Number of employees |
+| credit_rating | VARCHAR | 10 | Null | Credit rating code |
+| status | ENUM | - | Not Null | Values: 'active', 'inactive', 'suspended' |
+| created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
+| updated_at | TIMESTAMP | - | Not Null | Last modification timestamp |
+
+**Table 12: ProductionLines**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| line_id | VARCHAR | 36 | Primary Key, Not Null | Unique production line identifier |
+| line_code | VARCHAR | 20 | Unique, Not Null | Short production line code |
+| line_name | VARCHAR | 100 | Not Null | Production line name |
+| location_id | VARCHAR | 36 | Foreign Key, Not Null | References Locations table |
+| capacity_per_hour | DECIMAL | 10,2 | Not Null | Standard production capacity per hour |
+| setup_time_minutes | INT | - | Not Null | Standard setup time in minutes |
+| operating_cost_per_hour | DECIMAL | 10,2 | Not Null | Operating cost per hour |
+| product_categories | JSON | - | Null | Product categories supported by this line |
+| status | ENUM | - | Not Null | Values: 'active', 'inactive', 'maintenance', 'setup' |
+| maintenance_schedule | JSON | - | Null | Scheduled maintenance information |
+| efficiency_rating | DECIMAL | 5,2 | Null | Current efficiency rating percentage |
+| last_maintenance_date | DATE | - | Null | Last maintenance date |
+| next_maintenance_date | DATE | - | Null | Scheduled next maintenance date |
+| created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
+| updated_at | TIMESTAMP | - | Not Null | Last modification timestamp |
+
+**Table 13: ProductionSchedules**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| schedule_id | VARCHAR | 36 | Primary Key, Not Null | Unique schedule identifier |
+| line_id | VARCHAR | 36 | Foreign Key, Not Null | References ProductionLines table |
+| product_id | VARCHAR | 36 | Foreign Key, Not Null | References Products table |
+| order_id | VARCHAR | 36 | Foreign Key, Null | References Orders table if applicable |
+| quantity | INT | - | Not Null, > 0 | Production quantity |
+| start_time | TIMESTAMP | - | Not Null | Scheduled start time |
+| end_time | TIMESTAMP | - | Not Null | Scheduled end time |
+| actual_start_time | TIMESTAMP | - | Null | Actual production start time |
+| actual_end_time | TIMESTAMP | - | Null | Actual production end time |
+| status | ENUM | - | Not Null | Values: 'scheduled', 'in_progress', 'completed', 'cancelled', 'delayed' |
+| priority | INT | - | Not Null, Default 5 | Priority level (1-10, lower is higher priority) |
+| setup_minutes | INT | - | Not Null | Setup time in minutes |
+| notes | TEXT | - | Null | Schedule notes |
+| scheduled_by | VARCHAR | 36 | Foreign Key, Not Null | References Users table |
+| created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
+| updated_at | TIMESTAMP | - | Not Null | Last modification timestamp |
+
+**Table 14: BillOfMaterials**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| bom_id | VARCHAR | 36 | Primary Key, Not Null | Unique BOM identifier |
+| parent_product_id | VARCHAR | 36 | Foreign Key, Not Null | References Products table (finished product) |
+| component_product_id | VARCHAR | 36 | Foreign Key, Not Null | References Products table (component) |
+| quantity_required | DECIMAL | 10,3 | Not Null, > 0 | Quantity of component required |
+| unit_of_measure | VARCHAR | 20 | Not Null | Unit of measure code |
+| version | VARCHAR | 20 | Not Null | BOM version identifier |
+| is_active | BOOLEAN | - | Not Null, Default TRUE | Whether this BOM version is active |
+| position_in_assembly | VARCHAR | 50 | Null | Position description in assembly |
+| notes | TEXT | - | Null | Notes about this component |
+| created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
+| updated_at | TIMESTAMP | - | Not Null | Last modification timestamp |
+
+**Table 15: WorkforceAllocations**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| allocation_id | VARCHAR | 36 | Primary Key, Not Null | Unique allocation identifier |
+| user_id | VARCHAR | 36 | Foreign Key, Not Null | References Users table |
+| location_id | VARCHAR | 36 | Foreign Key, Not Null | References Locations table |
+| line_id | VARCHAR | 36 | Foreign Key, Null | References ProductionLines table if applicable |
+| position | VARCHAR | 100 | Not Null | Job position/title |
+| skills_required | JSON | - | Not Null | Required skills for position |
+| skills_possessed | JSON | - | Not Null | Skills possessed by worker |
+| shift | VARCHAR | 50 | Not Null | Shift designation (morning, afternoon, night) |
+| start_date | DATE | - | Not Null | Assignment start date |
+| end_date | DATE | - | Null | Assignment end date (null for permanent) |
+| hours_per_week | DECIMAL | 5,2 | Not Null | Standard hours per week |
+| productivity_rating | DECIMAL | 3,1 | Null | Productivity rating (0.0-5.0) |
+| allocation_status | ENUM | - | Not Null | Values: 'active', 'transferred', 'terminated', 'on_leave' |
+| created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
+| updated_at | TIMESTAMP | - | Not Null | Last modification timestamp |
+
+**Table 16: VendorApplications**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| application_id | VARCHAR | 36 | Primary Key, Not Null | Unique application identifier |
+| applicant_email | VARCHAR | 255 | Not Null | Applicant email address |
+| company_name | VARCHAR | 255 | Not Null | Applicant company name |
+| documents_path | VARCHAR | 255 | Not Null | Path to submitted documents |
+| status | ENUM | - | Not Null | Values: 'submitted', 'under_review', 'approved_for_inspection', 'requires_review', 'rejected', 'approved' |
+| validation_score | DECIMAL | 5,2 | Null | Automated validation score (0-100) |
+| validation_details | JSON | - | Null | Detailed validation results |
+| reviewed_by | VARCHAR | 36 | Foreign Key, Null | References Users table for reviewer |
+| review_notes | TEXT | - | Null | Notes from manual review |
+| submitted_at | TIMESTAMP | - | Not Null | Application submission timestamp |
+| reviewed_at | TIMESTAMP | - | Null | Review completion timestamp |
+| created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
+| updated_at | TIMESTAMP | - | Not Null | Last modification timestamp |
+
+**Table 17: DemandForecasts**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| forecast_id | VARCHAR | 36 | Primary Key, Not Null | Unique forecast identifier |
+| product_id | VARCHAR | 36 | Foreign Key, Not Null | References Products table |
+| location_id | VARCHAR | 36 | Foreign Key, Null | References Locations table if location-specific |
+| forecast_period | DATE | - | Not Null | Forecast target period (month) |
+| forecast_quantity | INT | - | Not Null | Predicted demand quantity |
+| confidence_level | DECIMAL | 5,2 | Not Null | Confidence percentage (0-100) |
+| lower_bound | INT | - | Not Null | Lower prediction interval |
+| upper_bound | INT | - | Not Null | Upper prediction interval |
+| model_id | VARCHAR | 36 | Foreign Key, Not Null | References MLModels table |
+| features_used | JSON | - | Not Null | Features used in forecast generation |
+| seasonality_factor | DECIMAL | 6,4 | Null | Calculated seasonality factor |
+| trend_factor | DECIMAL | 6,4 | Null | Calculated trend factor |
+| actual_quantity | INT | - | Null | Actual demand quantity (after period) |
+| accuracy_percent | DECIMAL | 5,2 | Null | Forecast accuracy percentage |
+| created_at | TIMESTAMP | - | Not Null | Forecast creation timestamp |
+| updated_at | TIMESTAMP | - | Not Null | Last update timestamp |
+
+**Table 18: MLModels**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| model_id | VARCHAR | 36 | Primary Key, Not Null | Unique model identifier |
+| model_name | VARCHAR | 100 | Not Null | Model name |
+| model_type | VARCHAR | 50 | Not Null | Algorithm type (ARIMA, XGBoost, etc.) |
+| purpose | ENUM | - | Not Null | Values: 'demand_forecast', 'price_optimization', 'inventory_optimization', 'customer_segmentation' |
+| version | VARCHAR | 20 | Not Null | Model version identifier |
+| parameters | JSON | - | Not Null | Model hyperparameters |
+| features | JSON | - | Not Null | Feature definitions used |
+| accuracy_metrics | JSON | - | Not Null | Performance metrics (RMSE, MAE, etc.) |
+| training_date | TIMESTAMP | - | Not Null | Model training completion date |
+| training_dataset_size | INT | - | Not Null | Size of training dataset |
+| is_active | BOOLEAN | - | Not Null, Default TRUE | Whether model is currently active |
+| file_path | VARCHAR | 255 | Not Null | Path to saved model file |
+| created_by | VARCHAR | 36 | Foreign Key, Not Null | References Users table |
+| created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
+| updated_at | TIMESTAMP | - | Not Null | Last modification timestamp |
+
+**Table 19: CustomerSegments**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| segment_id | VARCHAR | 36 | Primary Key, Not Null | Unique segment identifier |
+| company_id | VARCHAR | 36 | Foreign Key, Not Null | References Companies table |
+| segment_name | VARCHAR | 100 | Not Null | Segment name/label |
+| segment_description | TEXT | - | Not Null | Detailed segment description |
+| cluster_id | INT | - | Not Null | ML-assigned cluster number |
+| segment_size | INT | - | Not Null | Number of customers in segment |
+| average_order_value | DECIMAL | 10,2 | Not Null | Average order value in segment |
+| purchase_frequency | DECIMAL | 6,2 | Not Null | Average purchase frequency (orders/month) |
+| primary_product_category | VARCHAR | 36 | Foreign Key, Null | References ProductCategories table |
+| behavioral_attributes | JSON | - | Not Null | Behavioral features of segment |
+| lifetime_value | DECIMAL | 12,2 | Not Null | Average customer lifetime value |
+| growth_rate | DECIMAL | 5,2 | Null | Segment growth rate percentage |
+| model_id | VARCHAR | 36 | Foreign Key, Not Null | References MLModels table |
+| created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
+| updated_at | TIMESTAMP | - | Not Null | Last modification timestamp |
+
+**Table 20: QualityControls**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| quality_control_id | VARCHAR | 36 | Primary Key, Not Null | Unique quality control identifier |
+| production_schedule_id | VARCHAR | 36 | Foreign Key, Not Null | References ProductionSchedules table |
+| product_id | VARCHAR | 36 | Foreign Key, Not Null | References Products table |
+| batch_number | VARCHAR | 50 | Not Null | Production batch number |
+| inspector_id | VARCHAR | 36 | Foreign Key, Not Null | References Users table |
+| inspection_date | TIMESTAMP | - | Not Null | Inspection timestamp |
+| pass_status | BOOLEAN | - | Not Null | Whether batch passed inspection |
+| defect_rate | DECIMAL | 5,2 | Not Null | Percentage of defective items |
+| defect_categories | JSON | - | Null | Categorized defects found |
+| sample_size | INT | - | Not Null | Number of items inspected |
+| rejection_reason | TEXT | - | Null | Explanation if failed |
+| corrective_actions | TEXT | - | Null | Required corrective actions |
+| created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
+| updated_at | TIMESTAMP | - | Not Null | Last modification timestamp |
+
+**Table 21: ShipmentTracking**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| tracking_id | VARCHAR | 36 | Primary Key, Not Null | Unique tracking identifier |
+| order_id | VARCHAR | 36 | Foreign Key, Not Null | References Orders table |
+| carrier | VARCHAR | 100 | Not Null | Shipping carrier name |
+| tracking_number | VARCHAR | 100 | Not Null | Carrier tracking number |
+| shipping_method | VARCHAR | 50 | Not Null | Shipping method description |
+| package_count | INT | - | Not Null, Default 1 | Number of packages |
+| total_weight | DECIMAL | 10,3 | Not Null | Total shipment weight |
+| current_status | ENUM | - | Not Null | Values: 'processing', 'in_transit', 'out_for_delivery', 'delivered', 'exception' |
+| current_location | TEXT | - | Null | Current shipment location |
+| estimated_delivery | DATE | - | Null | Estimated delivery date |
+| actual_delivery | TIMESTAMP | - | Null | Actual delivery timestamp |
+| tracking_url | VARCHAR | 255 | Null | URL for customer tracking |
+| tracking_events | JSON | - | Null | Historical tracking events |
+| signature_required | BOOLEAN | - | Not Null, Default FALSE | Whether signature is required |
+| signature_name | VARCHAR | 100 | Null | Name of signing recipient |
+| created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
+| updated_at | TIMESTAMP | - | Not Null | Last modification timestamp |
+
+**Table 22: AuditLogs**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| log_id | VARCHAR | 36 | Primary Key, Not Null | Unique log identifier |
+| user_id | VARCHAR | 36 | Foreign Key, Null | References Users table |
+| entity_type | VARCHAR | 50 | Not Null | Entity affected (Order, User, Product, etc.) |
+| entity_id | VARCHAR | 36 | Not Null | Identifier of affected entity |
+| action | ENUM | - | Not Null | Values: 'create', 'read', 'update', 'delete', 'login', 'logout', 'export' |
+| description | TEXT | - | Not Null | Description of activity |
+| old_values | JSON | - | Null | Previous values for updates |
+| new_values | JSON | - | Null | New values for updates |
+| ip_address | VARCHAR | 45 | Not Null | Source IP address |
+| user_agent | VARCHAR | 255 | Not Null | User agent string |
+| success | BOOLEAN | - | Not Null | Whether action succeeded |
+| failure_reason | TEXT | - | Null | Reason if action failed |
+| created_at | TIMESTAMP | - | Not Null | Log creation timestamp |
+
+**Table 23: FeatureData**
+
+| Field Name | Data Type | Size | Constraint | Description |
+|------------|-----------|------|------------|-------------|
+| feature_id | VARCHAR | 36 | Primary Key, Not Null | Unique feature record identifier |
+| entity_type | VARCHAR | 50 | Not Null | Entity type (Product, Supplier, etc.) |
+| entity_id | VARCHAR | 36 | Not Null | Entity identifier |
+| feature_date | DATE | - | Not Null | Date features represent |
+| numerical_features | JSON | - | Not Null | Numerical ML features |
+| categorical_features | JSON | - | Not Null | Categorical ML features encoded |
+| temporal_features | JSON | - | Not Null | Time-based features |
+| computed_features | JSON | - | Not Null | Derived/calculated features |
+| feature_version | VARCHAR | 20 | Not Null | Feature extraction version |
+| quality_score | DECIMAL | 5,2 | Not Null | Feature quality score (0-100) |
+| created_at | TIMESTAMP | - | Not Null | Record creation timestamp |
+| updated_at | TIMESTAMP | - | Not Null | Last modification timestamp |
+
+The database schema presented above provides comprehensive support for all functional modules of the Aktina Supply Chain Management System, with particular attention to data needs for analytics and machine learning capabilities. The schema implements appropriate temporal attributes, relationship structures, and specialized entities that facilitate both operational requirements and advanced analytical processing.
 | supplier_id | VARCHAR | 36 | Primary Key, Not Null | Unique supplier identifier |
 | user_id | VARCHAR | 36 | Foreign Key, Not Null | References Users table |
 | company_name | VARCHAR | 255 | Not Null | Official company name |
@@ -446,6 +909,11 @@ The following tables describe the core database entities, their attributes, data
 The component design section presents the detailed internal structure of the Aktina Supply Chain Management System, including object definitions, member functions, and pseudocode implementations. This design follows object-oriented principles and provides clear interfaces between system components.
 
 ### 5.1 Core System Objects and Member Functions
+## 5. COMPONENT DESIGN
+
+The component design section presents the detailed internal structure of the Aktina Supply Chain Management System, including object definitions, member functions, and simplified process flows. This design follows object-oriented principles and provides clear interfaces between system components.
+
+### 5.1 Core System Objects and Member Functions
 
 **5.1.1 User Management Objects**
 
@@ -453,43 +921,41 @@ The component design section presents the detailed internal structure of the Akt
 
 The UserController manages user authentication, authorization, and profile operations across all user roles within the system.
 
-```pseudocode
-UserController.authenticate(email: String, password: String)
-BEGIN
-    user = Database.findUserByEmail(email)
-    IF user IS NULL THEN
-        RETURN AuthenticationResult.failure("Invalid credentials")
-    END IF
+```
+Function: Authenticate User
+Begin
+    Look up user by email address
+    If user not found
+        Return error message "Invalid credentials"
     
-    IF Password.verify(password, user.passwordHash) IS FALSE THEN
-        RETURN AuthenticationResult.failure("Invalid credentials")
-    END IF
+    Check if password matches stored password
+    If password doesn't match
+        Return error message "Invalid credentials"
     
-    IF user.status != "active" THEN
-        RETURN AuthenticationResult.failure("Account inactive")
-    END IF
+    Check if account is active
+    If account is not active
+        Return error message "Account inactive"
     
-    token = JWT.generate(user.userId, user.roleId)
-    Database.updateLastLogin(user.userId, getCurrentTimestamp())
-    RETURN AuthenticationResult.success(token, user)
-END
+    Generate security token for user session
+    Update user's last login time
+    Return success with user information
+End
 ```
 
-```pseudocode
-UserController.authorizeAction(token: String, requiredPermission: String)
-BEGIN
-    claims = JWT.verify(token)
-    IF claims IS NULL THEN
-        RETURN AuthorizationResult.failure("Invalid token")
-    END IF
+```
+Function: Check Permission for Action
+Begin
+    Verify security token is valid
+    If token is invalid
+        Return error message "Invalid token"
     
-    userPermissions = Database.getUserPermissions(claims.userId)
-    IF requiredPermission IN userPermissions THEN
-        RETURN AuthorizationResult.success()
-    ELSE
-        RETURN AuthorizationResult.failure("Insufficient permissions")
-    END IF
-END
+    Get user's permissions from database
+    Check if user has the required permission
+    If user has permission
+        Return success
+    Else
+        Return error message "Insufficient permissions"
+End
 ```
 
 **5.1.2 Order Management Objects**
@@ -498,75 +964,62 @@ END
 
 The OrderProcessor handles the complete order lifecycle from placement through delivery confirmation.
 
-```pseudocode
-OrderProcessor.createOrder(buyerId: String, supplierId: String, orderItems: Array)
-BEGIN
-    order = new Order()
-    order.orderId = generateUUID()
-    order.orderNumber = generateOrderNumber()
-    order.buyerId = buyerId
-    order.supplierId = supplierId
-    order.status = "pending"
-    order.orderDate = getCurrentTimestamp()
+```
+Function: Create New Order
+Begin
+    Create new order record
+    Set unique order ID and number
+    Set buyer and supplier information
+    Set initial status to "pending"
+    Set order date to current time
     
-    totalAmount = 0
-    FOR EACH item IN orderItems DO
-        product = Database.getProduct(item.productId)
-        IF product IS NULL THEN
-            RETURN OrderResult.failure("Invalid product: " + item.productId)
-        END IF
+    Set total amount to zero
+    For each item in order list
+        Get product information
+        If product doesn't exist
+            Return error message with invalid product ID
         
-        orderItem = new OrderItem()
-        orderItem.productId = item.productId
-        orderItem.quantity = item.quantity
-        orderItem.unitPrice = product.unitPrice
-        orderItem.totalPrice = item.quantity * product.unitPrice
-        
-        order.addItem(orderItem)
-        totalAmount = totalAmount + orderItem.totalPrice
-    END FOR
+        Create new order item
+        Set product ID, quantity, price information
+        Calculate line total price
+        Add item to order
+        Add line total to order total amount
     
-    order.totalAmount = totalAmount
-    
-    Database.saveOrder(order)
-    EventBus.publish("OrderCreated", order)
-    
-    RETURN OrderResult.success(order)
-END
+    Save order to database
+    Send notification about new order
+    Return success with order details
+End
 ```
 
-```pseudocode
-OrderProcessor.updateOrderStatus(orderId: String, newStatus: String, userId: String)
-BEGIN
-    order = Database.getOrder(orderId)
-    IF order IS NULL THEN
-        RETURN UpdateResult.failure("Order not found")
-    END IF
+```
+Function: Update Order Status
+Begin
+    Find order in database
+    If order not found
+        Return error message "Order not found"
     
-    IF NOT isValidStatusTransition(order.status, newStatus) THEN
-        RETURN UpdateResult.failure("Invalid status transition")
-    END IF
+    Check if status change is allowed
+    If status change not allowed
+        Return error message "Invalid status change"
     
-    IF NOT hasPermissionToUpdateStatus(userId, order, newStatus) THEN
-        RETURN UpdateResult.failure("Permission denied")
-    END IF
+    Check if user has permission to change status
+    If user doesn't have permission
+        Return error message "Permission denied"
     
-    previousStatus = order.status
-    order.status = newStatus
-    order.updatedAt = getCurrentTimestamp()
+    Save previous status for reference
+    Update order status to new status
+    Update last modified timestamp
     
-    IF newStatus == "shipped" THEN
-        order.shippedDate = getCurrentTimestamp()
-    ELSE IF newStatus == "delivered" THEN
-        order.deliveredDate = getCurrentTimestamp()
-        updateInventoryOnDelivery(order)
-    END IF
+    If new status is "shipped"
+        Set shipping date to current time
+    If new status is "delivered"
+        Set delivery date to current time
+        Update inventory records
     
-    Database.updateOrder(order)
-    EventBus.publish("OrderStatusUpdated", order, previousStatus)
-    
-    RETURN UpdateResult.success(order)
-END
+    Save updated order to database
+    Send notification about status change
+    Return success with updated order
+End
 ```
 
 **5.1.3 Inventory Management Objects**
@@ -575,89 +1028,77 @@ END
 
 The InventoryManager maintains real-time inventory levels and automated reorder processes.
 
-```pseudocode
-InventoryManager.updateInventory(productId: String, locationId: String, quantityChange: Integer, operation: String)
-BEGIN
-    inventory = Database.getInventory(productId, locationId)
-    IF inventory IS NULL THEN
-        inventory = createNewInventoryRecord(productId, locationId)
-    END IF
+```
+Function: Update Inventory
+Begin
+    Find inventory record for product at location
+    If record not found
+        Create new inventory record
     
-    Database.beginTransaction()
-    TRY
-        IF operation == "receive" THEN
-            inventory.quantityAvailable = inventory.quantityAvailable + quantityChange
-        ELSE IF operation == "reserve" THEN
-            IF inventory.quantityAvailable < quantityChange THEN
-                THROW InsufficientInventoryException("Not enough stock available")
-            END IF
-            inventory.quantityAvailable = inventory.quantityAvailable - quantityChange
-            inventory.quantityReserved = inventory.quantityReserved + quantityChange
-        ELSE IF operation == "ship" THEN
-            inventory.quantityReserved = inventory.quantityReserved - quantityChange
-            inventory.quantityInTransit = inventory.quantityInTransit + quantityChange
-        ELSE IF operation == "deliver" THEN
-            inventory.quantityInTransit = inventory.quantityInTransit - quantityChange
-        END IF
+    Start database transaction for safety
+    Try
+        If operation is "receive items"
+            Add quantity to available stock
+        If operation is "reserve items"
+            If not enough available stock
+                Raise error "Not enough stock available"
+            Reduce available quantity
+            Increase reserved quantity
+        If operation is "ship items"
+            Reduce reserved quantity
+            Increase in-transit quantity
+        If operation is "deliver items"
+            Reduce in-transit quantity
         
-        inventory.updatedAt = getCurrentTimestamp()
-        Database.updateInventory(inventory)
+        Update last modified timestamp
+        Save inventory changes to database
         
-        IF inventory.quantityAvailable <= inventory.reorderPoint THEN
-            triggerReorderProcess(inventory)
-        END IF
+        If available quantity is below reorder point
+            Start reorder process
         
-        Database.commitTransaction()
-        EventBus.publish("InventoryUpdated", inventory)
-        
-        RETURN InventoryResult.success(inventory)
-    CATCH Exception e
-        Database.rollbackTransaction()
-        RETURN InventoryResult.failure(e.message)
-    END TRY
-END
+        Complete database transaction
+        Send inventory update notification
+        Return success with updated inventory
+    Catch any error
+        Cancel database transaction
+        Return error message
+End
 ```
 
 **5.1.4 Machine Learning Service Objects**
 
 **DemandPredictor Object**
 
-The DemandPredictor implements machine learning algorithms for demand forecasting.
+The DemandPredictor implements algorithms for demand forecasting.
 
-```pseudocode
-DemandPredictor.predictDemand(productId: String, forecastPeriod: Integer)
-BEGIN
-    historicalData = Database.getSalesHistory(productId, 24) // 24 months
-    IF historicalData.length < 12 THEN
-        RETURN PredictionResult.failure("Insufficient historical data")
-    END IF
+```
+Function: Predict Future Demand
+Begin
+    Get sales history for product (last 24 months)
+    If less than 12 months of data available
+        Return error "Not enough historical data"
     
-    features = extractFeatures(historicalData)
-    // Features: monthly sales, seasonal index, trend component, price changes
+    Extract useful patterns from sales history
     
-    model = loadTrainedModel("demand_forecast_model")
-    IF model IS NULL THEN
-        model = trainNewModel(features)
-        saveModel(model, "demand_forecast_model")
-    END IF
+    Load previously trained prediction model
+    If no model available
+        Create new model based on sales patterns
+        Save model for future use
     
-    predictions = Array()
-    FOR i = 1 TO forecastPeriod DO
-        futureFeatures = extrapolateFeaturesForMonth(features, i)
-        prediction = model.predict(futureFeatures)
+    Create empty list for predictions
+    For each month in forecast period
+        Estimate future conditions based on patterns
+        Calculate predicted demand
         
-        predictionRecord = new DemandPrediction()
-        predictionRecord.productId = productId
-        predictionRecord.period = getCurrentMonth() + i
-        predictionRecord.predictedDemand = prediction
-        predictionRecord.confidence = model.getConfidenceScore(futureFeatures)
+        Create prediction record
+        Set product ID, future month, predicted amount
+        Set confidence level for prediction
         
-        predictions.add(predictionRecord)
-    END FOR
+        Add prediction to list
     
-    Database.savePredictions(predictions)
-    RETURN PredictionResult.success(predictions)
-END
+    Save all predictions to database
+    Return success with prediction list
+End
 ```
 
 **5.1.5 Vendor Validation Service Objects**
@@ -666,114 +1107,100 @@ END
 
 The VendorValidator processes supplier applications and performs automated validation.
 
-```pseudocode
-VendorValidator.validateVendorApplication(applicationId: String, documentsPath: String)
-BEGIN
-    application = Database.getVendorApplication(applicationId)
-    IF application IS NULL THEN
-        RETURN ValidationResult.failure("Application not found")
-    END IF
+```
+Function: Validate Vendor Application
+Begin
+    Find application in database
+    If application not found
+        Return error "Application not found"
     
-    documents = PDFProcessor.extractDocuments(documentsPath)
-    validationScore = 0
-    validationDetails = new ValidationReport()
+    Extract information from submitted documents
+    Set initial score to zero
+    Create validation report
     
-    // Financial Stability Check
-    bankStatements = documents.getBankStatements()
-    financialScore = analyzeFinancialStability(bankStatements)
-    validationScore = validationScore + (financialScore * 0.4)
-    validationDetails.financialStability = financialScore
+    Check financial documents
+    Calculate financial stability score
+    Add weighted financial score to total score
     
-    // Reputation and Experience Check
-    businessCertificates = documents.getBusinessCertificates()
-    reputationScore = analyzeBusinessReputation(businessCertificates)
-    validationScore = validationScore + (reputationScore * 0.3)
-    validationDetails.businessReputation = reputationScore
+    Check business history documents
+    Calculate reputation and experience score
+    Add weighted reputation score to total score
     
-    // Regulatory Compliance Check
-    complianceDocuments = documents.getComplianceDocuments()
-    complianceScore = analyzeRegulatoryCompliance(complianceDocuments)
-    validationScore = validationScore + (complianceScore * 0.3)
-    validationDetails.regulatoryCompliance = complianceScore
+    Check compliance documents
+    Calculate regulatory compliance score
+    Add weighted compliance score to total score
     
-    application.validationScore = validationScore
-    application.validationDetails = validationDetails
+    Save total validation score with application
+    Save detailed validation report
     
-    IF validationScore >= 75 THEN
-        application.status = "approved_for_inspection"
-        schedulePhysicalInspection(application)
-    ELSE IF validationScore >= 50 THEN
-        application.status = "requires_review"
-    ELSE
-        application.status = "rejected"
-    END IF
+    If total score is 75 or higher
+        Set status to "approved for inspection"
+        Schedule physical inspection
+    If total score is between 50 and 74
+        Set status to "requires review"
+    If total score is below 50
+        Set status to "rejected"
     
-    Database.updateVendorApplication(application)
-    EventBus.publish("VendorValidationCompleted", application)
-    
-    RETURN ValidationResult.success(application)
-END
+    Save updated application to database
+    Send notification about completed validation
+    Return success with validation results
+End
 ```
 
 **5.1.6 Communication and Chat Objects**
 
 **ChatBotService Object**
 
-The ChatBotService provides AI-powered customer support and query resolution.
+The ChatBotService provides automated support and query resolution.
 
-```pseudocode
-ChatBotService.processUserQuery(userId: String, message: String, context: String)
-BEGIN
-    user = Database.getUser(userId)
-    userRole = user.roleId
-    
-    // Preprocess the message
-    cleanedMessage = preprocessMessage(message)
-    intent = classifyIntent(cleanedMessage, userRole)
-    entities = extractEntities(cleanedMessage)
-    
-    response = new ChatResponse()
-    
-    SWITCH intent
-        CASE "order_status_inquiry":
-            orderInfo = getOrderInformation(entities.orderId, userId)
-            response.message = generateOrderStatusResponse(orderInfo)
-            response.actions = ["view_order_details", "track_shipment"]
-            
-        CASE "inventory_inquiry":
-            IF userRole IN ["production_manager", "admin"] THEN
-                inventoryInfo = getInventoryInformation(entities.productId)
-                response.message = generateInventoryResponse(inventoryInfo)
-                response.actions = ["view_inventory_details", "create_reorder"]
-            ELSE
-                response.message = "You don't have permission to access inventory information."
-            END IF
-            
-        CASE "general_help":
-            response.message = generateHelpResponse(userRole)
-            response.actions = getAvailableActions(userRole)
-            
-        CASE "escalate_to_human":
-            humanAgent = findAvailableAgent(userRole)
-            IF humanAgent IS NOT NULL THEN
-                createHumanConversation(userId, humanAgent.id, message)
-                response.message = "I've connected you with " + humanAgent.name + ". They will assist you shortly."
-            ELSE
-                response.message = "All agents are currently busy. I've created a support ticket for you."
-                createSupportTicket(userId, message, context)
-            END IF
-            
-        DEFAULT:
-            response.message = "I'm not sure how to help with that. Could you please rephrase your question?"
-            response.suggestions = getSuggestedQuestions(userRole)
-    END SWITCH
-    
-    // Log the interaction for learning purposes
-    Database.logChatInteraction(userId, message, intent, response)
-    
-    RETURN response
-END
 ```
+Function: Process User Question
+Begin
+    Get user information and role
+    
+    Clean and standardize user message
+    Determine what user is asking about
+    Extract important details from question
+    
+    Create empty response
+    
+    Based on question type:
+        Case "asking about order status":
+            Get order information for user
+            Create response about order status
+            Add buttons for order details and tracking
+            
+        Case "asking about inventory":
+            If user role allows inventory access
+                Get inventory information
+                Create response with inventory details
+                Add buttons for details and reordering
+            Else
+                Create "no permission" response
+            
+        Case "asking for general help":
+            Create helpful response based on user role
+            Add buttons for common actions
+            
+        Case "asking for human assistance":
+            Find available support person
+            If support person available
+                Connect user with support person
+                Create response about connection
+            Else
+                Create support ticket
+                Create response about ticket creation
+            
+        Default case:
+            Create "I don't understand" response
+            Add suggestions for better questions
+    
+    Save conversation for improvement purposes
+    Return response to user
+End
+```
+
+This component design provides a comprehensive foundation for implementing the Aktina Supply Chain Management System with clear interfaces, robust error handling, and appropriate separation of concerns across different functional domains.
 
 This component design provides a comprehensive foundation for implementing the Aktina Supply Chain Management System with clear interfaces, robust error handling, and appropriate separation of concerns across different functional domains.
 
