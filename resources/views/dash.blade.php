@@ -1,15 +1,3 @@
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
-<h1>This is where the dashboard will be</h1>
-</body>
-</html>
 <!--
 =========================================================
 * Soft UI Dashboard Tailwind - v1.0.5
@@ -24,48 +12,109 @@
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 -->
+
+<!--
+    DASHBOARD TEMPLATE OVERVIEW
+    ==========================
+    This is a comprehensive admin dashboard template built with Laravel Blade templating engine
+    Location: /resources/views/dash.blade.php
+
+    MAIN COMPONENTS STRUCTURE:
+    1. HTML HEAD - Contains meta tags, external stylesheets, and fonts
+    2. SIDEBAR NAVIGATION - Left sidebar with navigation menu items
+    3. MAIN CONTENT AREA - Dashboard content with statistics cards, charts, and tables
+    4. CONFIGURATION PANEL - Right-side settings panel for customization
+    5. FOOTER - Footer section with additional links
+    6. JAVASCRIPT - External scripts for charts, scrollbars, and interactions
+-->
+
 <!DOCTYPE html>
 <html>
 <head>
+    <!--
+        HTML HEAD SECTION
+        =================
+        Location: <head> tag
+        Purpose: Contains all external resources, meta tags, and configuration
+        Components included:
+        - Character encoding and viewport settings
+        - Page title and favicon
+        - External fonts (Open Sans from Google Fonts)
+        - Font Awesome icons for UI elements
+        - Nucleo icon sets for enhanced iconography
+        - Popper.js for tooltip positioning
+        - Main CSS stylesheet for dashboard styling
+        - Analytics tracking script (Nepcha)
+    -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- FAVICON AND APPLE TOUCH ICON - For browser tabs and mobile home screen -->
     <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png" />
     <link rel="icon" type="image/png" href="../assets/img/favicon.png" />
-    <title>Soft UI Dashboard Tailwind</title>
-    <!--     Fonts and icons     -->
+
+    <title>Dashboard</title>
+
+    <!-- EXTERNAL FONTS - Google Fonts for typography -->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
-    <!-- Font Awesome Icons -->
+
+    <!-- ICON LIBRARIES - Font Awesome and Nucleo for UI icons -->
     <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
-    <!-- Nucleo Icons -->
     <link href="../assets/css/nucleo-icons.css" rel="stylesheet" />
     <link href="../assets/css/nucleo-svg.css" rel="stylesheet" />
-    <!-- Popper -->
+
+    <!-- POPPER.JS - For tooltip and dropdown positioning -->
     <script src="https://unpkg.com/@popperjs/core@2"></script>
-    <!-- Main Styling -->
+
+    <!-- MAIN STYLESHEET - Core dashboard styling with Tailwind CSS -->
     <link href="../assets/css/soft-ui-dashboard-tailwind.css?v=1.0.5" rel="stylesheet" />
 
-    <!-- Nepcha Analytics (nepcha.com) -->
-    <!-- Nepcha is a easy-to-use web analytics. No cookies and fully compliant with GDPR, CCPA and PECR. -->
+    <!-- ANALYTICS - Web analytics tracking (GDPR compliant) -->
     <script defer data-site="YOUR_DOMAIN_HERE" src="https://api.nepcha.com/js/nepcha-analytics.js"></script>
 </head>
 
 <body class="m-0 font-sans antialiased font-normal text-base leading-default bg-gray-50 text-slate-500">
-<!-- sidenav  -->
+
+<!--
+    SIDEBAR NAVIGATION COMPONENT
+    ============================
+    Location: Left side of the dashboard
+    Purpose: Main navigation menu for the dashboard
+    Features:
+    - Collapsible sidebar for mobile devices
+    - Logo and branding section
+    - Navigation menu items with icons
+    - Account pages section
+    - Help documentation card
+    - Pro upgrade button
+    - Fixed positioning with responsive behavior
+    - Smooth animations and transitions
+-->
 <aside class="max-w-62.5 ease-nav-brand z-990 fixed inset-y-0 my-4 ml-4 block w-full -translate-x-full flex-wrap items-center justify-between overflow-y-auto rounded-2xl border-0 bg-white p-0 antialiased shadow-none transition-transform duration-200 xl:left-0 xl:translate-x-0 xl:bg-transparent">
+
+    <!-- SIDEBAR HEADER - Logo and close button -->
     <div class="h-19.5">
+        <!-- Close button for mobile - only visible on small screens -->
         <i class="absolute top-0 right-0 hidden p-4 opacity-50 cursor-pointer fas fa-times text-slate-400 xl:hidden" sidenav-close></i>
+
+        <!-- Logo and brand name -->
         <a class="block px-8 py-6 m-0 text-sm whitespace-nowrap text-slate-700" href="javascript:;" target="_blank">
             <img src="../assets/img/logo-ct.png" class="inline h-full max-w-full transition-all duration-200 ease-nav-brand max-h-8" alt="main_logo" />
             <span class="ml-1 font-semibold transition-all duration-200 ease-nav-brand">Soft UI Dashboard</span>
         </a>
     </div>
 
+    <!-- NAVIGATION DIVIDER -->
     <hr class="h-px mt-0 bg-transparent bg-gradient-to-r from-transparent via-black/40 to-transparent" />
 
+    <!-- MAIN NAVIGATION MENU -->
     <div class="items-center block w-auto max-h-screen overflow-auto h-sidenav grow basis-full">
         <ul class="flex flex-col pl-0 mb-0">
+
+            <!-- DASHBOARD MENU ITEM - Active/Current page -->
             <li class="mt-0.5 w-full">
                 <a class="py-2.7 shadow-soft-xl text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap rounded-lg bg-white px-4 font-semibold text-slate-700 transition-colors" href="../pages/dashboard.html">
+                    <!-- Dashboard icon with gradient background -->
                     <div class="bg-gradient-to-tl from-purple-700 to-pink-500 shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center xl:p-2.5">
                         <svg width="12px" height="12px" viewBox="0 0 45 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                             <title>shop</title>
@@ -91,8 +140,10 @@
                 </a>
             </li>
 
+            <!-- TABLES MENU ITEM -->
             <li class="mt-0.5 w-full">
                 <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors" href="../pages/tables.html">
+                    <!-- Tables icon -->
                     <div class="shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-white bg-center stroke-0 text-center xl:p-2.5">
                         <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                             <title>office</title>
@@ -252,15 +303,25 @@
         </ul>
     </div>
 
+    <!-- SIDEBAR FOOTER SECTION -->
     <div class="mx-4">
-        <!-- load phantom colors for card after: -->
+
+        <!-- HIDDEN COLOR CLASSES - For dynamic theme changes -->
         <p class="invisible hidden text-gray-800 text-red-500 text-red-600 after:bg-gradient-to-tl after:from-gray-900 after:to-slate-800 after:bg-gradient-to-tl after:from-blue-600 after:to-cyan-400 after:bg-gradient-to-tl after:from-red-500 after:to-yellow-400 after:bg-gradient-to-tl after:from-green-600 after:to-lime-400 after:bg-gradient-to-tl after:from-red-600 after:to-rose-400 after:bg-gradient-to-tl after:from-slate-600 after:to-slate-300 text-lime-500 text-cyan-500 text-slate-400 text-fuchsia-500"></p>
+
+        <!-- HELP/DOCUMENTATION CARD -->
         <div class="after:opacity-65 after:bg-gradient-to-tl after:from-slate-600 after:to-slate-300 relative flex min-w-0 flex-col items-center break-words rounded-2xl border-0 border-solid border-blue-900 bg-white bg-clip-border shadow-none after:absolute after:top-0 after:bottom-0 after:left-0 after:z-10 after:block after:h-full after:w-full after:rounded-2xl after:content-['']" sidenav-card>
+            <!-- Background image overlay -->
             <div class="mb-7.5 absolute h-full w-full rounded-2xl bg-cover bg-center" style="background-image: url('../assets/img/curved-images/white-curved.jpeg')"></div>
+
+            <!-- Card content -->
             <div class="relative z-20 flex-auto w-full p-4 text-left text-white">
+                <!-- Diamond icon -->
                 <div class="flex items-center justify-center w-8 h-8 mb-4 text-center bg-white bg-center rounded-lg icon shadow-soft-2xl">
                     <i class="top-0 z-10 text-transparent ni leading-none ni-diamond text-lg bg-gradient-to-tl from-slate-600 to-slate-300 bg-clip-text opacity-80" sidenav-card-icon></i>
                 </div>
+
+                <!-- Help text and documentation link -->
                 <div class="transition-all duration-200 ease-nav-brand">
                     <h6 class="mb-0 text-white">Need help?</h6>
                     <p class="mt-0 mb-4 font-semibold leading-tight text-xs">Please check our docs</p>
@@ -268,19 +329,47 @@
                 </div>
             </div>
         </div>
-        <!-- pro btn  -->
+
+        <!-- UPGRADE TO PRO BUTTON -->
         <a class="inline-block w-full px-6 py-3 my-4 font-bold text-center text-white uppercase align-middle transition-all ease-in border-0 rounded-lg select-none shadow-soft-md bg-150 bg-x-25 leading-pro text-xs bg-gradient-to-tl from-purple-700 to-pink-500 hover:shadow-soft-2xl hover:scale-102" target="_blank" href="https://www.creative-tim.com/product/soft-ui-dashboard-pro-tailwind?ref=sidebarfree">Upgrade to pro</a>
     </div>
 </aside>
 
-<!-- end sidenav -->
+<!-- END SIDEBAR NAVIGATION -->
 
+<!--
+    MAIN CONTENT AREA
+    =================
+    Location: Right side of the dashboard (main section)
+    Purpose: Contains the primary dashboard content including navbar, statistics cards, charts, and tables
+    Features:
+    - Responsive layout that adjusts to sidebar visibility
+    - Top navigation bar with breadcrumbs and user controls
+    - Statistics cards displaying key metrics
+    - Interactive charts and data visualizations
+    - Project management table
+    - Orders timeline
+    - Footer component
+-->
 <main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200">
-    <!-- Navbar -->
+
+    <!--
+        TOP NAVIGATION BAR
+        ==================
+        Location: Top of main content area
+        Purpose: Page navigation, search, and user controls
+        Components:
+        - Breadcrumb navigation
+        - Search input field
+        - User notifications dropdown
+        - Settings button
+        - Mobile sidebar toggle
+    -->
     <nav class="relative flex flex-wrap items-center justify-between px-0 py-2 mx-6 transition-all shadow-none duration-250 ease-soft-in rounded-2xl lg:flex-nowrap lg:justify-start" navbar-main navbar-scroll="true">
         <div class="flex items-center justify-between w-full px-4 py-1 mx-auto flex-wrap-inherit">
+
+            <!-- BREADCRUMB NAVIGATION -->
             <nav>
-                <!-- breadcrumb -->
                 <ol class="flex flex-wrap pt-1 mr-12 bg-transparent rounded-lg sm:mr-16">
                     <li class="leading-normal text-sm">
                         <a class="opacity-50 text-slate-700" href="javascript:;">Pages</a>
@@ -290,28 +379,36 @@
                 <h6 class="mb-0 font-bold capitalize">Dashboard</h6>
             </nav>
 
+            <!-- TOP RIGHT CONTROLS -->
             <div class="flex items-center mt-2 grow sm:mt-0 sm:mr-6 md:mr-0 lg:flex lg:basis-auto">
+
+                <!-- SEARCH INPUT FIELD -->
                 <div class="flex items-center md:ml-auto md:pr-4">
                     <div class="relative flex flex-wrap items-stretch w-full transition-all rounded-lg ease-soft">
-                <span class="text-sm ease-soft leading-5.6 absolute z-50 -ml-px flex h-full items-center whitespace-nowrap rounded-lg rounded-tr-none rounded-br-none border border-r-0 border-transparent bg-transparent py-2 px-2.5 text-center font-normal text-slate-500 transition-all">
-                  <i class="fas fa-search"></i>
-                </span>
+                        <!-- Search icon -->
+                        <span class="text-sm ease-soft leading-5.6 absolute z-50 -ml-px flex h-full items-center whitespace-nowrap rounded-lg rounded-tr-none rounded-br-none border border-r-0 border-transparent bg-transparent py-2 px-2.5 text-center font-normal text-slate-500 transition-all">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <!-- Search input -->
                         <input type="text" class="pl-8.75 text-sm focus:shadow-soft-primary-outline ease-soft w-1/100 leading-5.6 relative -ml-px block min-w-0 flex-auto rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 pr-3 text-gray-700 transition-all placeholder:text-gray-500 focus:border-fuchsia-300 focus:outline-none focus:transition-shadow" placeholder="Type here..." />
                     </div>
                 </div>
+
+                <!-- TOP RIGHT MENU -->
                 <ul class="flex flex-row justify-end pl-0 mb-0 list-none md-max:w-full">
-                    <!-- online builder btn  -->
-                    <!-- <li class="flex items-center">
-                      <a class="inline-block px-8 py-2 mb-0 mr-4 font-bold text-center uppercase align-middle transition-all bg-transparent border border-solid rounded-lg shadow-none cursor-pointer leading-pro border-fuchsia-500 ease-soft-in text-xs hover:scale-102 active:shadow-soft-xs text-fuchsia-500 hover:border-fuchsia-500 active:bg-fuchsia-500 active:hover:text-fuchsia-500 hover:text-fuchsia-500 tracking-tight-soft hover:bg-transparent hover:opacity-75 hover:shadow-none active:text-white active:hover:bg-transparent" target="_blank" href="https://www.creative-tim.com/builder/soft-ui?ref=navbar-dashboard&amp;_ga=2.76518741.1192788655.1647724933-1242940210.1644448053">Online Builder</a>
-                    </li> -->
+
+                    <!-- SIGN IN LINK -->
                     <li class="flex items-center">
                         <a href="../pages/sign-in.html" class="block px-0 py-2 font-semibold transition-all ease-nav-brand text-sm text-slate-500">
                             <i class="fa fa-user sm:mr-1"></i>
                             <span class="hidden sm:inline">Sign In</span>
                         </a>
                     </li>
+
+                    <!-- MOBILE SIDEBAR TOGGLE -->
                     <li class="flex items-center pl-4 xl:hidden">
                         <a href="javascript:;" class="block p-0 transition-all ease-nav-brand text-sm text-slate-500" sidenav-trigger>
+                            <!-- Hamburger menu icon -->
                             <div class="w-4.5 overflow-hidden">
                                 <i class="ease-soft mb-0.75 relative block h-0.5 rounded-sm bg-slate-500 transition-all"></i>
                                 <i class="ease-soft mb-0.75 relative block h-0.5 rounded-sm bg-slate-500 transition-all"></i>
@@ -319,23 +416,36 @@
                             </div>
                         </a>
                     </li>
+
+                    <!-- SETTINGS BUTTON -->
                     <li class="flex items-center px-4">
                         <a href="javascript:;" class="p-0 transition-all text-sm ease-nav-brand text-slate-500">
                             <i fixed-plugin-button-nav class="cursor-pointer fa fa-cog"></i>
-                            <!-- fixed-plugin-button-nav  -->
                         </a>
                     </li>
 
-                    <!-- notifications -->
-
+                    <!--
+                        NOTIFICATIONS DROPDOWN
+                        ======================
+                        Location: Top right corner of navbar
+                        Purpose: Display user notifications and alerts
+                        Features:
+                        - Bell icon trigger
+                        - Dropdown menu with notification items
+                        - User profile images
+                        - Timestamps for each notification
+                        - Various notification types (messages, albums, payments)
+                    -->
                     <li class="relative flex items-center pr-2">
                         <p class="hidden transform-dropdown-show"></p>
                         <a href="javascript:;" class="block p-0 transition-all text-sm ease-nav-brand text-slate-500" dropdown-trigger aria-expanded="false">
                             <i class="cursor-pointer fa fa-bell"></i>
                         </a>
 
+                        <!-- NOTIFICATION DROPDOWN MENU -->
                         <ul dropdown-menu class="text-sm transform-dropdown before:font-awesome before:leading-default before:duration-350 before:ease-soft lg:shadow-soft-3xl duration-250 min-w-44 before:sm:right-7.5 before:text-5.5 pointer-events-none absolute right-0 top-0 z-50 origin-top list-none rounded-lg border-0 border-solid border-transparent bg-white bg-clip-padding px-2 py-4 text-left text-slate-500 opacity-0 transition-all before:absolute before:right-2 before:left-auto before:top-0 before:z-50 before:inline-block before:font-normal before:text-white before:antialiased before:transition-all before:content-['\f0d8'] sm:-mr-6 lg:absolute lg:right-0 lg:left-auto lg:mt-2 lg:block lg:cursor-pointer">
-                            <!-- add show class on dropdown open js -->
+
+                            <!-- Notification Item 1 - New Message -->
                             <li class="relative mb-2">
                                 <a class="ease-soft py-1.2 clear-both block w-full whitespace-nowrap rounded-lg bg-transparent px-4 duration-300 hover:bg-gray-200 hover:text-slate-700 lg:transition-colors" href="javascript:;">
                                     <div class="flex py-1">
@@ -353,6 +463,7 @@
                                 </a>
                             </li>
 
+                            <!-- Notification Item 2 - New Album -->
                             <li class="relative mb-2">
                                 <a class="ease-soft py-1.2 clear-both block w-full whitespace-nowrap rounded-lg px-4 transition-colors duration-300 hover:bg-gray-200 hover:text-slate-700" href="javascript:;">
                                     <div class="flex py-1">
@@ -370,10 +481,12 @@
                                 </a>
                             </li>
 
+                            <!-- Notification Item 3 - Payment Completed -->
                             <li class="relative">
                                 <a class="ease-soft py-1.2 clear-both block w-full whitespace-nowrap rounded-lg px-4 transition-colors duration-300 hover:bg-gray-200 hover:text-slate-700" href="javascript:;">
                                     <div class="flex py-1">
                                         <div class="inline-flex items-center justify-center my-auto mr-4 text-white transition-all duration-200 ease-nav-brand text-sm bg-gradient-to-tl from-slate-600 to-slate-300 h-9 w-9 rounded-xl">
+                                            <!-- Credit card icon for payment notification -->
                                             <svg width="12px" height="12px" viewBox="0 0 43 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                                                 <title>credit-card</title>
                                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -405,17 +518,37 @@
         </div>
     </nav>
 
-    <!-- end Navbar -->
+    <!-- END TOP NAVIGATION BAR -->
 
-    <!-- cards -->
+    <!--
+        DASHBOARD CONTENT CONTAINER
+        ===========================
+        Location: Main content area below navigation
+        Purpose: Contains all dashboard widgets, cards, charts, and tables
+        Layout: Responsive grid system with multiple rows of content
+    -->
     <div class="w-full px-6 py-6 mx-auto">
-        <!-- row 1 -->
+
+        <!--
+            STATISTICS CARDS ROW 1
+            ======================
+            Location: Top row of dashboard content
+            Purpose: Display key performance metrics and statistics
+            Components: 4 responsive cards showing financial and user data
+            Features:
+            - Real-time data display
+            - Percentage change indicators
+            - Gradient icon backgrounds
+            - Responsive grid layout (1 column on mobile, 2 on tablet, 4 on desktop)
+        -->
         <div class="flex flex-wrap -mx-3">
-            <!-- card1 -->
+
+            <!-- STATISTICS CARD 1 - Today's Money -->
             <div class="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
                 <div class="relative flex flex-col min-w-0 break-words bg-white shadow-soft-xl rounded-2xl bg-clip-border">
                     <div class="flex-auto p-4">
                         <div class="flex flex-row -mx-3">
+                            <!-- Text content section -->
                             <div class="flex-none w-2/3 max-w-full px-3">
                                 <div>
                                     <p class="mb-0 font-sans font-semibold leading-normal text-sm">Today's Money</p>
@@ -425,6 +558,7 @@
                                     </h5>
                                 </div>
                             </div>
+                            <!-- Icon section -->
                             <div class="px-3 text-right basis-1/3">
                                 <div class="inline-block w-12 h-12 text-center rounded-lg bg-gradient-to-tl from-purple-700 to-pink-500">
                                     <i class="ni leading-none ni-money-coins text-lg relative top-3.5 text-white"></i>
@@ -435,11 +569,12 @@
                 </div>
             </div>
 
-            <!-- card2 -->
+            <!-- STATISTICS CARD 2 - Today's Users -->
             <div class="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
                 <div class="relative flex flex-col min-w-0 break-words bg-white shadow-soft-xl rounded-2xl bg-clip-border">
                     <div class="flex-auto p-4">
                         <div class="flex flex-row -mx-3">
+                            <!-- Text content section -->
                             <div class="flex-none w-2/3 max-w-full px-3">
                                 <div>
                                     <p class="mb-0 font-sans font-semibold leading-normal text-sm">Today's Users</p>
@@ -449,6 +584,7 @@
                                     </h5>
                                 </div>
                             </div>
+                            <!-- Icon section -->
                             <div class="px-3 text-right basis-1/3">
                                 <div class="inline-block w-12 h-12 text-center rounded-lg bg-gradient-to-tl from-purple-700 to-pink-500">
                                     <i class="ni leading-none ni-world text-lg relative top-3.5 text-white"></i>
@@ -459,11 +595,12 @@
                 </div>
             </div>
 
-            <!-- card3 -->
+            <!-- STATISTICS CARD 3 - New Clients -->
             <div class="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
                 <div class="relative flex flex-col min-w-0 break-words bg-white shadow-soft-xl rounded-2xl bg-clip-border">
                     <div class="flex-auto p-4">
                         <div class="flex flex-row -mx-3">
+                            <!-- Text content section -->
                             <div class="flex-none w-2/3 max-w-full px-3">
                                 <div>
                                     <p class="mb-0 font-sans font-semibold leading-normal text-sm">New Clients</p>
@@ -473,6 +610,7 @@
                                     </h5>
                                 </div>
                             </div>
+                            <!-- Icon section -->
                             <div class="px-3 text-right basis-1/3">
                                 <div class="inline-block w-12 h-12 text-center rounded-lg bg-gradient-to-tl from-purple-700 to-pink-500">
                                     <i class="ni leading-none ni-paper-diploma text-lg relative top-3.5 text-white"></i>
@@ -483,11 +621,12 @@
                 </div>
             </div>
 
-            <!-- card4 -->
+            <!-- STATISTICS CARD 4 - Sales -->
             <div class="w-full max-w-full px-3 sm:w-1/2 sm:flex-none xl:w-1/4">
                 <div class="relative flex flex-col min-w-0 break-words bg-white shadow-soft-xl rounded-2xl bg-clip-border">
                     <div class="flex-auto p-4">
                         <div class="flex flex-row -mx-3">
+                            <!-- Text content section -->
                             <div class="flex-none w-2/3 max-w-full px-3">
                                 <div>
                                     <p class="mb-0 font-sans font-semibold leading-normal text-sm">Sales</p>
@@ -497,6 +636,7 @@
                                     </h5>
                                 </div>
                             </div>
+                            <!-- Icon section -->
                             <div class="px-3 text-right basis-1/3">
                                 <div class="inline-block w-12 h-12 text-center rounded-lg bg-gradient-to-tl from-purple-700 to-pink-500">
                                     <i class="ni leading-none ni-cart text-lg relative top-3.5 text-white"></i>
@@ -508,12 +648,24 @@
             </div>
         </div>
 
-        <!-- cards row 2 -->
+        <!--
+            FEATURE CARDS ROW 2
+            ===================
+            Location: Second row of dashboard content
+            Purpose: Showcase main features and call-to-action content
+            Components:
+            - Left card: "Built by developers" feature with rocket illustration
+            - Right card: "Work with the rockets" motivational content with background image
+            Layout: Responsive (stacked on mobile, side-by-side on desktop)
+        -->
         <div class="flex flex-wrap mt-6 -mx-3">
+
+            <!-- LEFT FEATURE CARD - Soft UI Dashboard Info -->
             <div class="w-full px-3 mb-6 lg:mb-0 lg:w-7/12 lg:flex-none">
                 <div class="relative flex flex-col min-w-0 break-words bg-white shadow-soft-xl rounded-2xl bg-clip-border">
                     <div class="flex-auto p-4">
                         <div class="flex flex-wrap -mx-3">
+                            <!-- Text content section -->
                             <div class="max-w-full px-3 lg:w-1/2 lg:flex-none">
                                 <div class="flex flex-col h-full">
                                     <p class="pt-2 mb-1 font-semibold">Built by developers</p>
@@ -525,9 +677,12 @@
                                     </a>
                                 </div>
                             </div>
+                            <!-- Illustration section -->
                             <div class="max-w-full px-3 mt-12 ml-auto text-center lg:mt-0 lg:w-5/12 lg:flex-none">
                                 <div class="h-full bg-gradient-to-tl from-purple-700 to-pink-500 rounded-xl">
+                                    <!-- Decorative waves background -->
                                     <img src="../assets/img/shapes/waves-white.svg" class="absolute top-0 hidden w-1/2 h-full lg:block" alt="waves" />
+                                    <!-- Rocket illustration -->
                                     <div class="relative flex items-center justify-center h-full">
                                         <img class="relative z-20 w-full pt-6" src="../assets/img/illustrations/rocket-white.png" alt="rocket" />
                                     </div>
@@ -537,10 +692,15 @@
                     </div>
                 </div>
             </div>
+
+            <!-- RIGHT FEATURE CARD - Motivational Content -->
             <div class="w-full max-w-full px-3 lg:w-5/12 lg:flex-none">
                 <div class="border-black/12.5 shadow-soft-xl relative flex h-full min-w-0 flex-col break-words rounded-2xl border-0 border-solid bg-white bg-clip-border p-4">
+                    <!-- Background image with overlay -->
                     <div class="relative h-full overflow-hidden bg-cover rounded-xl" style="background-image: url('../assets/img/ivancik.jpg')">
+                        <!-- Dark overlay for text readability -->
                         <span class="absolute top-0 left-0 w-full h-full bg-center bg-cover bg-gradient-to-tl from-gray-900 to-slate-800 opacity-80"></span>
+                        <!-- Content overlay -->
                         <div class="relative z-10 flex flex-col flex-auto h-full p-4">
                             <h5 class="pt-2 mb-6 font-bold text-white">Work with the rockets</h5>
                             <p class="text-white">Wealth creation is an evolutionarily recent positive-sum game. It is all about who take the opportunity first.</p>
@@ -554,23 +714,46 @@
             </div>
         </div>
 
-        <!-- cards row 3 -->
-
+        <!--
+            CHARTS AND ANALYTICS ROW 3
+            ===========================
+            Location: Third row of dashboard content
+            Purpose: Data visualization and analytics display
+            Components:
+            - Left: Active Users chart with progress bars and statistics
+            - Right: Sales Overview line chart with trend analysis
+            Features:
+            - Interactive charts using Chart.js library
+            - Progress indicators with different colors
+            - Performance metrics and growth indicators
+            - Canvas elements for chart rendering
+        -->
         <div class="flex flex-wrap mt-6 -mx-3">
+
+            <!-- LEFT CHART CARD - Active Users Analytics -->
             <div class="w-full max-w-full px-3 mt-0 mb-6 lg:mb-0 lg:w-5/12 lg:flex-none">
                 <div class="border-black/12.5 shadow-soft-xl relative z-20 flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid bg-white bg-clip-border">
                     <div class="flex-auto p-4">
+                        <!-- Bar Chart Container -->
                         <div class="py-4 pr-1 mb-4 bg-gradient-to-tl from-gray-900 to-slate-800 rounded-xl">
                             <div>
+                                <!-- Chart.js Canvas Element -->
                                 <canvas id="chart-bars" height="170"></canvas>
                             </div>
                         </div>
+
+                        <!-- Chart Header -->
                         <h6 class="mt-6 mb-0 ml-2">Active Users</h6>
                         <p class="ml-2 leading-normal text-sm">(<span class="font-bold">+23%</span>) than last week</p>
+
+                        <!-- User Analytics Grid -->
                         <div class="w-full px-6 mx-auto max-w-screen-2xl rounded-xl">
                             <div class="flex flex-wrap mt-0 -mx-3">
+
+                                <!-- Users Metric -->
                                 <div class="flex-none w-1/4 max-w-full py-4 pl-0 pr-3 mt-0">
                                     <div class="flex mb-2">
+                                        <!-- Document icon -->
                                         <div class="flex items-center justify-center w-5 h-5 mr-2 text-center bg-center rounded fill-current shadow-soft-2xl bg-gradient-to-tl from-purple-700 to-pink-500 text-neutral-900">
                                             <svg width="10px" height="10px" viewBox="0 0 40 44" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                                                 <title>document</title>
@@ -589,12 +772,16 @@
                                         <p class="mt-1 mb-0 font-semibold leading-tight text-xs">Users</p>
                                     </div>
                                     <h4 class="font-bold">36K</h4>
+                                    <!-- Progress bar for Users -->
                                     <div class="text-xs h-0.75 flex w-3/4 overflow-visible rounded-lg bg-gray-200">
                                         <div class="duration-600 ease-soft -mt-0.38 -ml-px flex h-1.5 w-3/5 flex-col justify-center overflow-hidden whitespace-nowrap rounded-lg bg-slate-700 text-center text-white transition-all" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
                                     </div>
                                 </div>
+
+                                <!-- Clicks Metric -->
                                 <div class="flex-none w-1/4 max-w-full py-4 pl-0 pr-3 mt-0">
                                     <div class="flex mb-2">
+                                        <!-- Spaceship icon -->
                                         <div class="flex items-center justify-center w-5 h-5 mr-2 text-center bg-center rounded fill-current shadow-soft-2xl bg-gradient-to-tl from-blue-600 to-cyan-400 text-neutral-900">
                                             <svg width="10px" height="10px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                                                 <title>spaceship</title>
@@ -602,10 +789,7 @@
                                                     <g transform="translate(-1720.000000, -592.000000)" fill="#FFFFFF" fill-rule="nonzero">
                                                         <g transform="translate(1716.000000, 291.000000)">
                                                             <g transform="translate(4.000000, 301.000000)">
-                                                                <path
-                                                                    class="color-background"
-                                                                    d="M39.3,0.706666667 C38.9660984,0.370464027 38.5048767,0.192278529 38.0316667,0.216666667 C14.6516667,1.43666667 6.015,22.2633333 5.93166667,22.4733333 C5.68236407,23.0926189 5.82664679,23.8009159 6.29833333,24.2733333 L15.7266667,33.7016667 C16.2013871,34.1756798 16.9140329,34.3188658 17.535,34.065 C17.7433333,33.98 38.4583333,25.2466667 39.7816667,1.97666667 C39.8087196,1.50414529 39.6335979,1.04240574 39.3,0.706666667 Z M25.69,19.0233333 C24.7367525,19.9768687 23.3029475,20.2622391 22.0572426,19.7463614 C20.8115377,19.2304837 19.9992882,18.0149658 19.9992882,16.6666667 C19.9992882,15.3183676 20.8115377,14.1028496 22.0572426,13.5869719 C23.3029475,13.0710943 24.7367525,13.3564646 25.69,14.31 C26.9912731,15.6116662 26.9912731,17.7216672 25.69,19.0233333 L25.69,19.0233333 Z"
-                                                                ></path>
+                                                                <path class="color-background" d="M39.3,0.706666667 C38.9660984,0.370464027 38.5048767,0.192278529 38.0316667,0.216666667 C14.6516667,1.43666667 6.015,22.2633333 5.93166667,22.4733333 C5.68236407,23.0926189 5.82664679,23.8009159 6.29833333,24.2733333 L15.7266667,33.7016667 C16.2013871,34.1756798 16.9140329,34.3188658 17.535,34.065 C17.7433333,33.98 38.4583333,25.2466667 39.7816667,1.97666667 C39.8087196,1.50414529 39.6335979,1.04240574 39.3,0.706666667 Z M25.69,19.0233333 C24.7367525,19.9768687 23.3029475,20.2622391 22.0572426,19.7463614 C20.8115377,19.2304837 19.9992882,18.0149658 19.9992882,16.6666667 C19.9992882,15.3183676 20.8115377,14.1028496 22.0572426,13.5869719 C23.3029475,13.0710943 24.7367525,13.3564646 25.69,14.31 C26.9912731,15.6116662 26.9912731,17.7216672 25.69,19.0233333 L25.69,19.0233333 Z"></path>
                                                                 <path class="color-background" d="M1.855,31.4066667 C3.05106558,30.2024182 4.79973884,29.7296005 6.43969145,30.1670277 C8.07964407,30.6044549 9.36054508,31.8853559 9.7979723,33.5253085 C10.2353995,35.1652612 9.76258177,36.9139344 8.55833333,38.11 C6.70666667,39.9616667 0,40 0,40 C0,40 0,33.2566667 1.855,31.4066667 Z"></path>
                                                                 <path class="color-background" d="M17.2616667,3.90166667 C12.4943643,3.07192755 7.62174065,4.61673894 4.20333333,8.04166667 C3.31200265,8.94126033 2.53706177,9.94913142 1.89666667,11.0416667 C1.5109569,11.6966059 1.61721591,12.5295394 2.155,13.0666667 L5.47,16.3833333 C8.55036617,11.4946947 12.5559074,7.25476565 17.2616667,3.90166667 L17.2616667,3.90166667 Z" opacity="0.598539807"></path>
                                                                 <path class="color-background" d="M36.0983333,22.7383333 C36.9280725,27.5056357 35.3832611,32.3782594 31.9583333,35.7966667 C31.0587397,36.6879974 30.0508686,37.4629382 28.9583333,38.1033333 C28.3033941,38.4890431 27.4704606,38.3827841 26.9333333,37.845 L23.6166667,34.53 C28.5053053,31.4496338 32.7452344,27.4440926 36.0983333,22.7383333 L36.0983333,22.7383333 Z" opacity="0.598539807"></path>
@@ -1116,39 +1300,74 @@
             </div>
         </div>
 
-       <!-- footer goes here-->
+       <!--
+           FOOTER COMPONENT
+           ================
+           Location: Bottom of main content area
+           Purpose: Display footer information and links
+           Component: Laravel Blade component (x-footer)
+           Features:
+           - Reusable component across multiple pages
+           - Customizable content through slots
+           - Located in resources/views/components/footer.blade.php
+           - Can include copyright, links, social media, etc.
+       -->
         <x-footer>
             hello
         </x-footer>
     </div>
-    <!-- end cards -->
+    <!-- END DASHBOARD CONTENT CONTAINER -->
 </main>
+
+<!--
+    CONFIGURATION PANEL
+    ====================
+    Location: Fixed panel on the right side of the screen
+    Purpose: Dashboard customization and theme settings
+    Features:
+    - Sidebar color customization
+    - Navigation type selection (transparent/white)
+    - Navbar position toggle (fixed/static)
+    - External links to documentation and pro version
+    - Social sharing buttons
+    - GitHub star button integration
+    Visibility: Can be toggled on/off via settings button
+-->
 <div fixed-plugin>
+    <!-- SETTINGS TOGGLE BUTTON -->
     <a fixed-plugin-button class="bottom-7.5 right-7.5 text-xl z-990 shadow-soft-lg rounded-circle fixed cursor-pointer bg-white px-4 py-2 text-slate-700">
         <i class="py-2 pointer-events-none fa fa-cog"> </i>
     </a>
-    <!-- -right-90 in loc de 0-->
+
+    <!-- CONFIGURATION PANEL CONTENT -->
     <div fixed-plugin-card class="z-sticky shadow-soft-3xl w-90 ease-soft -right-90 fixed top-0 left-auto flex h-full min-w-0 flex-col break-words rounded-none border-0 bg-white bg-clip-border px-2.5 duration-200">
+
+        <!-- Panel Header -->
         <div class="px-6 pt-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
             <div class="float-left">
                 <h5 class="mt-4 mb-0">Soft UI Configurator</h5>
                 <p>See our dashboard options.</p>
             </div>
             <div class="float-right mt-6">
+                <!-- Close button -->
                 <button fixed-plugin-close-button class="inline-block p-0 mb-4 font-bold text-center uppercase align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer hover:scale-102 leading-pro text-xs ease-soft-in tracking-tight-soft bg-150 bg-x-25 active:opacity-85 text-slate-700">
                     <i class="fa fa-close"></i>
                 </button>
             </div>
-            <!-- End Toggle Button -->
         </div>
+
         <hr class="h-px mx-0 my-1 bg-transparent bg-gradient-to-r from-transparent via-black/40 to-transparent" />
+
+        <!-- Configuration Options -->
         <div class="flex-auto p-6 pt-0 sm:pt-4">
-            <!-- Sidebar Backgrounds -->
+
+            <!-- Sidebar Color Options -->
             <div>
                 <h6 class="mb-0">Sidebar Colors</h6>
             </div>
             <a href="javascript:void(0)">
                 <div class="my-2 text-left" sidenav-colors>
+                    <!-- Color selection buttons with different gradient options -->
                     <span class="text-xs rounded-circle h-5.75 mr-1.25 w-5.75 ease-soft-in-out bg-gradient-to-tl from-purple-700 to-pink-500 relative inline-block cursor-pointer whitespace-nowrap border border-solid border-slate-700 text-center align-baseline font-bold uppercase leading-none text-white transition-all duration-200 hover:border-slate-700" active-color data-color-from="purple-700" data-color-to="pink-500" onclick="sidebarColor(this)"></span>
                     <span class="text-xs rounded-circle h-5.75 mr-1.25 w-5.75 ease-soft-in-out bg-gradient-to-tl from-gray-900 to-slate-800 relative inline-block cursor-pointer whitespace-nowrap border border-solid border-white text-center align-baseline font-bold uppercase leading-none text-white transition-all duration-200 hover:border-slate-700" data-color-from="gray-900" data-color-to="slate-800" onclick="sidebarColor(this)"></span>
                     <span class="text-xs rounded-circle h-5.75 mr-1.25 w-5.75 ease-soft-in-out bg-gradient-to-tl from-blue-600 to-cyan-400 relative inline-block cursor-pointer whitespace-nowrap border border-solid border-white text-center align-baseline font-bold uppercase leading-none text-white transition-all duration-200 hover:border-slate-700" data-color-from="blue-600" data-color-to="cyan-400" onclick="sidebarColor(this)"></span>
@@ -1157,42 +1376,84 @@
                     <span class="text-xs rounded-circle h-5.75 mr-1.25 w-5.75 ease-soft-in-out bg-gradient-to-tl from-red-600 to-rose-400 relative inline-block cursor-pointer whitespace-nowrap border border-solid border-white text-center align-baseline font-bold uppercase leading-none text-white transition-all duration-200 hover:border-slate-700" data-color-from="red-600" data-color-to="rose-400" onclick="sidebarColor(this)"></span>
                 </div>
             </a>
-            <!-- Sidenav Type -->
+
+            <!-- Sidebar Type Selection -->
             <div class="mt-4">
                 <h6 class="mb-0">Sidenav Type</h6>
                 <p class="leading-normal text-sm">Choose between 2 different sidenav types.</p>
             </div>
             <div class="flex">
+                <!-- Transparent style button -->
                 <button transparent-style-btn class="inline-block w-full px-4 py-3 mb-2 font-bold text-center text-white uppercase align-middle transition-all border border-transparent border-solid rounded-lg cursor-pointer xl-max:cursor-not-allowed xl-max:opacity-65 xl-max:pointer-events-none xl-max:bg-gradient-to-tl xl-max:from-purple-700 xl-max:to-pink-500 xl-max:text-white xl-max:border-0 hover:scale-102 hover:shadow-soft-xs active:opacity-85 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-purple-700 to-pink-500 bg-fuchsia-500 hover:border-fuchsia-500" data-class="bg-transparent" active-style>Transparent</button>
+                <!-- White style button -->
                 <button white-style-btn class="inline-block w-full px-4 py-3 mb-2 ml-2 font-bold text-center uppercase align-middle transition-all bg-transparent border border-solid rounded-lg cursor-pointer xl-max:cursor-not-allowed xl-max:opacity-65 xl-max:pointer-events-none xl-max:bg-gradient-to-tl xl-max:from-purple-700 xl-max:to-pink-500 xl-max:text-white xl-max:border-0 hover:scale-102 hover:shadow-soft-xs active:opacity-85 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 border-fuchsia-500 bg-none text-fuchsia-500 hover:border-fuchsia-500" data-class="bg-white">White</button>
             </div>
             <p class="block mt-2 leading-normal text-sm xl:hidden">You can change the sidenav type just on desktop view.</p>
-            <!-- Navbar Fixed -->
+
+            <!-- Navbar Fixed Toggle -->
             <div class="mt-4">
                 <h6 class="mb-0">Navbar Fixed</h6>
             </div>
             <div class="min-h-6 mb-0.5 block pl-0">
                 <input navbarFixed class="rounded-10 duration-250 ease-soft-in-out after:rounded-circle after:shadow-soft-2xl after:duration-250 checked:after:translate-x-5.25 h-5 relative float-left mt-1 ml-auto w-10 cursor-pointer appearance-none border border-solid border-gray-200 bg-slate-800/10 bg-none bg-contain bg-left bg-no-repeat align-top transition-all after:absolute after:top-px after:h-4 after:w-4 after:translate-x-px after:bg-white after:content-[''] checked:border-slate-800/95 checked:bg-slate-800/95 checked:bg-none checked:bg-right" type="checkbox" />
             </div>
+
             <hr class="h-px bg-transparent bg-gradient-to-r from-transparent via-black/40 to-transparent sm:my-6" />
+
+            <!-- External Links and Actions -->
+            <!-- Free Download Button -->
             <a class="inline-block w-full px-6 py-3 mb-4 font-bold text-center text-white uppercase align-middle transition-all bg-transparent border-0 rounded-lg cursor-pointer leading-pro text-xs ease-soft-in hover:shadow-soft-xs hover:scale-102 active:opacity-85 tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gradient-to-tl from-gray-900 to-slate-800" href="https://www.creative-tim.com/product/soft-ui-dashboard-tailwind" target="_blank">Free Download</a>
+
+            <!-- Documentation Link -->
             <a class="inline-block w-full px-6 py-3 mb-4 font-bold text-center uppercase align-middle transition-all bg-transparent border border-solid rounded-lg shadow-none cursor-pointer active:shadow-soft-xs hover:scale-102 active:opacity-85 leading-pro text-xs ease-soft-in tracking-tight-soft bg-150 bg-x-25 border-slate-700 text-slate-700 hover:bg-transparent hover:text-slate-700 hover:shadow-none active:bg-slate-700 active:text-white active:hover:bg-transparent active:hover:text-slate-700 active:hover:shadow-none" href="https://www.creative-tim.com/learning-lab/tailwind/html/quick-start/soft-ui-dashboard/" target="_blank">View documentation</a>
+
+            <!-- Social Sharing Section -->
             <div class="w-full text-center">
+                <!-- GitHub Star Button -->
                 <a class="github-button" href="https://github.com/creativetimofficial/soft-ui-dashboard-tailwind" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star creativetimofficial/soft-ui-dashboard on GitHub">Star</a>
+
                 <h6 class="mt-4">Thank you for sharing!</h6>
+
+                <!-- Twitter Share Button -->
                 <a href="https://twitter.com/intent/tweet?text=Check%20Soft%20UI%20Dashboard%20Tailwind%20made%20by%20%40CreativeTim&hashtags=webdesign,dashboard,tailwindcss&amp;url=https%3A%2F%2Fwww.creative-tim.com%2Fproduct%2Fsoft-ui-dashboard-tailwind" class="inline-block px-6 py-3 mb-0 mr-2 font-bold text-center text-white uppercase align-middle transition-all border-0 rounded-lg cursor-pointer hover:shadow-soft-xs hover:scale-102 active:opacity-85 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 me-2 border-slate-700 bg-slate-700" target="_blank"> <i class="mr-1 fab fa-twitter"></i> Tweet </a>
+
+                <!-- Facebook Share Button -->
                 <a href="https://www.facebook.com/sharer/sharer.php?u=https://www.creative-tim.com/product/soft-ui-dashboard-tailwind" class="inline-block px-6 py-3 mb-0 mr-2 font-bold text-center text-white uppercase align-middle transition-all border-0 rounded-lg cursor-pointer hover:shadow-soft-xs hover:scale-102 active:opacity-85 leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 me-2 border-slate-700 bg-slate-700" target="_blank"> <i class="mr-1 fab fa-facebook-square"></i> Share </a>
             </div>
         </div>
     </div>
 </div>
+
+<!-- END CONFIGURATION PANEL -->
 </body>
-<!-- plugin for charts  -->
+
+<!--
+    EXTERNAL JAVASCRIPT LIBRARIES
+    ==============================
+    Location: Bottom of HTML document for optimal page loading
+    Purpose: Enhanced functionality and interactive features
+    Libraries included:
+    - Chart.js: For rendering interactive charts and graphs
+    - Perfect Scrollbar: For custom scrollbars with smooth scrolling
+    - GitHub Buttons: For social proof and GitHub integration
+    - Main Dashboard Script: Core functionality and theme management
+
+    Loading Strategy:
+    - async defer: Non-blocking script loading for better performance
+    - Scripts load after HTML parsing is complete
+    - Ensures proper DOM availability before script execution
+-->
+
+<!-- Chart.js Library - For rendering bar charts, line charts, and other data visualizations -->
 <script src="../assets/js/plugins/chartjs.min.js" async></script>
-<!-- plugin for scrollbar  -->
+
+<!-- Perfect Scrollbar - For enhanced scrollbar appearance and behavior -->
 <script src="../assets/js/plugins/perfect-scrollbar.min.js" async></script>
-<!-- github button -->
+
+<!-- GitHub Buttons - For displaying GitHub star/fork buttons with live counts -->
 <script async defer src="https://buttons.github.io/buttons.js"></script>
-<!-- main script file  -->
+
+<!-- Main Dashboard Script - Core functionality including theme switching, navigation, and interactions -->
 <script src="../assets/js/soft-ui-dashboard-tailwind.js?v=1.0.5" async></script>
+
 </html>
