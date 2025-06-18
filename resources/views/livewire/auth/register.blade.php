@@ -74,7 +74,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 wire:model="role"
                 id="role"
                 required
-                class="mt-1 block w-full text-zinc-900 dark:text-white h-12 px-4 py-3 rounded-md border-zinc-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-zinc-700 dark:bg-zinc-800"
+                class="mt-1 block w-full text-zinc-700 dark:text-zinc-300 h-12 px-4 py-3 rounded-md border-zinc-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-zinc-700 dark:bg-zinc-800"
             >
                 <option value="" disabled selected>{{ __('Select a role') }}</option>
                 <option value="Admin">{{ __('Admin') }}</option>
