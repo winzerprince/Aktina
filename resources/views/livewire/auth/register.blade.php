@@ -11,6 +11,7 @@ use Livewire\Volt\Component;
 new #[Layout('components.layouts.auth')] class extends Component {
     public string $name = '';
     public string $email = '';
+    public string $role = '';
     public string $password = '';
     public string $password_confirmation = '';
 
@@ -22,12 +23,14 @@ new #[Layout('components.layouts.auth')] class extends Component {
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'role' => ['required', 'string', 'in:Admin,Production Manager,HR Manager,Vendor,Retailer,Supplier'],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
+        $user = User::create($validated);
 
-        event(new Registered(($user = User::create($validated))));
+        event(new Registered(($user )));
 
         Auth::login($user);
 
@@ -62,6 +65,28 @@ new #[Layout('components.layouts.auth')] class extends Component {
             autocomplete="email"
             placeholder="email@example.com"
         />
+        <!-- Role Selection -->
+        <div class="mt-4">
+            <label for="role" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                {{ __('Select your role') }}
+            </label>
+            <select
+                wire:model="role"
+                id="role"
+                required
+                class="mt-1 block w-full text-zinc-900 dark:text-white h-12 px-4 py-3 rounded-md border-zinc-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-zinc-700 dark:bg-zinc-800"
+            >
+                <option value="" disabled selected>{{ __('Select a role') }}</option>
+                <option value="Admin">{{ __('Admin') }}</option>
+                <option value="Production Manager">{{ __('Production Manager') }}</option>
+                <option value="HR Manager">{{ __('HR Manager') }}</option>
+                <option value="Vendor">{{ __('Vendor') }}</option>
+                <option value="Retailer">{{ __('Retailer') }}</option>
+                <option value="Supplier">{{ __('Supplier') }}</option>
+            </select>
+            @error('role') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
+        </div>
+
 
         <!-- Password -->
         <flux:input
