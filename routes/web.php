@@ -19,6 +19,23 @@ Route::view('stocks', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('stocks');
 
+Route::view('sales', 'dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('sales');
+
+Route::view('products', 'dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('products');
+
+Route::view('invoices', 'dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('invoices');
+
+Route::view('settings', 'dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('settings');
+
+
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 

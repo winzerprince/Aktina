@@ -21,19 +21,23 @@
                 <flux:navlist.group class="grid">
                     <flux:navlist.item :href="route('orders')" :current="request()->routeIs('orders')" wire:navigate>{{ __('Orders') }}</flux:navlist.item> 
                     <flux:navlist.item :href="route('stocks')" :current="request()->routeIs('stocks')" wire:navigate>{{ __('Stocks') }}</flux:navlist.item>
+                    <flux:navlist.item :href="route('sales')" :current="request()->routeIs('sales')" wire:navigate>{{ __('Sales') }}</flux:navlist.item>
+                    <flux:navlist.item :href="route('products')" :current="request()->routeIs('products')" wire:navigate>{{ __('Products') }}</flux:navlist.item>
+                    <flux:navlist.item :href="route('invoices')" :current="request()->routeIs('invoices')" wire:navigate>{{ __('Invoices') }}</flux:navlist.item>
+                    <flux:navlist.item :href="route('settings')" :current="request()->routeIs('settings')" wire:navigate>{{ __('Settings') }}</flux:navlist.item>
                 </flux:navlist.group> 
             </flux:navlist>
 
             <flux:spacer />
 
             <flux:navlist variant="outline">
-                <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
+                <!--<flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
                 {{ __('Repository') }}
                 </flux:navlist.item>
 
                 <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
                 {{ __('Documentation') }}
-                </flux:navlist.item>
+                </flux:navlist.item>-->
             </flux:navlist>
 
             <!-- Desktop User Menu -->
