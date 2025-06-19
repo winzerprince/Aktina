@@ -65,7 +65,7 @@
                         <flux:navlist.item :href="route('vendor.order_management')" :current="request()->routeIs('vendor.order_management')" wire:navigate>
                             {{ __('Order Management') }}
                         </flux:navlist.item>
-                        <flux:navlist.item :href="route('vendor.AI_assistant')" :current="request()->routeIs('vendor.AI_assistant')" wire:navigate>
+                        <flux:navlist.item :href="route('vendor.AI_assistant')" :current="request()->routeIs('vendor.ai_assistant')" wire:navigate>
                             {{ __('AI Assistant') }}
                         </flux:navlist.item>
                     </flux:navlist.group>
@@ -91,7 +91,7 @@
                         <flux:navlist.item :href="route('hr_manager.workforce_analytics')" :current="request()->routeIs('hr_manager.workforce_analytics')" wire:navigate>
                             {{ __('Workforce Analytics') }}
                         </flux:navlist.item>
-                        <flux:navlist.item :href="route('hr_manager.AI_assistant')" :current="request()->routeIs('hr_manager.AI_assistant')" wire:navigate>
+                        <flux:navlist.item :href="route('hr_manager.AI_assistant')" :current="request()->routeIs('hr_manager.ai_assistant')" wire:navigate>
                             {{ __('AI Assistant') }}
                         </flux:navlist.item>
                         <flux:navlist.item :href="route('hr_manager.staff_performance')" :current="request()->routeIs('hr_manager.staff_performance')" wire:navigate>
