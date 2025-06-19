@@ -35,6 +35,38 @@ Route::view('settings', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('settings');
 
+Route::view('retailer/dashboard', 'retailer.dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('retailer.dashboard');
+
+Route::view('admin/dashboard', 'admin.dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('admin.dashboard');
+
+Route::view('retailer/feedback', 'retailer.feedback')
+    ->middleware(['auth', 'verified'])
+    ->name('retailer.feedback');
+
+Route::view('production_manager/dashboard', 'production_manager.dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('production_manager.dashboard');
+
+Route::view('hr_manager/dashboard', 'hr_manager.dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('hr_manager.dashboard');
+
+Route::view('supplier/dashboard', 'supplier.dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('supplier.dashboard');
+
+Route::view('vendor/dashboard', 'vendor.dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('vendor.dashboard');
+
+Route::view('access-denied', 'access_denied')
+    ->middleware(['auth', 'verified'])
+    ->name('access.denied');
+
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');

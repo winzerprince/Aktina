@@ -28,6 +28,20 @@
                 </flux:navlist.group> 
             </flux:navlist>
 
+            @php
+                $role = auth()->user()->role ?? null;
+            @endphp
+
+            @if ($role === 'Retailer')
+                <flux:navlist variant="outline">
+                    <flux:navlist.group class="grid">
+                        <flux:navlist.item :href="route('retailer.feedback')" :current="request()->routeIs('retailer.feedback')" wire:navigate>
+                            {{ __('Customer Feedback') }}
+                        </flux:navlist.item>
+                    </flux:navlist.group>
+                </flux:navlist>
+            @endif
+
             <flux:spacer />
 
             <flux:navlist variant="outline">
