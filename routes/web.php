@@ -15,6 +15,10 @@ Route::view('orders', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('orders');
 
+Route::view('stocks', 'dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('stocks');
+
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 

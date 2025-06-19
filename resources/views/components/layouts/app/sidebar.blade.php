@@ -18,9 +18,10 @@
                 </flux:navlist.group>
             </flux:navlist>
             <flux:navlist variant="outline">
-                <flux:navlist.group :heading="__('Platform')" class="grid">
-                    <flux:navlist.item :href="route('orders')" :current="request()->routeIs('orders')" wire:navigate>{{ __('Orders') }}</flux:navlist.item>
-                </flux:navlist.group>
+                <flux:navlist.group class="grid">
+                    <flux:navlist.item :href="route('orders')" :current="request()->routeIs('orders')" wire:navigate>{{ __('Orders') }}</flux:navlist.item> 
+                    <flux:navlist.item :href="route('stocks')" :current="request()->routeIs('stocks')" wire:navigate>{{ __('Stocks') }}</flux:navlist.item>
+                </flux:navlist.group> 
             </flux:navlist>
 
             <flux:spacer />
