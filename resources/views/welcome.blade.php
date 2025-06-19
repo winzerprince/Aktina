@@ -88,7 +88,7 @@
                                 </span>
                             </span>
                             <span>
-                               Learn extras
+                               Learn less
                                 <a href="mailto:aitajprince100@gmail.com" target="_blank" class="inline-flex items-center space-x-1 font-medium underline underline-offset-4 text-[#209900] dark:text-[#018800] ms-1">
                                     <span>about us</span>
                                     <svg
