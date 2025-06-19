@@ -4,6 +4,7 @@
         @include('partials.head')
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
+        <!--this first flux handles the whole side bar-->
         <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
@@ -13,7 +14,12 @@
 
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Platform')" class="grid">
-                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
+                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Home') }}</flux:navlist.item>
+                </flux:navlist.group>
+            </flux:navlist>
+            <flux:navlist variant="outline">
+                <flux:navlist.group :heading="__('Platform')" class="grid">
+                    <flux:navlist.item :href="route('orders')" :current="request()->routeIs('orders')" wire:navigate>{{ __('Orders') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
 
