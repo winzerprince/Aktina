@@ -4,6 +4,10 @@
             <!--first small grid-->
             <div class="relative aspect-video overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
                 <x-placeholder-pattern class="absolute inset-0 size-full stroke-gray-900/20 dark:stroke-neutral-100/20" />
+                <h1 class="block px-16 py-8 m-0 whitespace-pre-wrap text-base text-white ">
+            <!--<img src="../assets/img/logo-ct.png" class="inline h-full max-w-full transition-all duration-200 ease-nav-brand max-h-8" alt="main_logo" />-->
+            <span class="ml-1 font-bold transition-all duration-200 ease-nav-brand">Administrator's Dashboard</span>
+</h1>
 
             </div>
             <!--second small grid-->
