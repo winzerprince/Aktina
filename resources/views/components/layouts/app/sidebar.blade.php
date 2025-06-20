@@ -23,6 +23,7 @@
 
 
             <!-- Get the current user's role for role-based navigation -->
+            @php
                 $role = auth()->user()->role ?? null;
             @endphp
 
@@ -105,8 +106,8 @@
                 </flux:navlist>
             @endif
 
+                <!-- Production Manager-specific navigation items for manufacturing oversight -->
             @if ($role === 'Production Manager')
-            <!-- Production Manager-specific navigation items for manufacturing oversight -->
                 <flux:navlist variant="outline">
                     <flux:navlist.group class="grid">
                         <flux:navlist.item :href="route('production_manager.order_management')" :current="request()->routeIs('production_manager.order_management')" wire:navigate>
@@ -149,7 +150,7 @@
                     :name="auth()->user()->name"
                     :initials="auth()->user()->initials()"
                     icon:trailing="chevrons-up-down"
-                />
+                /></flux:profile>
 
                 <flux:menu class="w-[220px]">
                     <flux:menu.radio.group>
@@ -200,7 +201,6 @@
 
             <flux:dropdown position="top" align="end">
                 <flux:profile
-            <!-- Mobile user profile dropdown -->
                     :initials="auth()->user()->initials()"
                     icon-trailing="chevron-down"
                 />
