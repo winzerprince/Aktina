@@ -55,6 +55,7 @@
                 </flux:navlist>
             @endif
 
+            <!-- Role-based Navigation -->
              @if ($role === 'Vendor')
                 <flux:navlist variant="outline">
                     <flux:navlist.group class="grid">
