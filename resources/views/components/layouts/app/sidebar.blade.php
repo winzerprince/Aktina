@@ -17,11 +17,11 @@
                     <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Home') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
-            <flux:navlist variant="outline">
+           <!-- <flux:navlist variant="outline">
                 <flux:navlist.group class="grid">
                     <flux:navlist.item :href="route('communication')" :current="request()->routeIs('communication')" wire:navigate>{{ __('Communication') }}</flux:navlist.item> 
                 </flux:navlist.group>
-            </flux:navlist>
+            </flux:navlist>-->
 
             @php
                 $role = auth()->user()->role ?? null;
@@ -76,7 +76,7 @@
                 <flux:navlist variant="outline">
                     <flux:navlist.group class="grid">
                         <flux:navlist.item :href="route('supplier.order_statistics')" :current="request()->routeIs('supplier.order_statistics')" wire:navigate>
-                            {{ __('Order Statistics') }}
+                            {{ __('Orders') }}
                         </flux:navlist.item>
                         <flux:navlist.item :href="route('supplier.delivery_metrics')" :current="request()->routeIs('supplier.delivery_metrics')" wire:navigate>
                             {{ __('Delivery Metrics') }}
@@ -115,7 +115,12 @@
                         </flux:navlist.item>
                     </flux:navlist.group>
                 </flux:navlist>
-            @endif            
+            @endif   
+             <flux:navlist variant="outline">
+                <flux:navlist.group class="grid">
+                    <flux:navlist.item :href="route('communication')" :current="request()->routeIs('communication')" wire:navigate>{{ __('Communication') }}</flux:navlist.item> 
+                </flux:navlist.group>
+            </flux:navlist>
 
             <flux:spacer />
 
