@@ -1,29 +1,33 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
+        <!-- Include the head partial that contains meta tags, CSS, and JavaScript references -->
         @include('partials.head')
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
-        <!--this first flux handles the whole side bar-->
+        <!-- Main sidebar component: sticky (stays in place when scrolling) and stashable (can be hidden) -->
         <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+            <!-- Toggle button for the sidebar, visible only on mobile devices (hidden on lg screens) -->
             <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
+            <!-- Application logo with link to dashboard, using wire:navigate for SPA-like navigation -->
             <a href="{{ route('dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
                 <x-app-logo />
             </a>
 
             <flux:navlist variant="outline">
+                <flux:navlist.group :heading="__()" class="grid">
                 <flux:navlist.group :heading="__('Platform')" class="grid">
-                    <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Home') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
 
 
-            @php
+            <!-- Get the current user's role for role-based navigation -->
                 $role = auth()->user()->role ?? null;
             @endphp
 
             @if ($role === 'Retailer')
+            <!-- Retailer-specific navigation items -->
                 <flux:navlist variant="outline">
                     <flux:navlist.group class="grid">
                         <flux:navlist.item :href="route('retailer.feedback')" :current="request()->routeIs('retailer.feedback')" wire:navigate>
@@ -40,6 +44,7 @@
             @endif
 
             @if ($role === 'Admin')
+            <!-- Admin-specific navigation items for system management -->
                 <flux:navlist variant="outline">
                     <flux:navlist.group class="grid">
                         <flux:navlist.item :href="route('admin.financial_analysis')" :current="request()->routeIs('admin.financial_analysis')" wire:navigate>
@@ -56,6 +61,7 @@
             @endif
 
              @if ($role === 'Vendor')
+             <!-- Vendor-specific navigation items for product providers -->
                 <flux:navlist variant="outline">
                     <flux:navlist.group class="grid">
                         <flux:navlist.item :href="route('vendor.order_management')" :current="request()->routeIs('vendor.order_management')" wire:navigate>
@@ -69,6 +75,7 @@
             @endif
 
              @if ($role === 'Supplier')
+             <!-- Supplier-specific navigation items for inventory management -->
                 <flux:navlist variant="outline">
                     <flux:navlist.group class="grid">
                         <flux:navlist.item :href="route('supplier.order_statistics')" :current="request()->routeIs('supplier.order_statistics')" wire:navigate>
@@ -82,6 +89,7 @@
             @endif
 
              @if ($role === 'HR Manager')
+             <!-- HR Manager-specific navigation items for personnel management -->
                 <flux:navlist variant="outline">
                     <flux:navlist.group class="grid">
                         <flux:navlist.item :href="route('hr_manager.workforce_analytics')" :current="request()->routeIs('hr_manager.workforce_analytics')" wire:navigate>
@@ -98,6 +106,7 @@
             @endif
 
             @if ($role === 'Production Manager')
+            <!-- Production Manager-specific navigation items for manufacturing oversight -->
                 <flux:navlist variant="outline">
                     <flux:navlist.group class="grid">
                         <flux:navlist.item :href="route('production_manager.order_management')" :current="request()->routeIs('production_manager.order_management')" wire:navigate>
@@ -111,16 +120,20 @@
                         </flux:navlist.item>
                     </flux:navlist.group>
                 </flux:navlist>
-            @endif   
+            @endif
              <flux:navlist variant="outline">
+
+             <!-- Communication link available to all user roles -->
                 <flux:navlist.group class="grid">
-                    <flux:navlist.item :href="route('communication')" :current="request()->routeIs('communication')" wire:navigate>{{ __('Communication') }}</flux:navlist.item> 
+                    <flux:navlist.item :href="route('communication')" :current="request()->routeIs('communication')" wire:navigate>{{ __('Communication') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
 
             <flux:spacer />
+            <!-- Spacer to push the bottom content to the end of the sidebar -->
 
             <flux:navlist variant="outline">
+            <!-- External links section - currently commented out -->
                 <!--<flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
                 {{ __('Repository') }}
                 </flux:navlist.item>
@@ -131,7 +144,7 @@
             </flux:navlist>
 
             <!-- Desktop User Menu -->
-            <flux:dropdown class="hidden lg:block" position="bottom" align="start">
+            <!-- Desktop User Menu - only visible on large screens -->
                 <flux:profile
                     :name="auth()->user()->name"
                     :initials="auth()->user()->initials()"
@@ -141,6 +154,7 @@
                 <flux:menu class="w-[220px]">
                     <flux:menu.radio.group>
                         <div class="p-0 text-sm font-normal">
+                        <!-- User profile summary with avatar, name and email -->
                             <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
                                 <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
                                     <span
@@ -161,12 +175,14 @@
                     <flux:menu.separator />
 
                     <flux:menu.radio.group>
+                    <!-- User settings link -->
                         <flux:menu.item :href="route('settings.profile')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
                     </flux:menu.radio.group>
 
                     <flux:menu.separator />
 
                     <form method="POST" action="{{ route('logout') }}" class="w-full">
+                    <!-- Logout form -->
                         @csrf
                         <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full">
                             {{ __('Log Out') }}
@@ -177,13 +193,14 @@
         </flux:sidebar>
 
         <!-- Mobile User Menu -->
-        <flux:header class="lg:hidden">
             <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
+            <!-- Mobile sidebar toggle button -->
             <flux:spacer />
 
             <flux:dropdown position="top" align="end">
                 <flux:profile
+            <!-- Mobile user profile dropdown -->
                     :initials="auth()->user()->initials()"
                     icon-trailing="chevron-down"
                 />
@@ -192,6 +209,7 @@
                     <flux:menu.radio.group>
                         <div class="p-0 text-sm font-normal">
                             <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
+                        <!-- Mobile user profile summary with avatar, name and email -->
                                 <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
                                     <span
                                         class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white"
@@ -212,12 +230,14 @@
 
                     <flux:menu.radio.group>
                         <flux:menu.item :href="route('settings.profile')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
+                    <!-- Mobile user settings link -->
                     </flux:menu.radio.group>
 
                     <flux:menu.separator />
 
                     <form method="POST" action="{{ route('logout') }}" class="w-full">
                         @csrf
+                    <!-- Mobile logout form -->
                         <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full">
                             {{ __('Log Out') }}
                         </flux:menu.item>
@@ -228,6 +248,8 @@
 
         {{ $slot }}
 
+        <!-- Content slot where the main page content will be rendered -->
         @fluxScripts
     </body>
+        <!-- Include Flux JavaScript utilities and components -->
 </html>
