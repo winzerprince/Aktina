@@ -17,11 +17,7 @@
                     <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Home') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
-           <!-- <flux:navlist variant="outline">
-                <flux:navlist.group class="grid">
-                    <flux:navlist.item :href="route('communication')" :current="request()->routeIs('communication')" wire:navigate>{{ __('Communication') }}</flux:navlist.item> 
-                </flux:navlist.group>
-            </flux:navlist>-->
+
 
             @php
                 $role = auth()->user()->role ?? null;
@@ -71,7 +67,7 @@
                     </flux:navlist.group>
                 </flux:navlist>
             @endif
-            
+
              @if ($role === 'Supplier')
                 <flux:navlist variant="outline">
                     <flux:navlist.group class="grid">
@@ -84,7 +80,7 @@
                     </flux:navlist.group>
                 </flux:navlist>
             @endif
-            
+
              @if ($role === 'HR Manager')
                 <flux:navlist variant="outline">
                     <flux:navlist.group class="grid">
@@ -100,7 +96,7 @@
                     </flux:navlist.group>
                 </flux:navlist>
             @endif
-            
+
             @if ($role === 'Production Manager')
                 <flux:navlist variant="outline">
                     <flux:navlist.group class="grid">
