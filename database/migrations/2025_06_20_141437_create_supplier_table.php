@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('supplier', function (Blueprint $table) {
-            $table->id();
+            $table->id()->primary();
             $table->json('resources')->nullable();
             $table->timestamps();
         });

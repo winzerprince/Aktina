@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('application', function (Blueprint $table) {
-            $table->id();
+            $table->id()->primary();
             $table->enum('status', ['pending','partially approved', 'approved', 'rejected'])->default('pending');
             $table->date('meeting_schedule')->nullable();
             $table->timestamps();

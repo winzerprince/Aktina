@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('retailer_listing', function (Blueprint $table) {
-            $table->id();
-            $table->email('retailer_email')->unique();
+            $table->id()->primary();
+            $table->string('retailer_email')->unique();
             $table->timestamps();
         });
     }
