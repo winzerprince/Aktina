@@ -103,6 +103,8 @@ Route::view('hr_manager/staff-performance', 'hr_manager.staff_performance')->mid
 Route::view('production_manager/order-management', 'production_manager.order_management')->middleware(['auth', 'verified'])->name('production_manager.order_management');
 Route::view('production_manager/inventory-alerts', 'production_manager.inventory_alerts')->middleware(['auth', 'verified'])->name('production_manager.inventory_alerts');
 Route::view('production_manager/production-metrics', 'production_manager.production_metrics')->middleware(['auth', 'verified'])->name('production_manager.production_metrics');
+Route::view('production_manager/sales_tracking', 'production_manager.sales_tracking')->middleware(['auth', 'verified'])->name('production_manager.sales_tracking');
+
 
 // Communication (common)
 Route::view('communication', 'communication')->middleware(['auth', 'verified'])->name('communication');
