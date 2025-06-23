@@ -105,6 +105,10 @@ Route::view('production_manager/inventory-alerts', 'production_manager.inventory
 Route::view('production_manager/production-metrics', 'production_manager.production_metrics')->middleware(['auth', 'verified'])->name('production_manager.production_metrics');
 Route::view('production_manager/sales_tracking', 'production_manager.sales_tracking')->middleware(['auth', 'verified'])->name('production_manager.sales_tracking');
 
+// Retailer-specific features
+Route::view('retailer/order_placement', 'retailer.order_placement')->middleware(['auth', 'verified'])->name('retailer.order_placement');
+Route::view('retailer/sales-insights', 'retailer.sales-insights')->middleware(['auth', 'verified'])->name('retailer.sales_insights');
+
 //Route::get('/production_manager/dashboard', function(){
   //  return view('production_manager.dashboard');
 //})->name('production_manager.dashboard');
