@@ -105,6 +105,18 @@ Route::view('production_manager/inventory-alerts', 'production_manager.inventory
 Route::view('production_manager/production-metrics', 'production_manager.production_metrics')->middleware(['auth', 'verified'])->name('production_manager.production_metrics');
 Route::view('production_manager/sales_tracking', 'production_manager.sales_tracking')->middleware(['auth', 'verified'])->name('production_manager.sales_tracking');
 
+//Route::get('/production_manager/dashboard', function(){
+  //  return view('production_manager.dashboard');
+//})->name('production_manager.dashboard');
+
+//Route::get('/order_management/completed_orders', function(){
+  //  return view('order_management.completed_orders');
+//})->name('order_management.completed_orders');
+
+//Route::get('/order_management/pending_orders', function(){
+  //  return view('order_management.pending_orders');
+//})->name('order_management.pending_orders');
+
 
 // Communication (common)
 Route::view('communication', 'communication')->middleware(['auth', 'verified'])->name('communication');
