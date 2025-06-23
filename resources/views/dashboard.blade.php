@@ -240,7 +240,7 @@
 
             <div class="flex flex-wrap -mx-3">
                 <div class="w-full max-w-full px-3">
-                    <x-ui.card title="Welcome" subtitle="Getting started with your dashboard">
+                    <x-ui.card title="Welcome" subtitle="">
                         <p class="text-gray-600 dark:text-gray-400 mb-4">
                             Welcome to your personalized dashboard. Here you can view your tasks, track progress, and manage your workflow.
                         </p>
@@ -253,7 +253,7 @@
                             class="mb-4"
                         />
 
-                        <x-ui.button variant="primary">
+                        <x-ui.button variant="primary" class="cursor-pointer">
                             Complete Profile
                         </x-ui.button>
                     </x-ui.card>
