@@ -110,6 +110,9 @@
                         <flux:navlist.item :href="route('production_manager.production_metrics')" :current="request()->routeIs('production_manager.production_metrics')" wire:navigate>
                             {{ __('Production Metrics') }}
                         </flux:navlist.item>
+                         <flux:navlist.item :href="route('production_manager.sales_tracking')" :current="request()->routeIs('production_manager.sales_tracking')" wire:navigate>
+                            {{ __('Sales Tracking') }}
+                        </flux:navlist.item>
                     </flux:navlist.group>
                 </flux:navlist>
             @endif
