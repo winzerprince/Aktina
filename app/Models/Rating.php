@@ -26,4 +26,31 @@ class Rating extends Model
     {
         return $this->belongsTo(Retailer::class);
     }
+
+    public function getStarsAttribute()
+    {
+        return str_repeat('★', $this->rating) . str_repeat('☆', 5 - $this->rating);
+    }
+
+    public function isPositive()
+    {
+        return $this->rating >= 4;
+    }
+
+    public function isNegative()
+    {
+        return $this->rating <= 2;
+    }
+
+    public function getRatingTextAttribute()
+    {
+        return match($this->rating) {
+            5 => 'Excellent',
+            4 => 'Good',
+            3 => 'Average',
+            2 => 'Poor',
+            1 => 'Very Poor',
+            default => 'Unrated'
+        };
+    }
 }

@@ -17,9 +17,9 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             HrManagerSeeder::class,
             ProductionManagerSeeder::class,
+            ApplicationSeeder::class, // Move before vendor
             VendorSeeder::class,
             RetailerSeeder::class,
-            ApplicationSeeder::class,
             RetailerListingSeeder::class,
             ResourceSeeder::class,
             ProductSeeder::class,

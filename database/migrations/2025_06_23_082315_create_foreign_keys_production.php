@@ -190,19 +190,6 @@ return new class extends Migration
                 ->onDelete('cascade');
         });
 
-        // Add vendor_id to application table
-        Schema::table('application', function (Blueprint $table) {
-            if (!Schema::hasColumn('application', 'vendor_id')) {
-                $table->unsignedBigInteger('vendor_id')->nullable();
-            }
-
-            $table->foreign('vendor_id')
-                ->references('id')
-                ->on('vendor')
-                ->onUpdate('cascade')
-                ->onDelete('cascade');
-        });
-
         // Add product_id and retailer_id to rating table
         Schema::table('rating', function (Blueprint $table) {
             if (!Schema::hasColumn('rating', 'product_id')) {
@@ -285,10 +272,6 @@ return new class extends Migration
 
         Schema::table('retailer', function (Blueprint $table) {
             $table->dropForeign(['user_id']);
-            $table->dropForeign(['vendor_id']);
-        });
-
-        Schema::table('application', function (Blueprint $table) {
             $table->dropForeign(['vendor_id']);
         });
 

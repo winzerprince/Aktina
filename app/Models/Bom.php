@@ -29,4 +29,22 @@ class Bom extends Model
     {
         return $this->hasMany(Resource::class);
     }
+
+    public function getTotalComponentCostAttribute()
+    {
+        return $this->resources()->sum('unit_cost');
+    }
+
+    public function getComponentCountAttribute()
+    {
+        return $this->resources()->count();
+    }
+
+    public function getProfitMarginAttribute()
+    {
+        if (!$this->product || !$this->product->msrp) {
+            return null;
+        }
+        return (($this->product->msrp - $this->price) / $this->product->msrp) * 100;
+    }
 }

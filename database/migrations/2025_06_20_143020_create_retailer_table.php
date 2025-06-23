@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('retailer', function (Blueprint $table) {
             $table->id()->primary();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('vendor_id')->nullable();
             $table->timestamps();
         });
     }

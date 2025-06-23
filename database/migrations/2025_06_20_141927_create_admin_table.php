@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('admin', function (Blueprint $table) {
             $table->id()->primary();
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->timestamps();
         });
     }

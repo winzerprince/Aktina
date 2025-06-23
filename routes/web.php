@@ -11,6 +11,10 @@ Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
+Route::view('components-demo', 'components-demo')
+    ->middleware(['auth', 'verified'])
+    ->name('components.demo');
+
 // Route::view('orders', 'dashboard')
 //     ->middleware(['auth', 'verified'])
 //     ->name('orders');
@@ -76,13 +80,8 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
 });
 
-// Retailer-specific features
-Route::view('retailer/feedback', 'retailer.feedback')->middleware(['auth', 'verified'])->name('retailer.feedback');
-Route::view('retailer/sales-insights', 'retailer.sales_insights')->middleware(['auth', 'verified'])->name('retailer.sales_insights');
-Route::view('retailer/order-placement', 'retailer.order_placement')->middleware(['auth', 'verified'])->name('retailer.order_placement');
-
 // Admin-specific features
-Route::view('admin/financial-analysis', 'admin.financial_analysis')->middleware(['auth', 'verified'])->name('admin.financial_analysis');
+Route::view('admin/financial-analysis', 'admin.financial-analysis')->middleware(['auth', 'verified'])->name('admin.financial_analysis');
 Route::view('admin/strategic-insight', 'admin.strategic_insight')->middleware(['auth', 'verified'])->name('admin.strategic_insight');
 Route::view('admin/user-access', 'admin.user_access')->middleware(['auth', 'verified'])->name('admin.user_access');
 

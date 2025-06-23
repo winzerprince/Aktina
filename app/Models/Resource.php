@@ -13,12 +13,22 @@ class Resource extends Model
 
     protected $fillable = [
         'name',
+        'component_type',
+        'category',
         'units',
         'reorder_level',
         'overstock_level',
+        'unit_cost',
+        'part_number',
+        'specifications',
         'description',
         'supplier_id',
         'bom_id',
+    ];
+
+    protected $casts = [
+        'unit_cost' => 'decimal:2',
+        'specifications' => 'array',
     ];
 
     public function supplier()
@@ -39,5 +49,15 @@ class Resource extends Model
     public function isOverstock()
     {
         return $this->units >= $this->overstock_level;
+    }
+
+    public function getSpecificationAttribute($key)
+    {
+        return $this->specifications[$key] ?? null;
+    }
+
+    public function isPhoneComponent()
+    {
+        return in_array($this->component_type, ['SoC', 'Display', 'Camera Sensor', 'Battery', 'Memory']);
     }
 }
