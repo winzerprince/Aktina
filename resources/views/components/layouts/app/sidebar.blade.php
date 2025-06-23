@@ -42,15 +42,18 @@
 
             @if ($role === 'Admin')
                 <flux:navlist variant="outline">
-                    <flux:navlist.group class="grid">
-                        <flux:navlist.item :href="route('admin.financial_analysis')" :current="request()->routeIs('admin.financial_analysis')" wire:navigate>
-                            {{ __('Financial Analysis') }}
+                    <flux:navlist.group :heading="__('Administration')" class="grid">
+                        <flux:navlist.item icon="home" :href="route('admin.home')" :current="request()->routeIs('admin.home')" wire:navigate>
+                            {{ __('Home') }}
                         </flux:navlist.item>
-                        <flux:navlist.item :href="route('admin.strategic_insight')" :current="request()->routeIs('admin.strategic_insight')" wire:navigate>
-                            {{ __('Strategic Insight') }}
+                        <flux:navlist.item icon="shopping-bag" :href="route('admin.sales')" :current="request()->routeIs('admin.sales')" wire:navigate>
+                            {{ __('Sales') }}
                         </flux:navlist.item>
-                        <flux:navlist.item :href="route('admin.user_access')" :current="request()->routeIs('admin.user_access')" wire:navigate>
-                            {{ __('User Access') }}
+                        <flux:navlist.item icon="users" :href="route('admin.user-management')" :current="request()->routeIs('admin.user-management')" wire:navigate>
+                            {{ __('User Management') }}
+                        </flux:navlist.item>
+                        <flux:navlist.item icon="chart-bar" :href="route('admin.insights')" :current="request()->routeIs('admin.insights')" wire:navigate>
+                            {{ __('Insights') }}
                         </flux:navlist.item>
                     </flux:navlist.group>
                 </flux:navlist>

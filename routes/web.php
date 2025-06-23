@@ -43,7 +43,7 @@ Route::view('retailer/dashboard', 'retailer.dashboard')
     ->middleware(['auth', 'verified'])
     ->name('retailer.dashboard');
 
-Route::view('admin/dashboard', 'admin.dashboard')
+Route::redirect('admin/dashboard', 'admin/home')
     ->middleware(['auth', 'verified'])
     ->name('admin.dashboard');
 
@@ -81,9 +81,10 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Admin-specific features
-Route::view('admin/financial-analysis', 'admin.financial-analysis')->middleware(['auth', 'verified'])->name('admin.financial_analysis');
-Route::view('admin/strategic-insight', 'admin.strategic_insight')->middleware(['auth', 'verified'])->name('admin.strategic_insight');
-Route::view('admin/user-access', 'admin.user_access')->middleware(['auth', 'verified'])->name('admin.user_access');
+Route::view('admin/home', 'admin.home')->middleware(['auth', 'verified'])->name('admin.home');
+Route::view('admin/sales', 'admin.sales')->middleware(['auth', 'verified'])->name('admin.sales');
+Route::view('admin/user-management', 'admin.user-management')->middleware(['auth', 'verified'])->name('admin.user-management');
+Route::view('admin/insights', 'admin.insights')->middleware(['auth', 'verified'])->name('admin.insights');
 
 // Vendor-specific features
 Route::view('vendor/order-management', 'vendor.order_management')->middleware(['auth', 'verified'])->name('vendor.order_management');
