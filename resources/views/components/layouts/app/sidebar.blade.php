@@ -12,8 +12,15 @@
                 <x-app-logo />
             </a>
 
+            @php
+                $role = auth()->user()->role ?? '';
+            @endphp
+            <div class="text-lg font-extrabold tracking-tight text-green-800 dark:text-zinc-200" >
+                {{ __($role . ' Dashboard') }}
+            </div>
+
             <flux:navlist variant="outline">
-                <flux:navlist.group :heading="__('Platform')" class="grid">
+                <flux:navlist.group class="grid " >
                     <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Home') }}</flux:navlist.item>
                     <flux:navlist.item icon="cube-transparent" :href="route('components.demo')" :current="request()->routeIs('components.demo')" wire:navigate>{{ __('UI Components') }}</flux:navlist.item>
                 </flux:navlist.group>
