@@ -44,7 +44,7 @@
                 <flux:navlist variant="outline">
                     <flux:navlist.group :heading="__('Administration')" class="grid">
                         <flux:navlist.item icon="home" :href="route('admin.home')" :current="request()->routeIs('admin.home')" wire:navigate>
-                            {{ __('Home') }}
+                            {{ __('Overview') }}
                         </flux:navlist.item>
                         <flux:navlist.item icon="shopping-bag" :href="route('admin.sales')" :current="request()->routeIs('admin.sales')" wire:navigate>
                             {{ __('Sales') }}
