@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('product_order', function (Blueprint $table) {
+        Schema::create('order', function (Blueprint $table) {
             $table->id()->primary();
-            $table->decimal('price', 8, 2);
+            $table->decimal('price', 10, 2);
+            $table->json('items'); // JSON field to store product IDs and quantities
+            $table->unsignedBigInteger('buyer_id')->nullable();
+            $table->unsignedBigInteger('seller_id')->nullable();
             $table->timestamps();
         });
     }

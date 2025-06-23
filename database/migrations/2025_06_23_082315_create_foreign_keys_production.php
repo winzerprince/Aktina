@@ -94,8 +94,9 @@ return new class extends Migration
         });
 
         // Add user_id to product_manager table
-        Schema::table('product_manager', function (Blueprint $table) {
-            if (!Schema::hasColumn('product_manager', 'user_id')) {
+
+        Schema::table('production_manager', function (Blueprint $table) {
+            if (!Schema::hasColumn('production_manager', 'user_id')) {
                 $table->unsignedBigInteger('user_id')->nullable();
             }
 
@@ -105,6 +106,7 @@ return new class extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
         });
+
 
         // Add user_id to admin table
         Schema::table('admin', function (Blueprint $table) {
@@ -261,9 +263,11 @@ return new class extends Migration
             $table->dropForeign(['user_id']);
         });
 
-        Schema::table('product_manager', function (Blueprint $table) {
+
+        Schema::table('production_manager', function (Blueprint $table) {
             $table->dropForeign(['user_id']);
         });
+
 
         Schema::table('admin', function (Blueprint $table) {
             $table->dropForeign(['user_id']);
