@@ -30,7 +30,7 @@
                         <flux:navlist.item :href="route('retailer.feedback')" :current="request()->routeIs('retailer.feedback')" wire:navigate>
                             {{ __('Customer Feedback') }}
                         </flux:navlist.item>
-                        <flux:navlist.item :href="route('retailer.sales_insights')" :current="request()->routeIs('retailer.sales_insights')" wire:navigate>
+                        <flux:navlist.item :href="route('retailer.sales_insights')" :current="request()->routeIs('retailer.sales-insights')" wire:navigate>
                             {{ __('Sales Insights') }}
                         </flux:navlist.item>
                         <flux:navlist.item :href="route('retailer.order_placement')" :current="request()->routeIs('retailer.order_placement')" wire:navigate>
