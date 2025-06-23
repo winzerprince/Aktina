@@ -75,5 +75,11 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/password', 'settings.password')->name('settings.password');
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
 });
+//Route::middleware(['auth', 'verified'])->group(function () {
+    //Route::get('volt', Volt::class)->name('volt');
+//});
+
+// Authentication Routes
+
 
 require __DIR__.'/auth.php';
