@@ -104,7 +104,6 @@
                     <flux:navlist.group class="grid">
                         <flux:navlist.item :href="route('production_manager.order_management')" :current="request()->routeIs('production_manager.order_management')" wire:navigate>
                             {{ __('Order Management') }}
-
                         </flux:navlist.item>
                         <flux:navlist.item :href="route('production_manager.inventory_alerts')" :current="request()->routeIs('production_manager.inventory_alerts')" wire:navigate>
                             {{ __('Inventory Alerts') }}
