@@ -103,12 +103,16 @@
                     <flux:navlist.group class="grid">
                         <flux:navlist.item :href="route('production_manager.order_management')" :current="request()->routeIs('production_manager.order_management')" wire:navigate>
                             {{ __('Order Management') }}
+
                         </flux:navlist.item>
                         <flux:navlist.item :href="route('production_manager.inventory_alerts')" :current="request()->routeIs('production_manager.inventory_alerts')" wire:navigate>
                             {{ __('Inventory Alerts') }}
                         </flux:navlist.item>
                         <flux:navlist.item :href="route('production_manager.production_metrics')" :current="request()->routeIs('production_manager.production_metrics')" wire:navigate>
                             {{ __('Production Metrics') }}
+                        </flux:navlist.item>
+                         <flux:navlist.item :href="route('production_manager.sales_tracking')" :current="request()->routeIs('production_manager.sales_tracking')" wire:navigate>
+                            {{ __('Sales Tracking') }}
                         </flux:navlist.item>
                     </flux:navlist.group>
                 </flux:navlist>
