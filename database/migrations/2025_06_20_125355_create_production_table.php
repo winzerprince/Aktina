@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('in_progress_units')->default(0);
             $table->integer('cancelled_units')->default(0);
             $table->string('assembly_line')->default('Line 1');
+            $table->unsignedBigInteger('product_id')->nullable();
 
             $table->timestamps();
         });

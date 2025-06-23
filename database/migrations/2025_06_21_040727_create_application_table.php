@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id()->primary();
             $table->enum('status', ['pending','partially approved', 'approved', 'rejected'])->default('pending');
             $table->date('meeting_schedule')->nullable();
+            $table->unsignedBigInteger('vendor_id')->nullable(); // Add vendor_id field
             $table->timestamps();
         });
     }

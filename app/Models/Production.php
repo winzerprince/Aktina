@@ -45,4 +45,38 @@ class Production extends Model
     {
         return $this->status === 'in_progress';
     }
+
+    public function getEstimatedCompletionDateAttribute()
+    {
+        if ($this->isCompleted() || $this->remaining_units <= 0) {
+            return null;
+        }
+
+        // Estimate based on current progress rate
+        $daysRunning = $this->created_at->diffInDays(now());
+        if ($daysRunning > 0 && $this->completed_units > 0) {
+            $unitsPerDay = $this->completed_units / $daysRunning;
+            $daysRemaining = $this->remaining_units / $unitsPerDay;
+            return now()->addDays(ceil($daysRemaining));
+        }
+
+        return null;
+    }
+
+    public function isPhoneFlagship()
+    {
+        return $this->product && $this->product->isFlagship();
+    }
+
+    public function getAssemblyLineTypeAttribute()
+    {
+        if (str_contains($this->assembly_line, 'Flagship')) {
+            return 'flagship';
+        } elseif (str_contains($this->assembly_line, 'Mid-Range')) {
+            return 'mid-range';
+        } elseif (str_contains($this->assembly_line, 'Budget')) {
+            return 'budget';
+        }
+        return 'standard';
+    }
 }

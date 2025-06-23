@@ -25,4 +25,14 @@ class RetailerListing extends Model
     {
         return $this->hasMany(Vendor::class);
     }
+
+    public function isApproved()
+    {
+        return $this->application && $this->application->isApproved();
+    }
+
+    public function getStatusAttribute()
+    {
+        return $this->application ? $this->application->status : 'pending';
+    }
 }

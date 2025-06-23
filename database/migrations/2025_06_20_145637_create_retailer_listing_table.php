@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('retailer_listing', function (Blueprint $table) {
             $table->id()->primary();
             $table->string('retailer_email')->unique();
+            $table->unsignedBigInteger('application_id')->nullable();
             $table->timestamps();
         });
     }

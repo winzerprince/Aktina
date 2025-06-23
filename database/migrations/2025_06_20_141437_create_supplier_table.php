@@ -13,7 +13,13 @@ return new class extends Migration
     {
         Schema::create('supplier', function (Blueprint $table) {
             $table->id()->primary();
-            $table->json('resources')->nullable();
+            $table->string('company_name');
+            $table->string('region'); // Asia-Pacific, Europe, US, etc.
+            $table->json('component_categories')->nullable(); // Categories they supply
+            $table->decimal('reliability_rating', 3, 2)->default(5.00); // Out of 5
+            $table->boolean('is_preferred')->default(false);
+            $table->text('certifications')->nullable(); // ISO, conflict-free, etc.
+            $table->json('resources')->nullable(); // Keep for backward compatibility
             $table->timestamps();
         });
     }

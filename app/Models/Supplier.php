@@ -13,11 +13,20 @@ class Supplier extends Model
 
     protected $fillable = [
         'user_id',
-        'resources',
+        'company_name',
+        'region',
+        'component_categories',
+        'reliability_rating',
+        'is_preferred',
+        'certifications',
+        'resources', // Keep for backward compatibility
     ];
 
     protected $casts = [
+        'component_categories' => 'array',
         'resources' => 'array',
+        'reliability_rating' => 'decimal:2',
+        'is_preferred' => 'boolean',
     ];
 
     public function user()
@@ -28,5 +37,31 @@ class Supplier extends Model
     public function resources()
     {
         return $this->hasMany(Resource::class);
+    }
+
+    public function isPreferred()
+    {
+        return $this->is_preferred;
+    }
+
+    public function suppliesComponent($componentType)
+    {
+        return in_array($componentType, $this->component_categories ?? []);
+    }
+
+    public function getReliabilityStarsAttribute()
+    {
+        return str_repeat('★', floor($this->reliability_rating)) .
+               str_repeat('☆', 5 - floor($this->reliability_rating));
+    }
+
+    public function isAsianPacific()
+    {
+        return $this->region === 'Asia-Pacific';
+    }
+
+    public function isUS()
+    {
+        return $this->region === 'US';
     }
 }

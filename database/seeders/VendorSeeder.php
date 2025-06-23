@@ -18,5 +18,10 @@ class VendorSeeder extends Seeder
                 'updated_at' => now(),
             ],
         ]);
+
+        // Update the application with vendor_id
+        DB::table('application')->where('id', 1)->update([
+            'vendor_id' => 1,
+        ]);
     }
 }

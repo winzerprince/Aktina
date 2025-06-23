@@ -137,4 +137,32 @@ class User extends Authenticatable
     {
         return $this->role === 'production_manager';
     }
+
+    // Additional role checking methods for tech industry
+    public function canManageComponents()
+    {
+        return in_array($this->role, ['admin', 'production_manager', 'supplier']);
+    }
+
+    public function canViewProduction()
+    {
+        return in_array($this->role, ['admin', 'production_manager']);
+    }
+
+    public function canManageSuppliers()
+    {
+        return in_array($this->role, ['admin', 'hr_manager']);
+    }
+
+    public function getCompanyTypeAttribute()
+    {
+        if ($this->isSupplier()) {
+            return 'Component Supplier';
+        } elseif ($this->isVendor()) {
+            return 'Distribution Partner';
+        } elseif ($this->isRetailer()) {
+            return 'Retail Partner';
+        }
+        return 'Aktina Technologies';
+    }
 }

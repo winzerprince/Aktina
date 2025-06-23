@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('bom', function (Blueprint $table) {
             $table->id()->primary();
             $table->decimal('price', 10, 2);
+            $table->unsignedBigInteger('product_id')->nullable();
             $table->timestamps();
         });
     }
