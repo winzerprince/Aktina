@@ -43,7 +43,7 @@ Route::view('retailer/dashboard', 'retailer.dashboard')
     ->middleware(['auth', 'verified'])
     ->name('retailer.dashboard');
 
-Route::view('admin/dashboard', 'admin.dashboard')
+Route::redirect('admin/dashboard', 'admin/home')
     ->middleware(['auth', 'verified'])
     ->name('admin.dashboard');
 
@@ -81,9 +81,10 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Admin-specific features
-Route::view('admin/financial-analysis', 'admin.financial-analysis')->middleware(['auth', 'verified'])->name('admin.financial_analysis');
-Route::view('admin/strategic-insight', 'admin.strategic_insight')->middleware(['auth', 'verified'])->name('admin.strategic_insight');
-Route::view('admin/user-access', 'admin.user_access')->middleware(['auth', 'verified'])->name('admin.user_access');
+Route::view('admin/home', 'admin.home')->middleware(['auth', 'verified'])->name('admin.home');
+Route::view('admin/sales', 'admin.sales')->middleware(['auth', 'verified'])->name('admin.sales');
+Route::view('admin/user-management', 'admin.user-management')->middleware(['auth', 'verified'])->name('admin.user-management');
+Route::view('admin/insights', 'admin.insights')->middleware(['auth', 'verified'])->name('admin.insights');
 
 // Vendor-specific features
 Route::view('vendor/order-management', 'vendor.order_management')->middleware(['auth', 'verified'])->name('vendor.order_management');
@@ -103,6 +104,10 @@ Route::view('production_manager/order-management', 'production_manager.order_man
 Route::view('production_manager/inventory-alerts', 'production_manager.inventory_alerts')->middleware(['auth', 'verified'])->name('production_manager.inventory_alerts');
 Route::view('production_manager/production-metrics', 'production_manager.production_metrics')->middleware(['auth', 'verified'])->name('production_manager.production_metrics');
 Route::view('production_manager/sales_tracking', 'production_manager.sales_tracking')->middleware(['auth', 'verified'])->name('production_manager.sales_tracking');
+
+// Retailer-specific features
+Route::view('retailer/order_placement', 'retailer.order_placement')->middleware(['auth', 'verified'])->name('retailer.order_placement');
+Route::view('retailer/sales-insights', 'retailer.sales-insights')->middleware(['auth', 'verified'])->name('retailer.sales_insights');
 
 //Route::get('/production_manager/dashboard', function(){
   //  return view('production_manager.dashboard');
