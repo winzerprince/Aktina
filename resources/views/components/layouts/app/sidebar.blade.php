@@ -12,21 +12,20 @@
                 <x-app-logo />
             </a>
 
+            @php
+                $role = auth()->user()->role ?? '';
+            @endphp
+            <div class="text-lg font-extrabold tracking-tight text-green-800 dark:text-zinc-200" >
+                {{ __($role . ' Dashboard') }}
+            </div>
+
             <flux:navlist variant="outline">
-                <flux:navlist.group :heading="__('Platform')" class="grid">
+                <flux:navlist.group class="grid " >
                     <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Home') }}</flux:navlist.item>
+                    <flux:navlist.item icon="cube-transparent" :href="route('components.demo')" :current="request()->routeIs('components.demo')" wire:navigate>{{ __('UI Components') }}</flux:navlist.item>
                 </flux:navlist.group>
             </flux:navlist>
-            <flux:navlist variant="outline">
-                <flux:navlist.group class="grid">
-                    <flux:navlist.item :href="route('orders')" :current="request()->routeIs('orders')" wire:navigate>{{ __('Orders') }}</flux:navlist.item> 
-                    <flux:navlist.item :href="route('stocks')" :current="request()->routeIs('stocks')" wire:navigate>{{ __('Stocks') }}</flux:navlist.item>
-                    <flux:navlist.item :href="route('sales')" :current="request()->routeIs('sales')" wire:navigate>{{ __('Sales') }}</flux:navlist.item>
-                    <flux:navlist.item :href="route('products')" :current="request()->routeIs('products')" wire:navigate>{{ __('Products') }}</flux:navlist.item>
-                    <flux:navlist.item :href="route('invoices')" :current="request()->routeIs('invoices')" wire:navigate>{{ __('Invoices') }}</flux:navlist.item>
-                    <flux:navlist.item :href="route('settings')" :current="request()->routeIs('settings')" wire:navigate>{{ __('Settings') }}</flux:navlist.item>
-                </flux:navlist.group> 
-            </flux:navlist>
+
 
             @php
                 $role = auth()->user()->role ?? null;
@@ -38,9 +37,101 @@
                         <flux:navlist.item :href="route('retailer.feedback')" :current="request()->routeIs('retailer.feedback')" wire:navigate>
                             {{ __('Customer Feedback') }}
                         </flux:navlist.item>
+                        <flux:navlist.item :href="route('retailer.sales_insights')" :current="request()->routeIs('retailer.sales-insights')" wire:navigate>
+                            {{ __('Sales Insights') }}
+                        </flux:navlist.item>
+                        <flux:navlist.item :href="route('retailer.order_placement')" :current="request()->routeIs('retailer.order_placement')" wire:navigate>
+                            {{ __('Order Placement') }}
+                        </flux:navlist.item>
                     </flux:navlist.group>
                 </flux:navlist>
             @endif
+
+            @if ($role === 'Admin')
+                <flux:navlist variant="outline">
+                    <flux:navlist.group :heading="__('Administration')" class="grid">
+                        <flux:navlist.item icon="home" :href="route('admin.home')" :current="request()->routeIs('admin.home')" wire:navigate>
+                            {{ __('Overview') }}
+                        </flux:navlist.item>
+                        <flux:navlist.item icon="shopping-bag" :href="route('admin.sales')" :current="request()->routeIs('admin.sales')" wire:navigate>
+                            {{ __('Sales') }}
+                        </flux:navlist.item>
+                        <flux:navlist.item icon="users" :href="route('admin.user-management')" :current="request()->routeIs('admin.user-management')" wire:navigate>
+                            {{ __('User Management') }}
+                        </flux:navlist.item>
+                        <flux:navlist.item icon="chart-bar" :href="route('admin.insights')" :current="request()->routeIs('admin.insights')" wire:navigate>
+                            {{ __('Insights') }}
+                        </flux:navlist.item>
+                    </flux:navlist.group>
+                </flux:navlist>
+            @endif
+
+            <!-- Role-based Navigation -->
+             @if ($role === 'Vendor')
+                <flux:navlist variant="outline">
+                    <flux:navlist.group class="grid">
+                        <flux:navlist.item :href="route('vendor.order_management')" :current="request()->routeIs('vendor.order_management')" wire:navigate>
+                            {{ __('Order Management') }}
+                        </flux:navlist.item>
+                        <flux:navlist.item :href="route('vendor.AI_assistant')" :current="request()->routeIs('vendor.ai_assistant')" wire:navigate>
+                            {{ __('AI Assistant') }}
+                        </flux:navlist.item>
+                    </flux:navlist.group>
+                </flux:navlist>
+            @endif
+
+             @if ($role === 'Supplier')
+                <flux:navlist variant="outline">
+                    <flux:navlist.group class="grid">
+                        <flux:navlist.item :href="route('supplier.order_statistics')" :current="request()->routeIs('supplier.order_statistics')" wire:navigate>
+                            {{ __('Order Statistics') }}
+                        </flux:navlist.item>
+                        <flux:navlist.item :href="route('supplier.delivery_metrics')" :current="request()->routeIs('supplier.delivery_metrics')" wire:navigate>
+                            {{ __('Delivery Metrics') }}
+                        </flux:navlist.item>
+                    </flux:navlist.group>
+                </flux:navlist>
+            @endif
+
+             @if ($role === 'HR Manager')
+                <flux:navlist variant="outline">
+                    <flux:navlist.group class="grid">
+                        <flux:navlist.item :href="route('hr_manager.workforce_analytics')" :current="request()->routeIs('hr_manager.workforce_analytics')" wire:navigate>
+                            {{ __('Workforce Analytics') }}
+                        </flux:navlist.item>
+                        <flux:navlist.item :href="route('hr_manager.AI_assistant')" :current="request()->routeIs('hr_manager.ai_assistant')" wire:navigate>
+                            {{ __('AI Assistant') }}
+                        </flux:navlist.item>
+                        <flux:navlist.item :href="route('hr_manager.staff_performance')" :current="request()->routeIs('hr_manager.staff_performance')" wire:navigate>
+                            {{ __('Staff Performance') }}
+                        </flux:navlist.item>
+                    </flux:navlist.group>
+                </flux:navlist>
+            @endif
+
+            @if ($role === 'Production Manager')
+                <flux:navlist variant="outline">
+                    <flux:navlist.group class="grid">
+                        <flux:navlist.item :href="route('production_manager.order_management')" :current="request()->routeIs('production_manager.order_management')" wire:navigate>
+                            {{ __('Order Management') }}
+                        </flux:navlist.item>
+                        <flux:navlist.item :href="route('production_manager.inventory_alerts')" :current="request()->routeIs('production_manager.inventory_alerts')" wire:navigate>
+                            {{ __('Inventory Alerts') }}
+                        </flux:navlist.item>
+                        <flux:navlist.item :href="route('production_manager.production_metrics')" :current="request()->routeIs('production_manager.production_metrics')" wire:navigate>
+                            {{ __('Production Metrics') }}
+                        </flux:navlist.item>
+                         <flux:navlist.item :href="route('production_manager.sales_tracking')" :current="request()->routeIs('production_manager.sales_tracking')" wire:navigate>
+                            {{ __('Sales Tracking') }}
+                        </flux:navlist.item>
+                    </flux:navlist.group>
+                </flux:navlist>
+            @endif
+            <flux:navlist variant="outline">
+                <flux:navlist.group class="grid">
+                    <flux:navlist.item :href="route('communication')" :current="request()->routeIs('communication')" wire:navigate>{{ __('Communication') }}</flux:navlist.item>
+                </flux:navlist.group>
+            </flux:navlist>
 
             <flux:spacer />
 

@@ -23,6 +23,9 @@ class User extends Authenticatable
         'email',
         'role',
         'password',
+        'verified',
+        'company_name',
+        'address',
     ];
 
     /**
@@ -45,6 +48,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'verified' => 'boolean',
+            'address' => 'array',
         ];
     }
 
@@ -58,5 +63,106 @@ class User extends Authenticatable
             ->take(2)
             ->map(fn ($word) => Str::substr($word, 0, 1))
             ->implode('');
+    }
+
+    // Role-based relationships
+    public function supplier()
+    {
+        return $this->hasOne(Supplier::class);
+    }
+
+    public function admin()
+    {
+        return $this->hasOne(Admin::class);
+    }
+
+    public function hrManager()
+    {
+        return $this->hasOne(HrManager::class);
+    }
+
+    public function productionManager()
+    {
+        return $this->hasOne(ProductionManager::class);
+    }
+
+    public function vendor()
+    {
+        return $this->hasOne(Vendor::class);
+    }
+
+    public function retailer()
+    {
+        return $this->hasOne(Retailer::class);
+    }
+
+    // Order relationships
+    public function buyerOrders()
+    {
+        return $this->hasMany(Order::class, 'buyer_id');
+    }
+
+    public function sellerOrders()
+    {
+        return $this->hasMany(Order::class, 'seller_id');
+    }
+
+    // Role checking methods
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isSupplier()
+    {
+        return $this->role === 'supplier';
+    }
+
+    public function isVendor()
+    {
+        return $this->role === 'vendor';
+    }
+
+    public function isRetailer()
+    {
+        return $this->role === 'retailer';
+    }
+
+    public function isHrManager()
+    {
+        return $this->role === 'hr_manager';
+    }
+
+    public function isProductionManager()
+    {
+        return $this->role === 'production_manager';
+    }
+
+    // Additional role checking methods for tech industry
+    public function canManageComponents()
+    {
+        return in_array($this->role, ['admin', 'production_manager', 'supplier']);
+    }
+
+    public function canViewProduction()
+    {
+        return in_array($this->role, ['admin', 'production_manager']);
+    }
+
+    public function canManageSuppliers()
+    {
+        return in_array($this->role, ['admin', 'hr_manager']);
+    }
+
+    public function getCompanyTypeAttribute()
+    {
+        if ($this->isSupplier()) {
+            return 'Component Supplier';
+        } elseif ($this->isVendor()) {
+            return 'Distribution Partner';
+        } elseif ($this->isRetailer()) {
+            return 'Retail Partner';
+        }
+        return 'Aktina Technologies';
     }
 }

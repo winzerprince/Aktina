@@ -25,7 +25,18 @@ new #[Layout('components.layouts.auth')] class extends Component {
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'role' => ['required', 'string', 'in:Admin,Production Manager,HR Manager,Vendor,Retailer,Supplier'],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
-        ]);
+        ],
+        [
+        'name.required' => 'Please enter your name.',
+        'email.required' => 'Please enter your email address.',
+        'email.email' => 'Please enter a valid email address with the form example@gmail.com.',
+        'email.unique' => 'This email is already registered.',
+        'role.required' => 'Please select a role.',
+        'role.in' => 'Please select a valid role.',
+        'password.required' => 'Please enter a password.',
+        'password.confirmed' => 'Passwords do not match.'
+    ]
+        );
 
         $validated['password'] = Hash::make($validated['password']);
         $user = User::create($validated);
@@ -36,6 +47,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
         $this->redirectIntended(route('dashboard', absolute: false), navigate: true);
     }
+
 }; ?>
 
 <div class="flex flex-col gap-6">
@@ -44,7 +56,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />
 
-    <form wire:submit="register" class="flex flex-col gap-6">
+    <form wire:submit="register" class="flex flex-col gap-6" novalidate>
         <!-- Name -->
         <flux:input
             wire:model="name"
@@ -84,7 +96,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 <option value="Retailer">{{ __('Retailer') }}</option>
                 <option value="Supplier">{{ __('Supplier') }}</option>
             </select>
-            @error('role') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
+            @error('role') <span class="text-red-400 text-sm mt-1">{{ $message }}</span> @enderror
         </div>
 
 

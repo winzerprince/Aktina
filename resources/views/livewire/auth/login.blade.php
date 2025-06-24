@@ -44,22 +44,22 @@ new #[Layout('components.layouts.auth')] class extends Component {
         $role = auth()->user()->role ?? null;
         if ($role === 'Retailer') {
             $this->redirectIntended(default: route('retailer.dashboard', absolute: false), navigate: true);
-        } 
+        }
         elseif ($role === 'Admin') {
             $this->redirectIntended(default: route('admin.dashboard', absolute: false), navigate: true);
-        } 
+        }
         elseif ($role === 'Production Manager') {
             $this->redirectIntended(default: route('production_manager.dashboard', absolute: false), navigate: true);
-        } 
+        }
         elseif ($role === 'HR Manager') {
             $this->redirectIntended(default: route('hr_manager.dashboard', absolute: false), navigate: true);
-        } 
+        }
         elseif ($role === 'Supplier') {
            $this->redirectIntended(default: route('supplier.dashboard', absolute: false), navigate: true);
-        } 
+        }
         elseif ($role === 'Vendor') {
            $this->redirectIntended(default: route('vendor.dashboard', absolute: false), navigate: true);
-        } 
+        }
         else {
             $this->redirectIntended(default: route('access.denied', absolute: false), navigate: true);
         }
@@ -95,13 +95,17 @@ new #[Layout('components.layouts.auth')] class extends Component {
     }
 }; ?>
 
-<div class="flex flex-col gap-6">
+<div
+    class="w-full max-w-md border rounded-lg p-6 my-16 text-zinc-900 dark:text-zinc-100"
+    style="border-color: #008800; box-shadow: 0 4px 24px 0 #00880033;"
+    id="login-border"
+>
     <x-auth-header :title="__('Log in to your account')" :description="__('Enter your email and password below to log in')" />
 
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />
 
-    <form wire:submit="login" class="flex flex-col gap-6">
+    <form wire:submit="login" class="flex flex-col gap-6" novalidate>
         <!-- Email Address -->
         <flux:input
             wire:model="email"
@@ -136,7 +140,15 @@ new #[Layout('components.layouts.auth')] class extends Component {
         <flux:checkbox wire:model="remember" :label="__('Remember me')" />
 
         <div class="flex items-center justify-end">
-            <flux:button variant="primary" type="submit" class="w-full">{{ __('Log in') }}</flux:button>
+            <flux:button
+                type="submit"
+                class="w-full border-none"
+                style="background-color: #30cf36; color: #fff; border: none; transition: background 0.2s;"
+                onmouseover="this.style.backgroundColor = (document.documentElement.classList.contains('dark') ? '#30cf36' : '#008800')"
+                onmouseout="this.style.backgroundColor = (document.documentElement.classList.contains('dark') ? '#044c03' : '#30cf36')"
+            >
+                {{ __('Log in') }}
+            </flux:button>
         </div>
     </form>
 
