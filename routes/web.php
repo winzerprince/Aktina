@@ -43,7 +43,7 @@ Route::view('retailer/dashboard', 'retailer.dashboard')
     ->middleware(['auth', 'verified'])
     ->name('retailer.dashboard');
 
-Route::redirect('admin/dashboard', 'admin/home')
+Route::redirect('admin/dashboard', 'admin.home')
     ->middleware(['auth', 'verified'])
     ->name('admin.dashboard');
 
