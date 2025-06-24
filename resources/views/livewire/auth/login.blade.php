@@ -44,22 +44,22 @@ new #[Layout('components.layouts.auth')] class extends Component {
         $role = auth()->user()->role ?? null;
         if ($role === 'Retailer') {
             $this->redirectIntended(default: route('retailer.dashboard', absolute: false), navigate: true);
-        } 
+        }
         elseif ($role === 'Admin') {
             $this->redirectIntended(default: route('admin.dashboard', absolute: false), navigate: true);
-        } 
+        }
         elseif ($role === 'Production Manager') {
             $this->redirectIntended(default: route('production_manager.dashboard', absolute: false), navigate: true);
-        } 
+        }
         elseif ($role === 'HR Manager') {
             $this->redirectIntended(default: route('hr_manager.dashboard', absolute: false), navigate: true);
-        } 
+        }
         elseif ($role === 'Supplier') {
            $this->redirectIntended(default: route('supplier.dashboard', absolute: false), navigate: true);
-        } 
+        }
         elseif ($role === 'Vendor') {
            $this->redirectIntended(default: route('vendor.dashboard', absolute: false), navigate: true);
-        } 
+        }
         else {
             $this->redirectIntended(default: route('access.denied', absolute: false), navigate: true);
         }
@@ -105,7 +105,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />
 
-    <form wire:submit="login" class="flex flex-col gap-6">
+    <form wire:submit="login" class="flex flex-col gap-6" novalidate>
         <!-- Email Address -->
         <flux:input
             wire:model="email"
