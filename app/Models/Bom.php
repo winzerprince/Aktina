@@ -11,9 +11,7 @@ class Bom extends Model
 
     protected $table = 'bom';
 
-    protected $fillable = [
-        'price',
-        'product_id',
+    protected $guarded = [
     ];
 
     protected $casts = [

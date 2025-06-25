@@ -11,10 +11,7 @@ class Rating extends Model
 
     protected $table = 'rating';
 
-    protected $fillable = [
-        'rating',
-        'product_id',
-        'retailer_id',
+    protected $guarded = [
     ];
 
     public function product()

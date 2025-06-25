@@ -1,3 +1,3 @@
 <x-layouts.app>
-    <h1>Sales</h1>
+    <h1>Overview</h1>
 </x-layouts.app>

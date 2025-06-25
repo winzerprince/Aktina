@@ -11,19 +11,7 @@ class Resource extends Model
 
     protected $table = 'resource';
 
-    protected $fillable = [
-        'name',
-        'component_type',
-        'category',
-        'units',
-        'reorder_level',
-        'overstock_level',
-        'unit_cost',
-        'part_number',
-        'specifications',
-        'description',
-        'supplier_id',
-        'bom_id',
+    protected $guarded = [
     ];
 
     protected $casts = [

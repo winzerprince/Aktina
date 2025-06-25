@@ -11,11 +11,7 @@ class Application extends Model
 
     protected $table = 'application';
 
-    protected $fillable = [
-        'status',
-        'meeting_schedule',
-        'vendor_id',
-    ];
+    protected $guarded = [];
 
     protected $casts = [
         'meeting_schedule' => 'date',
@@ -61,7 +57,7 @@ class Application extends Model
 
     public function getStatusColorAttribute()
     {
-        return match($this->status) {
+        return match ($this->status) {
             'approved' => 'green',
             'partially approved' => 'yellow',
             'pending' => 'blue',

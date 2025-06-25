@@ -11,8 +11,7 @@ class HrManager extends Model
 
     protected $table = 'hr_manager';
 
-    protected $fillable = [
-        'user_id',
+    protected $guarded = [
     ];
 
     public function user()

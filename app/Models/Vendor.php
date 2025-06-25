@@ -11,10 +11,7 @@ class Vendor extends Model
 
     protected $table = 'vendor';
 
-    protected $fillable = [
-        'user_id',
-        'retailer_listing_id',
-        'application_id',
+    protected $guarded = [
     ];
 
     public function user()

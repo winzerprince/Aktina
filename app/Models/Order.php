@@ -11,11 +11,7 @@ class Order extends Model
 
     protected $table = 'order';
 
-    protected $fillable = [
-        'price',
-        'items',
-        'buyer_id',
-        'seller_id',
+    protected $guarded = [
     ];
 
     protected $casts = [

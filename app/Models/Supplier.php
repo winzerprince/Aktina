@@ -11,15 +11,8 @@ class Supplier extends Model
 
     protected $table = 'supplier';
 
-    protected $fillable = [
-        'user_id',
-        'company_name',
-        'region',
-        'component_categories',
-        'reliability_rating',
-        'is_preferred',
-        'certifications',
-        'resources', // Keep for backward compatibility
+    protected $guarded = [
+         // Keep for backward compatibility
     ];
 
     protected $casts = [

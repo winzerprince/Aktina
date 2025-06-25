@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminDashboardController;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -39,33 +40,8 @@ Route::view('components-demo', 'components-demo')
 //     ->middleware(['auth', 'verified'])
 //     ->name('settings');
 
-Route::view('retailer/dashboard', 'retailer.dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('retailer.dashboard');
 
-Route::redirect('admin/dashboard', 'admin.home')
-    ->middleware(['auth', 'verified'])
-    ->name('admin.dashboard');
 
-Route::view('retailer/feedback', 'retailer.feedback')
-    ->middleware(['auth', 'verified'])
-    ->name('retailer.feedback');
-
-Route::view('production_manager/dashboard', 'production_manager.dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('production_manager.dashboard');
-
-Route::view('hr_manager/dashboard', 'hr_manager.dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('hr_manager.dashboard');
-
-Route::view('supplier/dashboard', 'supplier.dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('supplier.dashboard');
-
-Route::view('vendor/dashboard', 'vendor.dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('vendor.dashboard');
 
 Route::view('access-denied', 'access_denied')
     ->middleware(['auth', 'verified'])
@@ -79,12 +55,22 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/password', 'settings.password')->name('settings.password');
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
 });
+//TODO: Add role middleware to restrict access to certain routes based on user roles
+//TODO: Customize veification middleware to be based on admins approval rather than email verification
 
-// Admin-specific features
-Route::view('admin/home', 'admin.home')->middleware(['auth', 'verified'])->name('admin.home');
-Route::view('admin/sales', 'admin.sales')->middleware(['auth', 'verified'])->name('admin.sales');
-Route::view('admin/user-management', 'admin.user-management')->middleware(['auth', 'verified'])->name('admin.user-management');
-Route::view('admin/insights', 'admin.insights')->middleware(['auth', 'verified'])->name('admin.insights');
+ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::controller(AdminDashboardController::class)->group(function () {
+        Route::get('/overview', 'overview')->name('overview');
+        Route::get('/sales', 'sales')->name('sales');
+        Route::get('/users', 'users')->name('users');
+        Route::get('/vendors', 'vendors')->name('vendors');
+        Route::get('/pending-signups', 'pendingSignups')->name('pending-signups');
+        Route::get('/trends-and-predictions', 'trendsAndPredictions')->name('trends-and-predictions');
+        Route::get('/important-metrics', 'importantMetrics')->name('important-metrics');
+        Route::get('/customer-insights', 'customerInsights')->name('customer-insights');
+    });
+
+    });
 
 // Vendor-specific features
 Route::view('vendor/order-management', 'vendor.order_management')->middleware(['auth', 'verified'])->name('vendor.order_management');

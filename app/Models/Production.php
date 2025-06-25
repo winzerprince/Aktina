@@ -11,14 +11,7 @@ class Production extends Model
 
     protected $table = 'production';
 
-    protected $fillable = [
-        'units',
-        'status',
-        'completed_units',
-        'in_progress_units',
-        'cancelled_units',
-        'assembly_line',
-        'product_id',
+    protected $guarded = [
     ];
 
     public function product()

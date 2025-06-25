@@ -11,9 +11,7 @@ class RetailerListing extends Model
 
     protected $table = 'retailer_listing';
 
-    protected $fillable = [
-        'retailer_email',
-        'application_id',
+    protected $guarded = [
     ];
 
     public function application()

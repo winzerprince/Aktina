@@ -11,9 +11,7 @@ class Retailer extends Model
 
     protected $table = 'retailer';
 
-    protected $fillable = [
-        'user_id',
-        'vendor_id',
+    protected $guarded = [
     ];
 
     public function user()
