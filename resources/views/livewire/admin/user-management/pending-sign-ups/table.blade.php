@@ -120,7 +120,7 @@
                     <h3 class="text-lg font-medium text-zinc-900 dark:text-zinc-100 mb-2">No pending sign-ups</h3>
                     <p class="text-zinc-500 dark:text-zinc-400">All users have verified their email addresses.</p>
                 </div>
-            @x-slot:empty>
+            </x-slot:empty>
         </x-table>
     </div>
 </div>
