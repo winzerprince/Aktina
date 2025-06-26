@@ -9,7 +9,7 @@ class Admin extends Model
 {
     use HasFactory;
 
-    protected $table = 'admin';
+    protected $table = 'admins';
 
     protected $guarded = [];
 
