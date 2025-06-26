@@ -9,7 +9,7 @@ class Resource extends Model
 {
     use HasFactory;
 
-    protected $table = 'resource';
+    protected $table = 'resources';
 
     protected $guarded = [
     ];
@@ -24,9 +24,9 @@ class Resource extends Model
         return $this->belongsTo(Supplier::class);
     }
 
-    public function bom()
+    public function boms()
     {
-        return $this->belongsTo(Bom::class);
+        return $this->belongsToMany(Bom::class, 'bom_resource');
     }
 
     public function isLowStock()

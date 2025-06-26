@@ -9,7 +9,7 @@ class Product extends Model
 {
     use HasFactory;
 
-    protected $table = 'product';
+    protected $table = 'products';
 
     protected $guarded = [
     ];
@@ -21,7 +21,7 @@ class Product extends Model
 
     public function bom()
     {
-        return $this->belongsTo(Bom::class);
+        return $this->hasOne(Bom::class);
     }
 
     public function productions()

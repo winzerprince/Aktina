@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('resource', function (Blueprint $table) {
+        Schema::create('resources', function (Blueprint $table) {
             $table->id()->primary();
             $table->string('name');
             $table->string('component_type'); // SoC, Display, Camera, Battery, etc.
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('resource');
+        Schema::dropIfExists('resources');
     }
 };

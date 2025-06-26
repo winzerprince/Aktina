@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bom', function (Blueprint $table) {
-            $table->id()->primary();
-            $table->decimal('price', 10, 2);
-            $table->unsignedBigInteger('product_id')->nullable();
-            $table->timestamps();
+        Schema::table('plural', function (Blueprint $table) {
+            //
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bom');
+        Schema::table('plural', function (Blueprint $table) {
+            //
+        });
     }
 };

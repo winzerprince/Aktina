@@ -9,7 +9,7 @@ class Bom extends Model
 {
     use HasFactory;
 
-    protected $table = 'bom';
+    protected $table = 'boms';
 
     protected $guarded = [
     ];
@@ -25,7 +25,7 @@ class Bom extends Model
 
     public function resources()
     {
-        return $this->hasMany(Resource::class);
+        return $this->belongsToMany(Resource::class, 'bom_resource');
     }
 
     public function getTotalComponentCostAttribute()

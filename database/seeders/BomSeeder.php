@@ -13,13 +13,12 @@ class BomSeeder extends Seeder
         // Get existing products to create BOMs for them
         $products = Product::all();
 
-        // Create BOMs for products
+        // Create BOMs for existing products (one-to-one relationship)
         foreach ($products->take(25) as $product) {
-            $bom = Bom::factory()->create(['product_id' => $product->id]);
+            Bom::factory()->create(['product_id' => $product->id]);
+        }
 
-            // Update product with bom_id
-            $product->update(['bom_id' => $bom->id]);
-        }        // Create additional BOMs with new products
+        // Create additional BOMs with new products
         Bom::factory(10)->create();
 
         // Create some expensive BOMs
