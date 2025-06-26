@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('production', function (Blueprint $table) {
+        Schema::create('productions', function (Blueprint $table) {
             $table->id()->primary();
             $table->integer('units')->default(0);
             $table->enum('status', ['pending', 'in_progress', 'completed', 'cancelled'])->default('pending');
@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('in_progress_units')->default(0);
             $table->integer('cancelled_units')->default(0);
             $table->string('assembly_line')->default('Line 1');
-            $table->unsignedBigInteger('product_id')->nullable();
+            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
 
             $table->timestamps();
         });
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('production');
+        Schema::dropIfExists('productions');
     }
 };

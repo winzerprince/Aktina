@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('production_manager', function (Blueprint $table) {
+        Schema::create('orders', function (Blueprint $table) {
             $table->id()->primary();
-            $table->unsignedBigInteger('user_id')->nullable();
+            $table->decimal('price', 10, 2);
+            $table->json('items'); // JSON field to store product IDs and quantities
+            $table->foreignId('buyer_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('seller_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -23,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('production_manager');
+        Schema::dropIfExists('orders');
     }
 };

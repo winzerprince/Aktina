@@ -11,12 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('order', function (Blueprint $table) {
+        Schema::create('hr_managers', function (Blueprint $table) {
             $table->id()->primary();
-            $table->decimal('price', 10, 2);
-            $table->json('items'); // JSON field to store product IDs and quantities
-            $table->unsignedBigInteger('buyer_id')->nullable();
-            $table->unsignedBigInteger('seller_id')->nullable();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -26,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('product_order');
+        Schema::dropIfExists('hr_manager');
     }
 };

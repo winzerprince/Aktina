@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('rating', function (Blueprint $table) {
+        Schema::create('production_managers', function (Blueprint $table) {
             $table->id()->primary();
-            $table->integer('rating');
-            $table->unsignedBigInteger('product_id')->nullable();
-            $table->unsignedBigInteger('retailer_id')->nullable();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -25,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('rating');
+        Schema::dropIfExists('production_managers');
     }
 };

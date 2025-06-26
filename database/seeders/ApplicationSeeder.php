@@ -22,11 +22,24 @@ class ApplicationSeeder extends Seeder
             }
         }
 
-        // Create additional applications with new vendors
-        Application::factory(10)->create();        // Create some approved applications with new vendors
-        Application::factory(5)->approved()->create();
+        // Create additional applications - each needs a vendor
+        // Since each vendor can have only one application (unique constraint),
+        // we need to create new vendors for additional applications
+        for ($i = 0; $i < 10; $i++) {
+            $vendor = Vendor::factory()->create();
+            Application::factory()->create(['vendor_id' => $vendor->id]);
+        }
+
+        // Create some approved applications with new vendors
+        for ($i = 0; $i < 5; $i++) {
+            $vendor = Vendor::factory()->create();
+            Application::factory()->approved()->create(['vendor_id' => $vendor->id]);
+        }
 
         // Create some pending applications with new vendors
-        Application::factory(8)->pending()->create();
+        for ($i = 0; $i < 8; $i++) {
+            $vendor = Vendor::factory()->create();
+            Application::factory()->pending()->create(['vendor_id' => $vendor->id]);
+        }
     }
 }

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id()->primary();
             $table->enum('status', ['pending','partially approved', 'approved', 'rejected'])->default('pending');
             $table->date('meeting_schedule')->nullable();
-            $table->foreignId('vendor_id')->unique()->constrained('vendors')->onDelete('cascade'); // One-to-one with vendor
+            $table->foreignId('vendor_id')->unique()->constrained('vendors')->onDelete('cascade')->nullable(); // One-to-one with vendor
             $table->timestamps();
         });
     }

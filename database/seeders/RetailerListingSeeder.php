@@ -22,7 +22,12 @@ class RetailerListingSeeder extends Seeder
             }
         }
 
-        // Create additional retailer listings with new applications
-        RetailerListing::factory(15)->create();
+        // Create additional retailer listings - each needs an application
+        // Each application needs a vendor due to foreign key constraint
+        for ($i = 0; $i < 15; $i++) {
+            $vendor = \App\Models\Vendor::factory()->create();
+            $application = Application::factory()->create(['vendor_id' => $vendor->id]);
+            RetailerListing::factory()->forApplication($application->id)->create();
+        }
     }
 }

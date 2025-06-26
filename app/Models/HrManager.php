@@ -9,7 +9,7 @@ class HrManager extends Model
 {
     use HasFactory;
 
-    protected $table = 'hr_manager';
+    protected $table = 'hr_managers';
 
     protected $guarded = [
     ];

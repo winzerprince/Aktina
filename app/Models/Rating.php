@@ -9,7 +9,7 @@ class Rating extends Model
 {
     use HasFactory;
 
-    protected $table = 'rating';
+    protected $table = 'ratings';
 
     protected $guarded = [
     ];
