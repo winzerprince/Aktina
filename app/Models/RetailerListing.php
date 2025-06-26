@@ -9,7 +9,7 @@ class RetailerListing extends Model
 {
     use HasFactory;
 
-    protected $table = 'retailer_listing';
+    protected $table = 'retailer_listings';
 
     protected $guarded = [
     ];
@@ -17,11 +17,6 @@ class RetailerListing extends Model
     public function application()
     {
         return $this->belongsTo(Application::class);
-    }
-
-    public function vendors()
-    {
-        return $this->hasMany(Vendor::class);
     }
 
     public function isApproved()

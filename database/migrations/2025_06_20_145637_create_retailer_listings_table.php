@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('retailer_listing', function (Blueprint $table) {
+        Schema::create('retailer_listings', function (Blueprint $table) {
             $table->id()->primary();
             $table->string('retailer_email')->unique();
-            $table->unsignedBigInteger('application_id')->nullable();
+            $table->foreignId('application_id')->constrained('applications')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('retailer_listing');
+        Schema::dropIfExists('retailer_listings');
     }
 };
