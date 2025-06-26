@@ -1,8 +1,12 @@
 <div class="bg-white dark:bg-zinc-800 rounded-lg shadow-sm border-2 border-zinc-200 dark:border-zinc-700 overflow-hidden">
     {{-- Table Header --}}
     <div class="bg-zinc-50 dark:bg-zinc-900 px-6 py-4 border-b border-zinc-200 dark:border-zinc-700">
-        <h2 class="text-xl font-semibold text-zinc-800 dark:text-zinc-200">Sales Orders</h2>
-        <p class="text-sm text-zinc-600 dark:text-zinc-400 mt-1">View and manage all sales orders</p>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h2 class="text-xl font-semibold text-zinc-800 dark:text-zinc-200">All Sales Orders</h2>
+                <p class="text-sm text-zinc-600 dark:text-zinc-400 mt-1">Complete history of production manager sales orders</p>
+            </div>
+        </div>
     </div>
 
     {{-- Table Content --}}
