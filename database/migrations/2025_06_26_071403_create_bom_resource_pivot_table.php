@@ -11,9 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bom_resource_pivot', function (Blueprint $table) {
+        Schema::create('bom_resource', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('bom_id')->constrained('boms')->onDelete('cascade');
+            $table->foreignId('resource_id')->constrained('resources')->onDelete('cascade');
             $table->timestamps();
+
+            $table->unique(['bom_id', 'resource_id']);
         });
     }
 
@@ -22,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bom_resource_pivot');
+        Schema::dropIfExists('bom_resource');
     }
 };
