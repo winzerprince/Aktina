@@ -2,47 +2,35 @@
 
 namespace Database\Seeders;
 
+use App\Models\Production;
+use App\Models\Product;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class ProductionSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('production')->insert([
-            [
-                'units' => 10000,
-                'status' => 'in_progress',
-                'completed_units' => 3500,
-                'in_progress_units' => 4000,
-                'cancelled_units' => 0,
-                'assembly_line' => 'Flagship Line A',
-                'product_id' => 1, // Aktina Pro 15
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'units' => 25000,
-                'status' => 'completed',
-                'completed_units' => 25000,
-                'in_progress_units' => 0,
-                'cancelled_units' => 0,
-                'assembly_line' => 'Mid-Range Line B',
-                'product_id' => 2, // Aktina Lite 12
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'units' => 50000,
-                'status' => 'pending',
-                'completed_units' => 0,
-                'in_progress_units' => 0,
-                'cancelled_units' => 0,
-                'assembly_line' => 'Budget Line C',
-                'product_id' => 3, // Aktina Essential 10
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ]);
+        // Get existing products to create production for them
+        $products = Product::all();
+
+        // Create production runs for existing products
+        if ($products->count() > 0) {
+            foreach ($products->take(20) as $product) {
+                // Some products may have multiple production runs
+                $runs = rand(1, 3);
+                for ($i = 0; $i < $runs; $i++) {
+                    Production::factory()->create(['product_id' => $product->id]);
+                }
+            }
+        }
+
+        // Create additional production runs with new products
+        Production::factory(25)->create();
+
+        // Create some completed production runs
+        Production::factory(15)->completed()->create();
+
+        // Create some in-progress production runs
+        Production::factory(10)->inProgress()->create();
     }
 }

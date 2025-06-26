@@ -2,44 +2,34 @@
 
 namespace Database\Seeders;
 
+use App\Models\Order;
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class OrderSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('order')->insert([
-            [
-                'price' => 24999.75,
-                'items' => json_encode([
-                    ['product_id' => 1, 'product_name' => 'Aktina Pro 15', 'quantity' => 25, 'unit_price' => 999.99],
-                ]),
-                'buyer_id' => 4, // David Kim (Retailer)
-                'seller_id' => 3, // Lisa Wang (Vendor)
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'price' => 22499.50,
-                'items' => json_encode([
-                    ['product_id' => 2, 'product_name' => 'Aktina Lite 12', 'quantity' => 50, 'unit_price' => 449.99],
-                ]),
-                'buyer_id' => 4, // David Kim (Retailer)
-                'seller_id' => 3, // Lisa Wang (Vendor)
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'price' => 19999.20,
-                'items' => json_encode([
-                    ['product_id' => 3, 'product_name' => 'Aktina Essential 10', 'quantity' => 100, 'unit_price' => 199.99],
-                ]),
-                'buyer_id' => 4, // David Kim (Retailer)
-                'seller_id' => 3, // Lisa Wang (Vendor)
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ]);
+        // Get existing users to act as buyers and sellers
+        $users = User::all();
+
+        // Create orders with existing users
+        if ($users->count() >= 2) {
+            for ($i = 0; $i < 20; $i++) {
+                $buyer = $users->random();
+                $seller = $users->where('id', '!=', $buyer->id)->random();
+
+                Order::factory()->create([
+                    'buyer_id' => $buyer->id,
+                    'seller_id' => $seller->id,
+                ]);
+            }
+        }
+
+        // Create additional orders with new users
+        Order::factory(30)->create();
+
+        // Create some large orders
+        Order::factory(8)->large()->create();
     }
 }

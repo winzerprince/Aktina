@@ -2,25 +2,27 @@
 
 namespace Database\Seeders;
 
+use App\Models\RetailerListing;
+use App\Models\Application;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class RetailerListingSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('retailer_listing')->insert([
-            [
-                'retailer_email' => 'retailer@example.com',
-                'application_id' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ]);
+        // Get existing applications to link retailer listings
+        $applications = Application::all();
 
-        // Update vendor with retailer_listing_id
-        DB::table('vendor')->where('id', 1)->update([
-            'retailer_listing_id' => 1,
-        ]);
+        // Create retailer listings for applications
+        if ($applications->count() > 0) {
+            foreach ($applications->take(12) as $application) {
+                if (rand(1, 10) <= 6) { // 60% chance of having a retailer listing
+                    RetailerListing::factory()->forApplication($application->id)->create();
+                }
+            }
+        }
+
+        // Create additional retailer listings with new applications
+        RetailerListing::factory(15)->create();
     }
 }

@@ -2,19 +2,21 @@
 
 namespace Database\Seeders;
 
+use App\Models\Admin;
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class AdminSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('admin')->insert([
-            [
-                'user_id' => 1, // Admin User
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ]);
+        // Get users with admin role to link to admins
+        $adminUsers = User::where('role', 'admin')->get();        // Create admins linked to existing users
+        foreach ($adminUsers->take(5) as $user) {
+            Admin::factory()->forUser($user->id)->create();
+        }
+
+        // Create additional admins with new users
+        Admin::factory(5)->create();
     }
 }

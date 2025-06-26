@@ -2,26 +2,26 @@
 
 namespace Database\Seeders;
 
+use App\Models\Vendor;
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class VendorSeeder extends Seeder
 {
     public function run(): void
     {
-        DB::table('vendor')->insert([
-            [
-                'user_id' => 3, // Jane Vendor
-                'application_id' => 1,
-                'retailer_listing_id' => null, // Will be set after retailer_listing is created
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-        ]);
+        // Get users with vendor role to link to vendors
+        $vendorUsers = User::where('role', 'vendor')->get();
 
-        // Update the application with vendor_id
-        DB::table('application')->where('id', 1)->update([
-            'vendor_id' => 1,
-        ]);
+        // Create vendors linked to existing users
+        foreach ($vendorUsers->take(10) as $user) {
+            Vendor::factory()->create(['user_id' => $user->id]);
+        }
+
+        // Create additional vendors with new users
+        Vendor::factory(15)->create();
+
+        // Create some vendors with applications (note: applications will be created separately)
+        // We'll update this relationship in ApplicationSeeder
     }
 }

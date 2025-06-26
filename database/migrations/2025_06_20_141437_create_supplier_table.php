@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('supplier', function (Blueprint $table) {
             $table->id()->primary();
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->string('company_name');
             $table->string('region'); // Asia-Pacific, Europe, US, etc.
             $table->json('component_categories')->nullable(); // Categories they supply
