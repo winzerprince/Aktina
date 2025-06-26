@@ -1,0 +1,45 @@
+<?php
+
+namespace App\Livewire\Admin\UserManagement\PendingSignUps;
+
+use App\Models\User;
+use Livewire\Component;
+use Livewire\WithPagination;
+
+class Table extends Component
+{
+    use WithPagination;
+
+    public function toggleEmailVerification($userId)
+    {
+        $user = User::findOrFail($userId);
+
+        // Toggle email verification status
+        if ($user->email_verified_at) {
+            $user->email_verified_at = null;
+            $status = 'email unverified';
+        } else {
+            $user->email_verified_at = now();
+            $status = 'email verified';
+        }
+
+        $user->save();
+
+        // Add a success message
+        session()->flash('message', "User {$user->name} has been {$status}.");
+    }
+
+    public function render()
+    {
+        // Only show users with unverified emails (email_verified_at is null)
+        $pendingUsers = User::query()
+            ->whereNull('email_verified_at')
+            ->with(['admin', 'supplier', 'vendor', 'retailer', 'hrManager', 'productionManager'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('livewire.admin.user-management.pending-sign-ups.table', [
+            'pendingUsers' => $pendingUsers
+        ]);
+    }
+}

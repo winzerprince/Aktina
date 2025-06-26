@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Livewire\Counter;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -112,3 +113,7 @@ Route::view('retailer/sales-insights', 'retailer.sales-insights')->middleware(['
 Route::view('communication', 'communication')->middleware(['auth', 'verified'])->name('communication');
 
 require __DIR__.'/auth.php';
+
+
+//Livewire routes
+Route::get('counter',Counter::class);

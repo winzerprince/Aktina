@@ -27,6 +27,11 @@ class Application extends Model
         return $this->hasMany(RetailerListing::class);
     }
 
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
     public function isPending()
     {
         return $this->status === 'pending';
@@ -47,7 +52,7 @@ class Application extends Model
         return $this->status === 'partially approved';
     }
 
-    public function getDaysUntilMeetingAttribute()
+    public function getDaysToMeeting()
     {
         if (!$this->meeting_schedule) {
             return null;
@@ -55,14 +60,15 @@ class Application extends Model
         return now()->diffInDays($this->meeting_schedule, false);
     }
 
-    public function getStatusColorAttribute()
+    public function getStatusColor()
     {
         return match ($this->status) {
             'approved' => 'green',
             'partially approved' => 'yellow',
-            'pending' => 'blue',
+            'pending' => 'gray',
             'rejected' => 'red',
-            default => 'gray'
+            default=> 'gray',
+
         };
     }
 }
