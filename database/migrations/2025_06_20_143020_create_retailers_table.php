@@ -11,10 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('retailer', function (Blueprint $table) {
+        Schema::create('retailers', function (Blueprint $table) {
             $table->id()->primary();
-            $table->unsignedBigInteger('user_id')->nullable();
-            $table->unsignedBigInteger('vendor_id')->nullable();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -24,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('retailer');
+        Schema::dropIfExists('retailers');
     }
 };

@@ -4,25 +4,21 @@ namespace Database\Seeders;
 
 use App\Models\Retailer;
 use App\Models\User;
-use App\Models\Vendor;
 use Illuminate\Database\Seeder;
 
 class RetailerSeeder extends Seeder
 {
     public function run(): void
     {
-        // Get users with retailer role and existing vendors
+        // Get users with retailer role
         $retailerUsers = User::where('role', 'retailer')->get();
-        $vendors = Vendor::all();
 
-        // Create retailers linked to existing users and vendors
-        if ($vendors->count() > 0) {
-            foreach ($retailerUsers->take(10) as $user) {
-                Retailer::factory()->forUserAndVendor($user->id, $vendors->random()->id)->create();
-            }
+        // Create retailers linked to existing users
+        foreach ($retailerUsers->take(10) as $user) {
+            Retailer::factory()->forUser($user->id)->create();
         }
 
-        // Create additional retailers with new users and vendors
+        // Create additional retailers with new users
         Retailer::factory(20)->create();
 
         // Create some verified retailers

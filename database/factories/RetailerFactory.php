@@ -4,7 +4,6 @@ namespace Database\Factories;
 
 use App\Models\Retailer;
 use App\Models\User;
-use App\Models\Vendor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,18 +19,16 @@ class RetailerFactory extends Factory
     {
         return [
             'user_id' => User::factory()->retailer(),
-            'vendor_id' => Vendor::factory(),
         ];
     }
 
     /**
-     * Indicate that the retailer is linked to an existing user and vendor.
+     * Indicate that the retailer is linked to an existing user.
      */
-    public function forUserAndVendor($userId, $vendorId): static
+    public function forUser($userId): static
     {
         return $this->state(fn (array $attributes) => [
             'user_id' => $userId,
-            'vendor_id' => $vendorId,
         ]);
     }
 

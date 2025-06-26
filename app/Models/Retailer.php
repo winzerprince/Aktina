@@ -9,7 +9,7 @@ class Retailer extends Model
 {
     use HasFactory;
 
-    protected $table = 'retailer';
+    protected $table = 'retailers';
 
     protected $guarded = [
     ];
@@ -17,11 +17,6 @@ class Retailer extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function vendor()
-    {
-        return $this->belongsTo(Vendor::class);
     }
 
     public function ratings()
