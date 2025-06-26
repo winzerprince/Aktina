@@ -9,7 +9,7 @@ class Application extends Model
 {
     use HasFactory;
 
-    protected $table = 'application';
+    protected $table = 'applications';
 
     protected $guarded = [];
 

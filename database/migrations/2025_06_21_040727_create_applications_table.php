@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('application', function (Blueprint $table) {
+        Schema::create('applications', function (Blueprint $table) {
             $table->id()->primary();
             $table->enum('status', ['pending','partially approved', 'approved', 'rejected'])->default('pending');
             $table->date('meeting_schedule')->nullable();
-            $table->unsignedBigInteger('vendor_id')->nullable(); // Add vendor_id field
+            $table->foreignId('vendor_id')->unique()->constrained('vendors')->onDelete('cascade'); // One-to-one with vendor
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('application');
+        Schema::dropIfExists('applications');
     }
 };
