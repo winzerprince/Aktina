@@ -9,7 +9,7 @@ class Vendor extends Model
 {
     use HasFactory;
 
-    protected $table = 'vendor';
+    protected $table = 'vendors';
 
     protected $guarded = [
     ];
@@ -21,16 +21,6 @@ class Vendor extends Model
 
     public function application()
     {
-        return $this->belongsTo(Application::class);
-    }
-
-    public function retailerListing()
-    {
-        return $this->belongsTo(RetailerListing::class);
-    }
-
-    public function retailers()
-    {
-        return $this->hasMany(Retailer::class);
+        return $this->hasOne(Application::class);
     }
 }

@@ -3,8 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\User;
-use App\Models\Application;
-use App\Models\RetailerListing;
 use App\Models\Vendor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -22,8 +20,6 @@ class VendorFactory extends Factory
     {
         return [
             'user_id' => User::factory()->vendor(),
-            'retailer_listing_id' => null,
-            'application_id' => null,
         ];
     }
 
