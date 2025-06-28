@@ -31,14 +31,20 @@
             @if ($role === 'Retailer')
                 <flux:navlist variant="outline">
                     <flux:navlist.group class="grid">
-                        <flux:navlist.item :href="route('retailer.feedback')" :current="request()->routeIs('retailer.feedback')" wire:navigate>
-                            {{ __('Customer Feedback') }}
+                        <flux:navlist.item :href="route('retailer.overview')" :current="request()->routeIs('retailer.overview')" wire:navigate>
+                            {{ __('Overview')}}
                         </flux:navlist.item>
-                        <flux:navlist.item :href="route('retailer.sales_insights')" :current="request()->routeIs('retailer.sales-insights')" wire:navigate>
-                            {{ __('Sales Insights') }}
+                        <flux:navlist.item :href="route('retailer.orders')" :current="request()->routeIs('retailer.orders')" wire:navigate>
+                            {{ __('Orders')}}
                         </flux:navlist.item>
-                        <flux:navlist.item :href="route('retailer.order_placement')" :current="request()->routeIs('retailer.order_placement')" wire:navigate>
-                            {{ __('Order Placement') }}
+                        <flux:navlist.item :href="route('retailer.sales')" :current="request()->routeIs('retailer.sales')" wire:navigate>
+                            {{ __('Sales')}}
+                        </flux:navlist.item>
+                        <flux:navlist.item :href="route('retailer.inventory')" :current="request()->routeIs('retailer.inventory')" wire:navigate>
+                            {{ __('Inventory')}}
+                        </flux:navlist.item>
+                        <flux:navlist.item :href="route('retailer.ratings')" :current="request()->routeIs('retailer.ratings')" wire:navigate>
+                            {{ __('Ratings')}}
                         </flux:navlist.item>
                     </flux:navlist.group>
                 </flux:navlist>
@@ -48,10 +54,10 @@
                 <flux:navlist variant="outline">
                     <flux:navlist.group :heading="__('Administration')" class="grid" >
                         <flux:navlist.item icon="home" :href="route('admin.overview')" :current="request()->routeIs('admin.overview')" wire:navigate>
-                            {{ __('Overview') }}
+                            {{ __('Overview')}}
                         </flux:navlist.item>
                         <flux:navlist.item icon="shopping-bag" :href="route('admin.sales')" :current="request()->routeIs('admin.sales')" wire:navigate>
-                            {{ __('Sales') }}
+                            {{ __('Sales')}}
                         </flux:navlist.item>
                         <flux:navlist.group
                             :heading="__('User Management')"
@@ -94,11 +100,20 @@
              @if ($role === 'Vendor')
                 <flux:navlist variant="outline">
                     <flux:navlist.group class="grid">
-                        <flux:navlist.item :href="route('vendor.order_management')" :current="request()->routeIs('vendor.order_management')" wire:navigate>
-                            {{ __('Order Management') }}
+                        <flux:navlist.item :href="route('vendor.overview')" :current="request()->routeIs('vendor.overview')" wire:navigate>
+                            {{ __('Overview') }}
                         </flux:navlist.item>
-                        <flux:navlist.item :href="route('vendor.AI_assistant')" :current="request()->routeIs('vendor.ai_assistant')" wire:navigate>
-                            {{ __('AI Assistant') }}
+                        <flux:navlist.item :href="route('vendor.orders')" :current="request()->routeIs('vendor.orders')" wire:navigate>
+                            {{ __('Orders') }}
+                        </flux:navlist.item>
+                        <flux:navlist.item :href="route('vendor.sales')" :current="request()->routeIs('vendor.sales')" wire:navigate>
+                            {{ __('Sales') }}
+                        </flux:navlist.item>
+                        <flux:navlist.item :href="route('vendor.inventory')" :current="request()->routeIs('vendor.inventory')" wire:navigate>
+                            {{ __('Inventory') }}
+                        </flux:navlist.item>
+                        <flux:navlist.item :href="route('vendor.retailers')" :current="request()->routeIs('vendor.retailers')" wire:navigate>
+                            {{ __('Retailers') }}
                         </flux:navlist.item>
                     </flux:navlist.group>
                 </flux:navlist>
@@ -107,11 +122,14 @@
              @if ($role === 'Supplier')
                 <flux:navlist variant="outline">
                     <flux:navlist.group class="grid">
-                        <flux:navlist.item :href="route('supplier.order_statistics')" :current="request()->routeIs('supplier.order_statistics')" wire:navigate>
-                            {{ __('Order Statistics') }}
+                        <flux:navlist.item :href="route('supplier.overview')" :current="request()->routeIs('supplier.overview')" wire:navigate>
+                            {{ __('Overview') }}
                         </flux:navlist.item>
-                        <flux:navlist.item :href="route('supplier.delivery_metrics')" :current="request()->routeIs('supplier.delivery_metrics')" wire:navigate>
-                            {{ __('Delivery Metrics') }}
+                        <flux:navlist.item :href="route('supplier.orders')" :current="request()->routeIs('supplier.orders')" wire:navigate>
+                            {{ __('Orders') }}
+                        </flux:navlist.item>
+                        <flux:navlist.item :href="route('supplier.resources')" :current="request()->routeIs('supplier.resources')" wire:navigate>
+                            {{ __('Resources') }}
                         </flux:navlist.item>
                     </flux:navlist.group>
                 </flux:navlist>
@@ -120,14 +138,11 @@
              @if ($role === 'HR Manager')
                 <flux:navlist variant="outline">
                     <flux:navlist.group class="grid">
-                        <flux:navlist.item :href="route('hr_manager.workforce_analytics')" :current="request()->routeIs('hr_manager.workforce_analytics')" wire:navigate>
-                            {{ __('Workforce Analytics') }}
+                        <flux:navlist.item :href="route('hr_manager.overview')" :current="request()->routeIs('hr_manager.overview')" wire:navigate>
+                            {{ __('Overview') }}
                         </flux:navlist.item>
-                        <flux:navlist.item :href="route('hr_manager.AI_assistant')" :current="request()->routeIs('hr_manager.ai_assistant')" wire:navigate>
-                            {{ __('AI Assistant') }}
-                        </flux:navlist.item>
-                        <flux:navlist.item :href="route('hr_manager.staff_performance')" :current="request()->routeIs('hr_manager.staff_performance')" wire:navigate>
-                            {{ __('Staff Performance') }}
+                        <flux:navlist.item :href="route('hr_manager.employees')" :current="request()->routeIs('hr_manager.employees')" wire:navigate>
+                            {{ __('Employees') }}
                         </flux:navlist.item>
                     </flux:navlist.group>
                 </flux:navlist>
@@ -136,17 +151,17 @@
             @if ($role === 'Production Manager')
                 <flux:navlist variant="outline">
                     <flux:navlist.group class="grid">
-                        <flux:navlist.item :href="route('production_manager.order_management')" :current="request()->routeIs('production_manager.order_management')" wire:navigate>
-                            {{ __('Order Management') }}
+                        <flux:navlist.item :href="route('production_manager.overview')" :current="request()->routeIs('production_manager.overview')" wire:navigate>
+                            {{ __('Overview') }}
                         </flux:navlist.item>
-                        <flux:navlist.item :href="route('production_manager.inventory_alerts')" :current="request()->routeIs('production_manager.inventory_alerts')" wire:navigate>
-                            {{ __('Inventory Alerts') }}
+                        <flux:navlist.item :href="route('production_manager.inventory')" :current="request()->routeIs('production_manager.inventory')" wire:navigate>
+                            {{ __('Inventory') }}
                         </flux:navlist.item>
-                        <flux:navlist.item :href="route('production_manager.production_metrics')" :current="request()->routeIs('production_manager.production_metrics')" wire:navigate>
-                            {{ __('Production Metrics') }}
+                        <flux:navlist.item :href="route('production_manager.orders')" :current="request()->routeIs('production_manager.orders')" wire:navigate>
+                            {{ __('Orders') }}
                         </flux:navlist.item>
-                         <flux:navlist.item :href="route('production_manager.sales_tracking')" :current="request()->routeIs('production_manager.sales_tracking')" wire:navigate>
-                            {{ __('Sales Tracking') }}
+                         <flux:navlist.item :href="route('production_manager.production')" :current="request()->routeIs('production_manager.production')" wire:navigate>
+                            {{ __('Production') }}
                         </flux:navlist.item>
                     </flux:navlist.group>
                 </flux:navlist>

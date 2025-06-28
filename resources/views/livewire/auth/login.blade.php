@@ -46,7 +46,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
             $this->redirectIntended(default: route('retailer.dashboard', absolute: false), navigate: true);
         }
         elseif ($role === 'Admin') {
-            $this->redirectIntended(default: route('admin.dashboard', absolute: false), navigate: true);
+            $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
         }
         elseif ($role === 'Production Manager') {
             $this->redirectIntended(default: route('production_manager.dashboard', absolute: false), navigate: true);

@@ -1,6 +1,11 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\HRManager\HRManagerDashboardController;
+use App\Http\Controllers\ProductionManager\ProductionManagerDashboardController;
+use App\Http\Controllers\Retailer\RetailerDashboardController;
+use App\Http\Controllers\Supplier\SupplierDashboardController;
+use App\Http\Controllers\Vendor\VendorDashboardController;
 use App\Livewire\Counter;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
@@ -59,6 +64,7 @@ Route::middleware(['auth'])->group(function () {
 //TODO: Add role middleware to restrict access to certain routes based on user roles
 //TODO: Customize veification middleware to be based on admins approval rather than email verification
 
+// Admin dashboard routes
  Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     Route::controller(AdminDashboardController::class)->group(function () {
         Route::get('/overview', 'overview')->name('overview');
@@ -72,6 +78,56 @@ Route::middleware(['auth'])->group(function () {
     });
 
     });
+
+ // Production Manager routes
+Route::middleware(['auth'])->prefix('production_manager')->name('production_manager.')->group(function (){
+    Route::controller(ProductionManagerDashboardController::class)->group(function () {
+        Route::get('/overview', 'overview')->name('overview');
+        Route::get('/inventory', 'inventory')->name('inventory');
+        Route::get('/orders', 'orders')->name('orders');
+        Route::get('/production', 'production')->name('production');
+    });
+});
+
+// Supplier dashboard routes
+Route::middleware(['auth'])->prefix('supplier')->name('supplier.')->group(function () {
+    Route::controller(SupplierDashboardController::class)->group(function () {
+        Route::get('/overview', 'overview')->name('overview');
+        Route::get('/orders', 'orders')->name('orders');
+        Route::get('/resources', 'resources')->name('resources');
+    });
+});
+
+
+// Vendor dashboard routes
+Route::middleware(['auth'])->prefix('vendor')->name('vendor.')->group(function () {
+    Route::controller(VendorDashboardController::class)->group(function() {
+        Route::get('/overview', 'overview')->name('overview');
+        Route::get('/orders', 'orders')->name('orders');
+        Route::get('/sales', 'sales')->name('sales');
+        Route::get('/inventory', 'inventory')->name('inventory');
+        Route::get('/retailers', 'retailers')->name('retailers');
+    });
+});
+
+// Retailer dashboard routes
+Route::middleware(['auth'])->prefix('retailer')->name('retailer.')->group(function () {
+    Route::controller(RetailerDashboardController::class)->group(function () {
+        Route::get('/overview', 'overview')->name('overview');
+        Route::get('/orders', 'orders')->name('orders');
+        Route::get('/sales', 'sales')->name('sales');
+        Route::get('/inventory', 'inventory')->name('inventory');
+        Route::get('/ratings', 'ratings')->name('ratings');
+    });
+});
+
+// HRManager dashboard routes
+Route::middleware(['auth'])->prefix('hr_manager')->name('hr_manager.')->group(function () {
+    Route::controller(HRManagerDashboardController::class)->group(function () {
+        Route::get('/overview', 'overview')->name('overview');
+        Route::get('/employees', 'employees')->name('employees');
+    });
+});
 
 // Vendor-specific features
 Route::view('vendor/order-management', 'vendor.order_management')->middleware(['auth', 'verified'])->name('vendor.order_management');
