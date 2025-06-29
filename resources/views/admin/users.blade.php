@@ -5,7 +5,5 @@
         </x-slot:middle>
     </x-header>
 
-    <div class="px-4 py-6">
-        <livewire:admin.user-management.users.table />
-    </div>
+
 </x-layouts.app>

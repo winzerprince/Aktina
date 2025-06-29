@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class Order extends Model
 {
@@ -24,19 +25,38 @@ class Order extends Model
         return $this->belongsTo(User::class, 'buyer_id');
     }
 
-    public function seller()
+    public function seller(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'seller_id');
     }
 
     public function getTotalItemsAttribute()
     {
-        return collect($this->items)->sum('quantity');
+        $items = $this->getItemsAsArray();
+        return collect($items)->sum('quantity');
     }
 
     public function getItemsCountAttribute()
     {
-        return count($this->items);
+        $items = $this->getItemsAsArray();
+        return count($items);
+    }
+
+    /**
+     * Helper method to ensure items is always an array
+     */
+    public function getItemsAsArray()
+    {
+        if (is_array($this->items)) {
+            return $this->items;
+        }
+
+        if (is_string($this->items)) {
+            $decoded = json_decode($this->items, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+
+        return [];
     }
 
     public function getOrderValueTierAttribute()
@@ -53,8 +73,9 @@ class Order extends Model
 
     public function containsFlagshipPhones()
     {
-        foreach ($this->items as $item) {
-            $product = Product::find($item['product_id']);
+        $items = $this->getItemsAsArray();
+        foreach ($items as $item) {
+            $product = Product::find($item['product_id'] ?? null);
             if ($product && $product->isFlagship()) {
                 return true;
             }
@@ -65,8 +86,9 @@ class Order extends Model
     public function getPhoneModelsAttribute()
     {
         $models = [];
-        foreach ($this->items as $item) {
-            $product = Product::find($item['product_id']);
+        $items = $this->getItemsAsArray();
+        foreach ($items as $item) {
+            $product = Product::find($item['product_id'] ?? null);
             if ($product) {
                 $models[] = $product->model;
             }

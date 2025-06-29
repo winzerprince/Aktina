@@ -5,7 +5,4 @@
         </x-slot:middle>
     </x-header>
 
-    <div class="px-4 py-6">
-        <livewire:admin.user-management.vendors.table />
-    </div>
 </x-layouts.app>

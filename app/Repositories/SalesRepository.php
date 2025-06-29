@@ -1,154 +1,103 @@
 <?php
-
 namespace App\Repositories;
 
-use App\Interfaces\Repositories\SalesRepositoryInterface;
 use App\Models\Order;
-use App\Models\ProductionManager;
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
-class SalesRepository implements SalesRepositoryInterface
-{
-    /**
-     * Cache TTL for production manager user IDs (1 hour)
-     */
-    private const PRODUCTION_MANAGER_CACHE_TTL = 3600;
+/**
+ * SalesRepository to handle sales-related data operations.
+ * It contains the following methods:
+ * - getSales: Retrieves all sales for a specific company with optional date filtering and pagination.
+ * - getTotalSales: Calculates the total sales amount for a specific company.
+ * - getSalesSummary: Provides a summary of sales for a specific company, including order count, total revenue, and average order value.
+ * - getSalesGroupedByDay: Gets sales data grouped by day for chart visualization.
+ */
+class SalesRepository{
 
     /**
-     * Cache TTL for order queries (15 minutes)
+     * Get all sales for a specific company.
+     *
+     * @param string $companyName
+     * @param string|null $startDate
+     * @param string|null $endDate
+     * @param int|null $perPage
+     * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    private const ORDER_CACHE_TTL = 900;
-
-    /**
-     * Get orders from production managers within date range
-     */
-    public function getProductionManagerOrders(Carbon $startDate, Carbon $endDate): Collection
+    public function getSales(string $companyName, string $startDate = null, string $endDate = null, int $perPage = null)
     {
-        $productionManagerUserIds = $this->getProductionManagerUserIds();
-
-        // Generate cache key based on date range and user IDs
-        $cacheKey = $this->generateOrdersCacheKey($productionManagerUserIds, $startDate, $endDate);
-
-        return Cache::remember($cacheKey, self::ORDER_CACHE_TTL, function () use ($productionManagerUserIds, $startDate, $endDate) {
-            return Order::query()
-                ->whereIn('seller_id', $productionManagerUserIds)
-                ->with(['buyer', 'seller'])
-                ->whereBetween('created_at', [$startDate, $endDate])
-                ->orderBy('created_at', 'desc')
-                ->get();
-        });
-    }
-
-    /**
-     * Get all orders from production managers (no date filtering)
-     */
-    public function getAllProductionManagerOrders(): Collection
-    {
-        $productionManagerUserIds = $this->getProductionManagerUserIds();
-
-        // Generate cache key for all orders
-        $cacheKey = $this->generateAllOrdersCacheKey($productionManagerUserIds);
-
-        return Cache::remember($cacheKey, self::ORDER_CACHE_TTL, function () use ($productionManagerUserIds) {
-            return Order::query()
-                ->whereIn('seller_id', $productionManagerUserIds)
-                ->with(['buyer', 'seller'])
-                ->orderBy('created_at', 'desc')
-                ->get();
-        });
-    }
-
-    /**
-     * Get orders with flexible filtering options
-     */
-    public function getOrdersByDateRange(array $filters, Carbon $startDate, Carbon $endDate): Collection
-    {
-        $query = Order::query()->whereBetween('created_at', [$startDate, $endDate]);
-
-        // Apply dynamic filters
-        if (!empty($filters['seller_ids'])) {
-            $query->whereIn('seller_id', $filters['seller_ids']);
-        }
-
-        if (!empty($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
-
-        // Add product filtering if needed
-        if (!empty($filters['product_ids'])) {
-            $query->whereHas('products', function ($q) use ($filters) {
-                $q->whereIn('id', $filters['product_ids']);
+        $query = Order::with(['buyer:id,name,email,company_name,role', 'seller:id,name,email,company_name'])
+            ->whereHas('seller', function($query) use ($companyName) {
+                $query->where('company_name', $companyName);
             });
+
+        // Add date filtering if provided
+        if ($startDate && $endDate) {
+            $endDate = Carbon::parse($endDate)->endOfDay();
+            $query->whereBetween('created_at', [$startDate, $endDate]);
         }
 
-        // Add eager loading conditionally
-        $eagerLoads = ['buyer', 'seller'];
-        if (!empty($filters['with_products'])) {
-            $eagerLoads[] = 'products';
-        }
-
-        // Generate cache key for filtered queries
-        $cacheKey = $this->generateFilteredOrdersCacheKey($filters, $startDate, $endDate);
-
-        return Cache::remember($cacheKey, self::ORDER_CACHE_TTL, function () use ($query, $eagerLoads) {
-            return $query->with($eagerLoads)
-                ->orderBy('created_at', 'desc')
-                ->get();
-        });
+        // Return paginated or all results
+        return $perPage ? $query->paginate($perPage) : $query->get();
     }
 
     /**
-     * Get production managers user IDs for caching
+     * Get total sales amount for a specific company.
+     *
+     * @param string $companyName
+     * @return float
      */
-    public function getProductionManagerUserIds(): array
+    public function getTotalSales(string $companyName): float
     {
-        return Cache::remember('production_manager_user_ids', self::PRODUCTION_MANAGER_CACHE_TTL, function () {
-            return ProductionManager::pluck('user_id')->toArray();
-        });
+        return Order::whereHas('seller', function($query) use ($companyName) {
+            $query->where('company_name', $companyName);
+        })->sum('price');
     }
 
     /**
-     * Generate cache key for sales orders query
+     * Get sales summary for a specific company.
+     *
+     * @param string $companyName
+     * @return array
      */
-    private function generateOrdersCacheKey(array $userIds, Carbon $startDate, Carbon $endDate): string
+    public function getSalesSummary(string $companyName): array
     {
-        $userIdsHash = md5(json_encode($userIds));
-        return "sales:production_managers:{$userIdsHash}:{$startDate->format('Y-m-d')}:{$endDate->format('Y-m-d')}";
+        $summary = Order::whereHas('seller', function ($query) use ($companyName) {
+            $query->where('company_name', $companyName);
+        })->select(
+            DB::raw('COUNT(*) as order_count'),
+            DB::raw('SUM(price) as total_revenue'),
+            DB::raw('AVG(price) as average_order_value')
+        )->first();
+
+        return $summary ? $summary->toArray() : [
+            'order_count' => 0,
+            'total_revenue' => 0,
+            'average_order_value' => 0,
+        ];
     }
 
     /**
-     * Generate cache key for all sales orders query
+     * Get sales data grouped by day for a chart.
+     *
+     * @param string $companyName
+     * @param string $startDate
+     * @param string $endDate
+     * @return \Illuminate\Database\Eloquent\Collection
      */
-    private function generateAllOrdersCacheKey(array $userIds): string
+    public function getSalesGroupedByDay(string $companyName, string $startDate, string $endDate)
     {
-        $userIdsHash = md5(json_encode($userIds));
-        return "sales:production_managers_all:{$userIdsHash}";
-    }
-
-    /**
-     * Generate cache key for filtered sales orders query
-     */
-    private function generateFilteredOrdersCacheKey(array $filters, Carbon $startDate, Carbon $endDate): string
-    {
-        $filtersHash = md5(json_encode($filters));
-        return "sales:filtered:{$filtersHash}:{$startDate->format('Y-m-d')}:{$endDate->format('Y-m-d')}";
-    }
-
-    /**
-     * Clear cache for production manager sales orders
-     */
-    public function clearProductionManagerOrdersCache(): void
-    {
-        Cache::forget('production_manager_user_ids');
-
-        // Clear pattern-based cache keys (if using Redis or similar)
-        if (Cache::getStore() instanceof \Illuminate\Cache\RedisStore) {
-            Cache::getStore()->getRedis()->del(Cache::getStore()->getRedis()->keys('sales:production_managers:*'));
-            Cache::getStore()->getRedis()->del(Cache::getStore()->getRedis()->keys('sales:production_managers_all:*'));
-            Cache::getStore()->getRedis()->del(Cache::getStore()->getRedis()->keys('sales:filtered:*'));
-        }
+        $endDate = Carbon::parse($endDate)->endOfDay();
+        return Order::whereHas('seller', function ($query) use ($companyName) {
+            $query->where('company_name', $companyName);
+        })
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->select(
+                DB::raw('DATE(created_at) as date'),
+                DB::raw('SUM(price) as total_sales')
+            )
+            ->groupBy('date')
+            ->orderBy('date', 'asc')
+            ->get();
     }
 }

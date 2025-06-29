@@ -1,0 +1,109 @@
+/* Sales Table Additional Styles */
+.sales-table-container {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+}
+
+/* Custom Mary UI table enhancements */
+.sales-table .table-row:hover {
+    background-color: rgba(34, 197, 94, 0.05);
+    transform: translateY(-1px);
+    transition: all 0.2s ease-in-out;
+}
+
+/* Modal backdrop blur effect */
+.modal-backdrop {
+    backdrop-filter: blur(4px);
+    background-color: rgba(0, 0, 0, 0.25);
+}
+
+/* Custom badge styles for order status */
+.order-badge {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    font-weight: 600;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+}
+
+/* Stats card hover effects */
+.stats-card {
+    transition: all 0.3s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom scrollbar for modal content */
+.modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Animation for table rows */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.table-row {
+    animation: slideInUp 0.3s ease-out;
+}
+
+/* Loading state */
+.loading-overlay {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(2px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sales-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .table-actions {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+}
+
+/* Dark mode specific styles */
+@media (prefers-color-scheme: dark) {
+    .sales-table-container {
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    }
+
+    .modal-content::-webkit-scrollbar-track {
+        background: #374151;
+    }
+
+    .modal-content::-webkit-scrollbar-thumb {
+        background: #6b7280;
+    }
+
+    .modal-content::-webkit-scrollbar-thumb:hover {
+        background: #9ca3af;
+    }
+}

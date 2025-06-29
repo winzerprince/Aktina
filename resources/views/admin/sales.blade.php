@@ -5,7 +5,8 @@
         </x-slot:middle>
     </x-header>
 
-    <div class="px-4 py-6">
-        <livewire:admin.sales.table />
+    <div class="max-w-7xl mx-auto p-6 space-y-6">
+        <livewire:sales.sales-table />
     </div>
+
 </x-layouts.app>
