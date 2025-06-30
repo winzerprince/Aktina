@@ -19,6 +19,11 @@ class Product extends Model
         'specifications' => 'array',
     ];
 
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'owner_id');
+    }
+
     public function bom()
     {
         return $this->hasOne(Bom::class);

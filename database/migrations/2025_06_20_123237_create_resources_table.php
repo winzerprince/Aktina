@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('resources', function (Blueprint $table) {
-            $table->id()->primary();
+            $table->id();
             $table->string('name');
             $table->string('component_type'); // SoC, Display, Camera, Battery, etc.
             $table->string('category'); // Core Processing, Display Systems, Camera Systems, etc.

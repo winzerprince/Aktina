@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDashboardController;
-use App\Http\Controllers\HRManager\HRManagerDashboardController;
-use App\Http\Controllers\ProductionManager\ProductionManagerDashboardController;
+use App\Http\Controllers\hr_manager\HrManagerDashboardController;
+use App\Http\Controllers\production_manager\ProductionManagerDashboardController;
 use App\Http\Controllers\Retailer\RetailerDashboardController;
 use App\Http\Controllers\Supplier\SupplierDashboardController;
 use App\Http\Controllers\Vendor\VendorDashboardController;
@@ -123,7 +123,7 @@ Route::middleware(['auth'])->prefix('retailer')->name('retailer.')->group(functi
 
 // HRManager dashboard routes
 Route::middleware(['auth'])->prefix('hr_manager')->name('hr_manager.')->group(function () {
-    Route::controller(HRManagerDashboardController::class)->group(function () {
+    Route::controller(HrManagerDashboardController::class)->group(function () {
         Route::get('/overview', 'overview')->name('overview');
         Route::get('/employees', 'employees')->name('employees');
     });

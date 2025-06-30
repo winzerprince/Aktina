@@ -14,6 +14,10 @@ class Retailer extends Model
     protected $guarded = [
     ];
 
+    protected $casts = [
+        'male_female_ratio' => 'decimal:2',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);

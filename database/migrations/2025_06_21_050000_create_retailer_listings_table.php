@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('retailer_listings', function (Blueprint $table) {
-            $table->id()->primary();
+            $table->id();
             $table->string('retailer_email')->unique();
             $table->foreignId('application_id')->constrained('applications')->onDelete('cascade');
             $table->timestamps();

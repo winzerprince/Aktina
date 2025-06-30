@@ -12,9 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->id()->primary();
+            $table->id();
             $table->decimal('price', 10, 2);
             $table->json('items'); // JSON field to store product IDs and quantities
+            $table->enum('status', ['pending', 'accepted', 'complete'])->default('pending');
             $table->foreignId('buyer_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('seller_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();

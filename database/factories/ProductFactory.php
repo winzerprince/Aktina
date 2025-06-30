@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -32,6 +33,7 @@ class ProductFactory extends Factory
                 'warranty' => $this->faker->randomElement(['1 year', '2 years', '3 years']),
             ]),
             'target_market' => $this->faker->randomElement(['flagship', 'mid-range', 'budget']),
+            'owner_id' => User::factory(),
         ];
     }
 
@@ -55,5 +57,17 @@ class ProductFactory extends Factory
             'msrp' => $this->faker->randomFloat(2, 50, 300),
             'target_market' => 'budget',
         ]);
+    }
+
+    /**
+     * Set the product's owner.
+     */
+    public function ownedBy($userId): static
+    {
+        return $this->state(function (array $attributes) use ($userId) {
+            return [
+                'owner_id' => $userId,
+            ];
+        });
     }
 }

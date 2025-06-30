@@ -48,6 +48,9 @@ class DatabaseSeeder extends Seeder
             // 11. Create ratings (depend on products and retailers)
             RatingSeeder::class,
 
+            // 12. Create reports
+            ReportSeeder::class,
+
             // 12. Create orders (depend on users as buyers/sellers)
             OrderSeeder::class,
         ]);

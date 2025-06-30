@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // This migration is no longer needed as foreign keys are now defined in the individual table migrations
-        // All foreign key constraints have been moved to their respective table creation migrations
+        // OBSOLETE: This migration is no longer needed
+        // All foreign key constraints are now defined in their respective table creation migrations
+        // Kept for migration history integrity
     }
 
     /**
@@ -20,6 +21,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Nothing to drop as this migration now does nothing
+        // Nothing to drop as this migration is obsolete
     }
 };

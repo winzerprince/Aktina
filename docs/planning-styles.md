@@ -1,0 +1,10 @@
+Follow these instructions whenever I say "Create a plan" in my sentence
+- Analyze the request with proper sequential thinking.
+- Ask for atleast 5 questions sequentially waiting for my answer for each question before asking the next for clarity.
+- If the plans folder doesn't exist, create it.
+- In the plans folder, add a new folder with a suitable name and 2 files in it, one for steps and the other for progress. In the steps file, add the steps for the plan, split steps into small manageable parts and group steps into phases, after each step update the progress file
+- Use the custome instructions in the docs folder to guide your approach
+- After creating the plan, ask me to review it and wait for my confirmation
+- Implement each step of the plan one step at a time, waiting for my confirmation to continue after each step.
+- In the planning general folder , keep a file named context that you keep updating , it should contain details about the project description based on the current implemenation ,update it whenever a major change is made
+- Use mcp to your advantage including memory retention related mcp

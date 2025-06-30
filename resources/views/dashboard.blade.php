@@ -12,26 +12,26 @@
             $role = auth()->user()->role ?? 'User';
         @endphp
 
-        @if($role === 'Admin')
+        @if($role === 'admin')
             <!-- Admin Dashboard -->
       <h1>Welcome to the Admin dashboard</h1>
 
 
-        @elseif($role === 'Production Manager')
+        @elseif($role === 'production_manager')
             <h1>Welcome to the Production Manager dashboard</h1>
 
-        @elseif($role === 'Supplier')
+        @elseif($role === 'supplier')
             <h1>Welcome to the Supplier dashboard </h1>
 
 
-        @elseif($role === 'HR Manager')
+        @elseif($role === 'hr_manager')
             <h1>Welcome to the HR Manager dashboard </h1>
 
-        @elseif($role === 'Vendor')
+        @elseif($role === 'vendor')
             <h1>Welcome to the Vendor dashboard </h1>
 
 
-        @elseif($role === 'Retailer')
+        @elseif($role === 'retailer')
             <h1>Welcome to the Retailer dashboard </h1>
 
 

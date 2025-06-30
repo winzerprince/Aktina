@@ -19,6 +19,12 @@ class RetailerFactory extends Factory
     {
         return [
             'user_id' => User::factory()->retailer(),
+            'male_female_ratio' => $this->faker->randomFloat(2, 0.1, 10.0),
+            'city' => $this->faker->city(),
+            'urban_rural_classification' => $this->faker->randomElement(['urban', 'suburban', 'rural']),
+            'customer_age_class' => $this->faker->randomElement(['child', 'teenager', 'youth', 'adult', 'senior']),
+            'customer_income_bracket' => $this->faker->randomElement(['low', 'medium', 'high']),
+            'customer_education_level' => $this->faker->randomElement(['low', 'mid', 'high']),
         ];
     }
 

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('boms', function (Blueprint $table) {
-            $table->id()->primary();
+            $table->id();
             $table->decimal('price', 10, 2);
             $table->foreignId('product_id')->unique()->constrained('products')->onDelete('cascade');
             $table->timestamps();

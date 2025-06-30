@@ -38,6 +38,7 @@ class OrderFactory extends Factory
         return [
             'price' => $totalPrice,
             'items' => json_encode($items),
+            'status' => $this->faker->randomElement([Order::STATUS_PENDING, Order::STATUS_ACCEPTED, Order::STATUS_COMPLETE]),
             'buyer_id' => User::factory(), // User acting as buyer
             'seller_id' => User::factory(), // User acting as seller
         ];
@@ -66,6 +67,42 @@ class OrderFactory extends Factory
             return [
                 'price' => $totalPrice,
                 'items' => json_encode($items),
+            ];
+        });
+    }
+
+    /**
+     * Set the order status to pending.
+     */
+    public function pending(): static
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'status' => Order::STATUS_PENDING,
+            ];
+        });
+    }
+
+    /**
+     * Set the order status to accepted.
+     */
+    public function accepted(): static
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'status' => Order::STATUS_ACCEPTED,
+            ];
+        });
+    }
+
+    /**
+     * Set the order status to complete.
+     */
+    public function complete(): static
+    {
+        return $this->state(function (array $attributes) {
+            return [
+                'status' => Order::STATUS_COMPLETE,
             ];
         });
     }

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('products', function (Blueprint $table) {
-            $table->id()->primary();
+            $table->id();
             $table->string('name');
             $table->string('model'); // e.g., "Aktina Pro 15", "Aktina Lite 12"
             $table->string('sku')->unique();
@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('category')->default('smartphone'); // smartphone, tablet, etc.
             $table->json('specifications')->nullable(); // Display size, RAM, storage, etc.
             $table->string('target_market')->nullable(); // flagship, mid-range, budget
+            $table->foreignId('owner_id')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

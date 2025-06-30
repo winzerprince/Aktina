@@ -15,6 +15,9 @@ class Application extends Model
 
     protected $casts = [
         'meeting_schedule' => 'date',
+        'form_data' => 'array',
+        'processed_by_java_server' => 'boolean',
+        'processing_date' => 'datetime',
     ];
 
     public function vendor()
@@ -50,6 +53,28 @@ class Application extends Model
     public function isPartiallyApproved()
     {
         return $this->status === 'partially approved';
+    }
+
+    public function isProcessedByJavaServer()
+    {
+        return $this->processed_by_java_server;
+    }
+
+    public function markAsProcessed()
+    {
+        $this->processed_by_java_server = true;
+        $this->processing_date = now();
+        return $this->save();
+    }
+
+    public function getPdfUrl()
+    {
+        return $this->pdf_path ? asset($this->pdf_path) : null;
+    }
+
+    public function getFormDataAttribute($value)
+    {
+        return $value ? json_decode($value, true) : [];
     }
 
     public function getDaysToMeeting()

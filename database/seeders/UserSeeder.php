@@ -54,7 +54,7 @@ class UserSeeder extends Seeder
             'address' => json_encode(['street' => '456 Commerce St', 'city' => 'New York', 'zip' => '10001']),
         ]);
 
-        // Create additional random users for different roles
+        // Create additional random users for different roles using snake_case
         User::factory(10)->create(['role' => 'admin']);
         User::factory(15)->create(['role' => 'supplier']);
         User::factory(20)->create(['role' => 'vendor']);

@@ -1,0 +1,7 @@
+- Use Eloquent ORM
+- Understand all related entities and their fields to an operation before editing a database components(migrations, factories, seeders, Models )
+- Keep factories simple and modular
+- Refactor any database migrations in order to make migrations specific modular and decoupled
+- Only add fields asked for, avoid adding extra fields.
+- Avoid being verbose in your implementation, list steps in lists and only output important implementations.
+- Fully understand the impact of each operation and change before you attempt to carry it out.

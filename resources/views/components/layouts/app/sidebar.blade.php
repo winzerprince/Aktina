@@ -28,7 +28,7 @@
 
 
 
-            @if ($role === 'Retailer')
+            @if ($role === 'retailer')
                 <flux:navlist variant="outline">
                     <flux:navlist.group class="grid">
                         <flux:navlist.item :href="route('retailer.overview')" :current="request()->routeIs('retailer.overview')" wire:navigate>
@@ -50,7 +50,7 @@
                 </flux:navlist>
             @endif
            <!-- Admin role-->
-            @if ($role === 'Admin')
+            @if ($role === 'admin')
                 <flux:navlist variant="outline">
                     <flux:navlist.group :heading="__('Administration')" class="grid" >
                         <flux:navlist.item icon="home" :href="route('admin.overview')" :current="request()->routeIs('admin.overview')" wire:navigate>
@@ -97,7 +97,7 @@
 
 
             <!-- Role-based Navigation -->
-             @if ($role === 'Vendor')
+             @if ($role === 'vendor')
                 <flux:navlist variant="outline">
                     <flux:navlist.group class="grid">
                         <flux:navlist.item :href="route('vendor.overview')" :current="request()->routeIs('vendor.overview')" wire:navigate>
@@ -119,7 +119,7 @@
                 </flux:navlist>
             @endif
 
-             @if ($role === 'Supplier')
+             @if ($role === 'supplier')
                 <flux:navlist variant="outline">
                     <flux:navlist.group class="grid">
                         <flux:navlist.item :href="route('supplier.overview')" :current="request()->routeIs('supplier.overview')" wire:navigate>
@@ -135,7 +135,7 @@
                 </flux:navlist>
             @endif
 
-             @if ($role === 'HR Manager')
+             @if ($role === 'hr_manager')
                 <flux:navlist variant="outline">
                     <flux:navlist.group class="grid">
                         <flux:navlist.item :href="route('hr_manager.overview')" :current="request()->routeIs('hr_manager.overview')" wire:navigate>
@@ -148,7 +148,7 @@
                 </flux:navlist>
             @endif
 
-            @if ($role === 'Production Manager')
+            @if ($role === 'production_manager')
                 <flux:navlist variant="outline">
                     <flux:navlist.group class="grid">
                         <flux:navlist.item :href="route('production_manager.overview')" :current="request()->routeIs('production_manager.overview')" wire:navigate>

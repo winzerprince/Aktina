@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('suppliers', function (Blueprint $table) {
-            $table->id()->primary();
+            $table->id();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->string('company_name');
             $table->string('region'); // Asia-Pacific, Europe, US, etc.

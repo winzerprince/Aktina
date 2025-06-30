@@ -1,0 +1,41 @@
+# Database Refactoring Progress
+
+- [x] Create plan
+- [x] Phase 1: Analyze and Prepare
+  - [x] Analyze existing migrations, models, factories, and seeders
+  - [x] Identify foreign key relationships that need to be moved to their respective table migrations
+  - [x] Prepare the structure for updated migrations with proper best practices
+- [x] Phase 2: Refactor Migrations
+  - [x] Update Orders migration to include status field
+  - [x] Update Products migration to include owner_id field
+  - [x] Update Retailers migration to include demographic fields
+  - [x] Create a new Reports migration
+  - [x] Update Application migration for PDF processing
+  - [x] Fix role naming to use snake_case consistently
+  - [x] Remove separate foreign keys migration 
+- [x] Phase 3: Update Factories and Models
+  - [x] Update Order model and factory with status field
+  - [x] Update Product model and factory with owner_id field
+  - [x] Update Retailer model and factory with demographic fields
+  - [x] Create Report model and factory
+  - [x] Update Application model and factory for PDF processing
+  - [x] Fix model relationships for new fields
+- [x] Phase 4: Update Seeders
+  - [x] Update OrderSeeder to distribute statuses
+  - [x] Update ProductSeeder to assign owners
+  - [x] Update RetailerSeeder with demographics
+  - [x] Create ReportSeeder
+  - [x] Update ApplicationSeeder for PDF/Java fields
+  - [x] Update DatabaseSeeder to include ReportSeeder
+  - [x] Update UserSeeder to use snake_case roles
+- [x] Phase 5: Fix Related Views and Resources
+  - [x] Update registration and dashboard views to use snake_case roles
+  - [x] Update sidebar with snake_case roles
+  - [x] Update login view for role-based redirection
+  - [x] Create snake_case directory structure for controller namespaces
+  - [x] Update route file to use snake_case controller namespaces
+  - [x] Create new controllers with proper snake_case namespaces
+
+## Remaining Tasks
+- [ ] Test the application to ensure all changes work properly
+- [ ] Document final changes and recommendations

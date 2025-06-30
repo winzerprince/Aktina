@@ -20,6 +20,10 @@ class Order extends Model
         'items' => 'array',
     ];
 
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_ACCEPTED = 'accepted';
+    public const STATUS_COMPLETE = 'complete';
+
     public function buyer()
     {
         return $this->belongsTo(User::class, 'buyer_id');
