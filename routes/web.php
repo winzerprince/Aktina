@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\ApplicationController;
 use App\Http\Controllers\hr_manager\HrManagerDashboardController;
 use App\Http\Controllers\production_manager\ProductionManagerDashboardController;
 use App\Http\Controllers\Retailer\RetailerDashboardController;
@@ -21,15 +22,25 @@ Route::get('/', function () {
 })->name('home');
 
 Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'role.verified'])
     ->name('dashboard');
 
 Route::view('components-demo', 'components-demo')
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'role.verified'])
     ->name('components.demo');
 
-// Orders Routes
-Route::middleware(['auth', 'verified'])->group(function () {
+// Pre-verification routes (no middleware - accessible to unverified users)
+Route::middleware(['auth'])->prefix('verification')->name('verification.')->group(function () {
+    Route::view('/vendor', 'verification.vendor')->name('vendor');
+    Route::view('/retailer', 'verification.retailer')->name('retailer');
+    Route::view('/supplier', 'verification.supplier')->name('supplier');
+    Route::view('/production-manager', 'verification.production-manager')->name('production-manager');
+    Route::view('/hr-manager', 'verification.hr-manager')->name('hr-manager');
+    Route::view('/general', 'verification.general')->name('general');
+});
+
+// Orders Routes - now with role verification
+Route::middleware(['auth', 'verified', 'role.verified'])->group(function () {
     // Product Orders
     Route::get('/orders', OrderList::class)->name('orders.index');
     Route::get('/orders/create', OrderCreate::class)->name('orders.create');
@@ -84,22 +95,32 @@ Route::middleware(['auth'])->group(function () {
 //TODO: Customize veification middleware to be based on admins approval rather than email verification
 
 // Admin dashboard routes
- Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role.verified'])->prefix('admin')->name('admin.')->group(function () {
     Route::controller(AdminDashboardController::class)->group(function () {
         Route::get('/overview', 'overview')->name('overview');
+        Route::get('/verification', 'verification')->name('verification');
         Route::get('/sales', 'sales')->name('sales');
         Route::get('/orders', 'orders')->name('orders');
         Route::get('/users', 'users')->name('users');
         Route::get('/vendors', 'vendors')->name('vendors');
-        Route::get('/pending-signups', 'pendingSignups')->name('pending-sign-ups');
+        Route::get('/pending-signups', 'pendingSignups')->name('pending-signups');
         Route::get('/trends-and-predictions', 'trendsAndPredictions')->name('trends-and-predictions');
         Route::get('/important-metrics', 'importantMetrics')->name('important-metrics');
         Route::get('/customer-insights', 'customerInsights')->name('customer-insights');
     });
 
+    // Application management routes
+    Route::controller(ApplicationController::class)->prefix('applications')->name('applications.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/{application}', 'show')->name('show');
+        Route::post('/{application}/schedule', 'schedule')->name('schedule');
+        Route::post('/{application}/complete-meeting', 'completeMeeting')->name('complete-meeting');
+        Route::post('/{application}/approve', 'approve')->name('approve');
+        Route::post('/{application}/reject', 'reject')->name('reject');
     });
+});
 
- // Production Manager routes
+// Production Manager routes
 Route::middleware(['auth'])->prefix('production_manager')->name('production_manager.')->group(function (){
     Route::controller(ProductionManagerDashboardController::class)->group(function () {
         Route::get('/overview', 'overview')->name('overview');

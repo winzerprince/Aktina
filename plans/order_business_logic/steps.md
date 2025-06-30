@@ -38,7 +38,7 @@ This plan outlines the steps to implement order business logic for Aktina, inclu
 
 ## Phase 2: Repositories and Services Implementation
 
-### Step 5: Create Order Repository
+### Step 5: Create Order Repository(keep in mind how the owner of the product changes(owner_id) for each operation)
 - Create OrderRepositoryInterface with methods for:
   - Getting all orders
   - Getting order by id
@@ -60,7 +60,7 @@ This plan outlines the steps to implement order business logic for Aktina, inclu
   - Checking resource stock levels
 - Implement ResourceOrderRepository class
 
-### Step 7: Create Order Service
+### Step 7: Create Order Service(keep in mind options for choosing order by start and end date, end date should use carbon endofday function)
 - Create OrderServiceInterface with methods for:
   - Processing new orders
   - Getting order details
@@ -70,7 +70,9 @@ This plan outlines the steps to implement order business logic for Aktina, inclu
   - Handling inventory adjustments
   - Selecting employees for order fulfillment
   - Sending order notifications
+  - creating order report
 - Implement OrderService class
+
 
 ### Step 8: Create ResourceOrder Service
 - Create ResourceOrderServiceInterface with methods for:

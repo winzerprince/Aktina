@@ -99,4 +99,14 @@ class AdminDashboardController extends Controller
     {
        return view('admin.orders');
     }
+
+    /**
+     * Display the verification dashboard.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function verification()
+    {
+        return view('admin.verification');
+    }
 }

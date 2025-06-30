@@ -34,6 +34,14 @@ class Order extends Model
         return $this->belongsTo(User::class, 'seller_id');
     }
 
+    /**
+     * Get the employees assigned to this order.
+     */
+    public function employees()
+    {
+        return $this->hasMany(Employee::class);
+    }
+
     public function getTotalItemsAttribute()
     {
         $items = $this->getItemsAsArray();

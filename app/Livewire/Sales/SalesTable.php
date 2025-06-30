@@ -22,7 +22,16 @@ class SalesTable extends Component
 
     public function mount()
     {
-        $this->companyName = auth()->user()->company_name; // Assuming user has a company_name attribute
+        $user = auth()->user();
+
+        // For admin users, use a special identifier to get all sales
+        // For regular users, use their company name or fallback to empty string
+        if ($user->role === 'admin') {
+            $this->companyName = '*'; // Special identifier for all companies
+        } else {
+            $this->companyName = $user->company_name ?? 'No Company';
+        }
+
         $this->startDate = Carbon::now()->subDays(29)->toDateString();
         $this->endDate = Carbon::now()->toDateString();
     }

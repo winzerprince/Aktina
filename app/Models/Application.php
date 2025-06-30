@@ -13,11 +13,20 @@ class Application extends Model
 
     protected $guarded = [];
 
+    // Status constants
+    const STATUS_PENDING = 'pending';
+    const STATUS_SCORED = 'scored';
+    const STATUS_MEETING_SCHEDULED = 'meeting_scheduled';
+    const STATUS_MEETING_COMPLETED = 'meeting_completed';
+    const STATUS_APPROVED = 'approved';
+    const STATUS_REJECTED = 'rejected';
+
     protected $casts = [
         'meeting_schedule' => 'date',
         'form_data' => 'array',
         'processed_by_java_server' => 'boolean',
         'processing_date' => 'datetime',
+        'score' => 'integer',
     ];
 
     public function vendor()
@@ -35,24 +44,34 @@ class Application extends Model
         return $this->status;
     }
 
-    public function isPending()
+    public function isScored()
     {
-        return $this->status === 'pending';
+        return $this->status === self::STATUS_SCORED;
+    }
+
+    public function isMeetingScheduled()
+    {
+        return $this->status === self::STATUS_MEETING_SCHEDULED;
+    }
+
+    public function isMeetingCompleted()
+    {
+        return $this->status === self::STATUS_MEETING_COMPLETED;
     }
 
     public function isApproved()
     {
-        return $this->status === 'approved';
+        return $this->status === self::STATUS_APPROVED;
     }
 
     public function isRejected()
     {
-        return $this->status === 'rejected';
+        return $this->status === self::STATUS_REJECTED;
     }
 
-    public function isPartiallyApproved()
+    public function isPending()
     {
-        return $this->status === 'partially approved';
+        return $this->status === self::STATUS_PENDING;
     }
 
     public function isProcessedByJavaServer()
@@ -88,12 +107,50 @@ class Application extends Model
     public function getStatusColor()
     {
         return match ($this->status) {
-            'approved' => 'green',
-            'partially approved' => 'yellow',
-            'pending' => 'gray',
-            'rejected' => 'red',
-            default=> 'gray',
+            self::STATUS_APPROVED => 'green',
+            self::STATUS_SCORED => 'blue',
+            self::STATUS_MEETING_SCHEDULED => 'yellow',
+            self::STATUS_MEETING_COMPLETED => 'purple',
+            self::STATUS_PENDING => 'gray',
+            self::STATUS_REJECTED => 'red',
+            default => 'gray',
+        };
+    }
 
+    public function markAsScored(int $score)
+    {
+        $this->score = $score;
+        $this->status = self::STATUS_SCORED;
+        $this->processed_by_java_server = true;
+        $this->processing_date = now();
+        return $this->save();
+    }
+
+    public function scheduleMeeting($date)
+    {
+        $this->meeting_schedule = $date;
+        $this->status = self::STATUS_MEETING_SCHEDULED;
+        return $this->save();
+    }
+
+    public function completeMeeting($notes = null)
+    {
+        $this->meeting_notes = $notes;
+        $this->status = self::STATUS_MEETING_COMPLETED;
+        return $this->save();
+    }
+
+    /**
+     * Get the current progress step for the progress indicator component
+     */
+    public function getProgressStep(): int
+    {
+        return match ($this->status) {
+            self::STATUS_PENDING => 1,
+            self::STATUS_SCORED => 2,
+            self::STATUS_MEETING_SCHEDULED, self::STATUS_MEETING_COMPLETED => 3,
+            self::STATUS_APPROVED, self::STATUS_REJECTED => 4,
+            default => 1,
         };
     }
 }

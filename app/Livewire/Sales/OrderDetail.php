@@ -6,16 +6,25 @@ use App\Interfaces\Services\OrderServiceInterface;
 use App\Models\Order;
 use App\Models\Employee;
 use Livewire\Component;
-use Mary\Traits\Toast;
 
 class OrderDetail extends Component
 {
-    use Toast;
+
 
     public $orderId;
     public $order;
     public $availableEmployees = [];
     public $selectedEmployees = [];
+
+    public function success($message)
+    {
+        session()->flash('success', $message);
+    }
+
+    public function error($message)
+    {
+        session()->flash('error', $message);
+    }
 
     public function mount($id)
     {
@@ -41,6 +50,13 @@ class OrderDetail extends Component
             $this->availableEmployees = Employee::where('status', Employee::STATUS_AVAILABLE)
                                       ->where('current_activity', Employee::ACTIVITY_NONE)
                                       ->get()
+                                      ->map(function ($employee) {
+                                          return [
+                                              'id' => $employee->id,
+                                              'name' => $employee->name,
+                                              'position' => $employee->role, // Map role to position for consistency
+                                          ];
+                                      })
                                       ->toArray();
         }
     }
@@ -90,7 +106,13 @@ class OrderDetail extends Component
         // Refresh assigned employees
         $assignedEmployees = [];
         if ($this->order && isset($this->order->employees)) {
-            $assignedEmployees = $this->order->employees->toArray();
+            $assignedEmployees = $this->order->employees->map(function ($employee) {
+                return [
+                    'id' => $employee->id,
+                    'name' => $employee->name,
+                    'position' => $employee->role, // Map role to position for consistency
+                ];
+            })->toArray();
         }
 
         return view('livewire.sales.order-detail', [

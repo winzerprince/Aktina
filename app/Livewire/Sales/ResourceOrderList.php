@@ -7,23 +7,27 @@ use App\Models\ResourceOrder;
 use Illuminate\Support\Carbon;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Mary\Traits\Toast;
 
 class ResourceOrderList extends Component
 {
     use WithPagination;
-    use Toast;
 
     public $searchTerm = '';
     public $statusFilter = '';
     public $dateFilter = 'all';
     public $startDate = '';
     public $endDate = '';
+    public $page = 1;
 
     protected $queryString = ['searchTerm', 'statusFilter', 'dateFilter'];
 
     public function mount()
     {
+        // Check if user is from Aktina company
+        if (!auth()->user() || auth()->user()->company_name !== 'Aktina') {
+            abort(403, 'Access denied. This section is only available to Aktina employees.');
+        }
+
         $this->startDate = Carbon::now()->subMonth()->format('Y-m-d');
         $this->endDate = Carbon::now()->format('Y-m-d');
     }
@@ -41,12 +45,12 @@ class ResourceOrderList extends Component
             $result = $resourceOrderService->acceptResourceOrder($resourceOrderId);
 
             if ($result) {
-                $this->success('Resource order accepted successfully!');
+                session()->flash('success', 'Resource order accepted successfully!');
             } else {
-                $this->error('Failed to accept resource order. Please try again.');
+                session()->flash('error', 'Failed to accept resource order. Please try again.');
             }
         } catch (\Exception $e) {
-            $this->error('Error: ' . $e->getMessage());
+            session()->flash('error', 'Error: ' . $e->getMessage());
         }
     }
 

@@ -3,9 +3,15 @@
 namespace App\Providers;
 
 use App\Interfaces\Repositories\SalesRepositoryInterface;
+use App\Interfaces\Repositories\ApplicationRepositoryInterface;
 use App\Interfaces\Services\SalesAnalyticsServiceInterface;
+use App\Interfaces\Services\VerificationServiceInterface;
+use App\Interfaces\Services\ApplicationServiceInterface;
 use App\Repositories\SalesRepository;
+use App\Repositories\ApplicationRepository;
 use App\Services\SalesAnalyticsService;
+use App\Services\VerificationService;
+use App\Services\ApplicationService;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -21,10 +27,25 @@ class RepositoryServiceProvider extends ServiceProvider
             SalesRepository::class
         );
 
+        $this->app->bind(
+            ApplicationRepositoryInterface::class,
+            ApplicationRepository::class
+        );
+
         // Bind Service Interfaces to Implementations
         $this->app->bind(
             SalesAnalyticsServiceInterface::class,
             SalesAnalyticsService::class
+        );
+
+        $this->app->bind(
+            VerificationServiceInterface::class,
+            VerificationService::class
+        );
+
+        $this->app->bind(
+            ApplicationServiceInterface::class,
+            ApplicationService::class
         );
     }
 

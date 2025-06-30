@@ -1,204 +1,290 @@
 <div class="space-y-6">
+<div class="space-y-6">
     {{-- Header Section with Date Filters --}}
-    <x-card title="Sales Overview" subtitle="Track and manage your sales performance" class="mb-6">
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
-            {{-- Date Filter Controls --}}
-            <div class="flex flex-col sm:flex-row gap-3">
-                <x-datetime
-                    label="Start Date"
-                    wire:model.live="startDate"
-                    type="date"
-                    class="min-w-40"
-                />
-
-                <x-datetime
-                    label="End Date"
-                    wire:model.live="endDate"
-                    type="date"
-                    class="min-w-40"
-                />
-
-                <x-button
-                    label="Apply Filters"
-                    icon="o-funnel"
-                    class="btn-primary self-end"
-                    wire:click="$refresh"
-                />
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+        <div class="p-6">
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">Sales Overview</h3>
+                <p class="text-sm text-gray-500">Track and manage your sales performance</p>
             </div>
-        </div>
 
-        {{-- Quick Stats Cards --}}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <x-stat
-                title="Total Revenue"
-                description="Total revenue from sales"
-                value="${{ number_format($sales->sum('price'), 2) }}"
-                icon="o-currency-dollar"
-                color="text-green-500"
-            />
-
-            <x-stat
-                title="Total Orders"
-                description="Number of orders"
-                value="{{ $sales->count() }}"
-                icon="o-shopping-bag"
-                color="text-blue-500"
-            />
-
-            <x-stat
-                title="Average Order Value"
-                description="Average value per order"
-                value="${{ $sales->count() > 0 ? number_format($sales->avg('price'), 2) : '0.00' }}"
-                icon="o-chart-bar"
-                color="text-purple-500"
-            />
-        </div>
-    </x-card>
-
-    {{-- Sales Table with Mary UI --}}
-    <x-card title="Sales Records" subtitle="Click on any row to view order details">
-        @php
-            $headers = [
-                ['key' => 'id', 'label' => 'Order ID', 'class' => 'w-20'],
-                ['key' => 'buyer', 'label' => 'Buyer'],
-                ['key' => 'price', 'label' => 'Total Amount', 'class' => 'text-right'],
-                ['key' => 'created_at', 'label' => 'Date'],
-            ];
-        @endphp
-
-        <x-table
-            :headers="$headers"
-            :rows="$sales"
-            @row-click="viewOrder($event.detail.id)"
-            striped
-        >
-            {{-- Order ID Column --}}
-            @scope('cell_id', $order)
-                <x-badge
-                    value="#{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}"
-                    class="badge-primary"
-                />
-            @endscope
-
-            {{-- Buyer Column --}}
-            @scope('cell_buyer', $order)
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 h-10 w-10">
-                        <x-avatar
-                            :title="$order->buyer ? substr($order->buyer->name, 0, 2) : 'UK'"
-                            class="!w-10 !h-10 !text-sm"
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+                {{-- Date Filter Controls --}}
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <div class="min-w-40">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                        <input
+                            type="date"
+                            wire:model.live="startDate"
+                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                         />
                     </div>
-                    <div class="ml-4">
-                        <div class="text-sm font-medium text-gray-900 dark:text-white">
-                            {{ $order->buyer->name ?? 'Unknown Buyer' }}
-                        </div>
-                        <div class="text-sm text-gray-500 dark:text-gray-400">
-                            {{ $order->buyer->email ?? 'N/A' }}
-                        </div>
-                        @if($order->buyer && $order->buyer->company_name)
-                            <div class="text-xs text-gray-400 dark:text-gray-500">
-                                {{ $order->buyer->company_name }}
-                                @if($order->buyer->role)
-                                    • {{ $order->buyer->role }}
-                                @endif
-                            </div>
-                        @endif
+
+                    <div class="min-w-40">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                        <input
+                            type="date"
+                            wire:model.live="endDate"
+                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                        />
                     </div>
+
+                    <button
+                        wire:click="$refresh"
+                        class="self-end inline-flex items-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"/>
+                        </svg>
+                        Apply Filters
+                    </button>
                 </div>
-            @endscope
-
-            {{-- Price Column --}}
-            @scope('cell_price', $order)
-                <div class="text-right">
-                    <div class="text-sm font-bold text-green-600 dark:text-green-400">
-                        ${{ number_format($order->price, 2) }}
-                    </div>
-                    @if($order->items && is_array($order->items))
-                        <div class="text-xs text-gray-500 dark:text-gray-400">
-                            {{ count($order->items) }} item(s) • {{ collect($order->items)->sum('quantity') }} units
-                        </div>
-                    @endif
-                </div>
-            @endscope
-
-            {{-- Date Column --}}
-            @scope('cell_created_at', $order)
-                <div>
-                    <div class="text-sm text-gray-900 dark:text-white">
-                        {{ $order->created_at->format('M d, Y') }}
-                    </div>
-                    <div class="text-sm text-gray-500 dark:text-gray-400">
-                        {{ $order->created_at->format('g:i A') }}
-                    </div>
-                </div>
-            @endscope
-
-            {{-- Empty State --}}
-            <x-slot:empty>
-                <x-icon name="o-document-text" label="No sales found. Try adjusting your date range or check back later." />
-            </x-slot:empty>
-        </x-table>
-
-        {{-- Pagination --}}
-        @if($sales->hasPages())
-            <div class="mt-4">
-                {{ $sales->links() }}
             </div>
-        @endif
-    </x-card>
 
-    {{-- Enhanced Spotlight Modal with Mary UI --}}
-    <x-modal wire:model="showOrderModal" title="Order Details" subtitle="Complete order information and purchased items" class="backdrop-blur">
-        @if($selectedOrder)
-            <div class="space-y-8">
-                {{-- Order Header --}}
-                <x-card class="bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 dark:from-green-900/30 dark:via-emerald-900/30 dark:to-teal-900/30 border-green-200 dark:border-green-700">
+            {{-- Quick Stats Cards --}}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
                     <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-4">
-                            <div class="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl">
-                                <x-icon name="o-shopping-bag" class="w-8 h-8 text-white" />
-                            </div>
-                            <div>
-                                <h3 class="text-2xl font-bold text-green-900 dark:text-green-100">
-                                    Order #{{ str_pad($selectedOrder->id, 4, '0', STR_PAD_LEFT) }}
-                                </h3>
-                                <p class="text-green-700 dark:text-green-300 text-lg">
-                                    Placed on {{ $selectedOrder->created_at->format('F j, Y \a\t g:i A') }}
-                                </p>
-                            </div>
+                        <div>
+                            <p class="text-green-100 text-sm font-medium">Total Revenue</p>
+                            <p class="text-3xl font-bold">${{ number_format($sales->sum('price'), 2) }}</p>
+                            <p class="text-green-100 text-xs">Total revenue from sales</p>
                         </div>
-                        <div class="text-right">
-                            <div class="text-4xl font-bold text-green-900 dark:text-green-100 mb-2">
-                                ${{ number_format($selectedOrder->price, 2) }}
-                            </div>
-                            <x-badge value="Completed" class="badge-success" />
+                        <div class="bg-green-400 bg-opacity-30 rounded-lg p-3">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                            </svg>
                         </div>
                     </div>
-                </x-card>
+                </div>
 
-                {{-- Customer and Order Information Grid --}}
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {{-- Customer Information --}}
-                    <x-card title="Customer Information" class="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-700">
-                        <div class="space-y-4">
-                            <div class="flex items-center space-x-4">
-                                <x-avatar
-                                    :title="$selectedOrder->buyer ? substr($selectedOrder->buyer->name, 0, 2) : 'UK'"
-                                    class="!w-16 !h-16 !text-xl"
-                                />
-                                <div>
-                                    <div class="text-lg font-bold text-blue-900 dark:text-blue-100">
-                                        {{ $selectedOrder->buyer->name ?? 'Unknown Buyer' }}
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-100 text-sm font-medium">Total Orders</p>
+                            <p class="text-3xl font-bold">{{ $sales->count() }}</p>
+                            <p class="text-blue-100 text-xs">Number of orders</p>
+                        </div>
+                        <div class="bg-blue-400 bg-opacity-30 rounded-lg p-3">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-purple-100 text-sm font-medium">Average Order Value</p>
+                            <p class="text-3xl font-bold">${{ $sales->count() > 0 ? number_format($sales->avg('price'), 2) : '0.00' }}</p>
+                            <p class="text-purple-100 text-xs">Average value per order</p>
+                        </div>
+                        <div class="bg-purple-400 bg-opacity-30 rounded-lg p-3">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Sales Table --}}
+    <div class="bg-white rounded-lg border border-gray-200 shadow-sm">
+        <div class="p-6">
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">Sales Records</h3>
+                <p class="text-sm text-gray-500">Click on any row to view order details</p>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="w-20 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Buyer</th>
+                            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Total Amount</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @forelse($sales as $order)
+                            <tr class="hover:bg-gray-50 cursor-pointer transition-colors duration-200" wire:click="viewOrder({{ $order->id }})">
+                                {{-- Order ID Column --}}
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        #{{ str_pad($order->id, 4, '0', STR_PAD_LEFT) }}
+                                    </span>
+                                </td>
+
+                                {{-- Buyer Column --}}
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10">
+                                            <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-sm font-medium text-blue-600">
+                                                {{ $order->buyer ? substr($order->buyer->name, 0, 2) : 'UK' }}
+                                            </div>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">
+                                                {{ $order->buyer->name ?? 'Unknown Buyer' }}
+                                            </div>
+                                            <div class="text-sm text-gray-500">
+                                                {{ $order->buyer->email ?? 'N/A' }}
+                                            </div>
+                                            @if($order->buyer && $order->buyer->company_name)
+                                                <div class="text-xs text-gray-400">
+                                                    {{ $order->buyer->company_name }}
+                                                    @if($order->buyer->role)
+                                                        • {{ $order->buyer->role }}
+                                                    @endif
+                                                </div>
+                                            @endif
+                                        </div>
                                     </div>
-                                    <div class="text-blue-700 dark:text-blue-300">
-                                        {{ $selectedOrder->buyer->email ?? 'N/A' }}
+                                </td>
+
+                                {{-- Price Column --}}
+                                <td class="px-6 py-4 whitespace-nowrap text-right">
+                                    <div class="text-sm font-bold text-green-600">
+                                        ${{ number_format($order->price, 2) }}
+                                    </div>
+                                    @if($order->items && is_array($order->items))
+                                        <div class="text-xs text-gray-500">
+                                            {{ count($order->items) }} item(s) • {{ collect($order->items)->sum('quantity') }} units
+                                        </div>
+                                    @endif
+                                </td>
+
+                                {{-- Date Column --}}
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">
+                                        {{ $order->created_at->format('M d, Y') }}
+                                    </div>
+                                    <div class="text-sm text-gray-500">
+                                        {{ $order->created_at->format('g:i A') }}
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="px-6 py-12 text-center">
+                                    <div class="flex flex-col items-center justify-center space-y-3">
+                                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-gray-500 text-lg font-medium">No sales found</p>
+                                            <p class="text-gray-400 text-sm">Try adjusting your date range or check back later</p>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            {{-- Pagination --}}
+            @if($sales->hasPages())
+                <div class="mt-4">
+                    {{ $sales->links() }}
+                </div>
+            @endif
+        </div>
+    </div>
+
+    {{-- Enhanced Modal --}}
+    @if($showOrderModal && $selectedOrder)
+        <div class="fixed inset-0 z-50 overflow-y-auto" x-data="{}" x-show="true" x-transition.opacity>
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75 backdrop-blur-sm" wire:click="closeModal"></div>
+
+                <div class="inline-block w-full max-w-4xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900">Order Details</h3>
+                                <p class="text-sm text-gray-500">Complete order information and purchased items</p>
+                            </div>
+                            <button wire:click="closeModal" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="px-6 py-6 space-y-8">
+                        {{-- Order Header --}}
+                        <div class="bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 border border-green-200 rounded-lg p-6">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <div class="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl">
+                                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-2xl font-bold text-green-900">
+                                            Order #{{ str_pad($selectedOrder->id, 4, '0', STR_PAD_LEFT) }}
+                                        </h3>
+                                        <p class="text-green-700 text-lg">
+                                            Placed on {{ $selectedOrder->created_at->format('F j, Y \a\t g:i A') }}
+                                        </p>
                                     </div>
                                 </div>
+                                <div class="text-right">
+                                    <div class="text-4xl font-bold text-green-900 mb-2">
+                                        ${{ number_format($selectedOrder->price, 2) }}
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                        Completed
+                                    </span>
+                                </div>
                             </div>
+                        </div>
 
-                            @if($selectedOrder->buyer && $selectedOrder->buyer->company_name)
-                                <x-hr />
+                        {{-- Customer and Order Information Grid --}}
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            {{-- Customer Information --}}
+                            <div class="bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200 rounded-lg p-6">
+                                <h4 class="text-lg font-semibold text-blue-900 mb-4">Customer Information</h4>
+                                <div class="space-y-4">
+                                    <div class="flex items-center space-x-4">
+                                        <div class="h-16 w-16 rounded-full bg-blue-200 flex items-center justify-center text-xl font-medium text-blue-600">
+                                            {{ $selectedOrder->buyer ? substr($selectedOrder->buyer->name, 0, 2) : 'UK' }}
+                                        </div>
+                                        <div>
+                                            <div class="text-lg font-bold text-blue-900">
+                                                {{ $selectedOrder->buyer->name ?? 'Unknown Buyer' }}
+                                            </div>
+                                            <div class="text-blue-700">
+                                                {{ $selectedOrder->buyer->email ?? 'N/A' }}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @if($selectedOrder->buyer && $selectedOrder->buyer->company_name)
+                                        <hr class="border-blue-200">
+                                        <div class="space-y-2">
+                                            <div class="flex justify-between">
+                                                <span class="text-blue-700 font-medium">Company:</span>
+                                                <span class="text-blue-900">{{ $selectedOrder->buyer->company_name }}</span>
+                                            </div>
+                                            @if($selectedOrder->buyer->role)
+                                                <div class="flex justify-between">
+                                                    <span class="text-blue-700 font-medium">Role:</span>
+                                                    <span class="text-blue-900">{{ $selectedOrder->buyer->role }}</span>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
                                 <div class="grid grid-cols-1 gap-3">
                                     <div>
                                         <p class="text-sm font-semibold text-blue-700 dark:text-blue-300">Company</p>
@@ -216,34 +302,36 @@
                     </x-card>
 
                     {{-- Order Summary --}}
-                    <x-card title="Order Summary" class="bg-gradient-to-br from-purple-50 to-pink-100 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-700">
+                    <div class="bg-gradient-to-br from-purple-50 to-pink-100 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-200 dark:border-purple-700 rounded-lg shadow-sm p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Order Summary</h3>
                         <div class="space-y-4">
                             <div class="grid grid-cols-2 gap-4">
-                                <x-stat
-                                    title="Order ID"
-                                    value="#{{ str_pad($selectedOrder->id, 4, '0', STR_PAD_LEFT) }}"
-                                    class="text-center"
-                                />
-                                <x-stat
-                                    title="Date"
-                                    value="{{ $selectedOrder->created_at->format('M d, Y') }}"
-                                    class="text-center"
-                                />
+                                <div class="text-center">
+                                    <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Order ID</div>
+                                    <div class="text-lg font-bold text-gray-900 dark:text-white">#{{ str_pad($selectedOrder->id, 4, '0', STR_PAD_LEFT) }}</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Date</div>
+                                    <div class="text-lg font-bold text-gray-900 dark:text-white">{{ $selectedOrder->created_at->format('M d, Y') }}</div>
+                                </div>
                             </div>
 
-                            <x-stat
-                                title="Total Amount"
-                                value="${{ number_format($selectedOrder->price, 2) }}"
-                                description="{{ $selectedOrder->created_at->format('g:i A') }}"
-                                class="text-center"
-                            />
+                            <div class="text-center">
+                                <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Amount</div>
+                                <div class="text-2xl font-bold text-gray-900 dark:text-white">${{ number_format($selectedOrder->price, 2) }}</div>
+                                <div class="text-xs text-gray-500 dark:text-gray-400">{{ $selectedOrder->created_at->format('g:i A') }}</div>
+                            </div>
                         </div>
-                    </x-card>
+                    </div>
                 </div>
 
                 {{-- Order Items Section --}}
                 @if($selectedOrder->items && is_array($selectedOrder->items) && count($selectedOrder->items) > 0)
-                    <x-card title="Purchased Items" subtitle="{{ count($selectedOrder->items) }} Items • {{ collect($selectedOrder->items)->sum('quantity') }} Units">
+                    <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Purchased Items</h3>
+                            <div class="text-sm text-gray-500">{{ count($selectedOrder->items) }} Items • {{ collect($selectedOrder->items)->sum('quantity') }} Units</div>
+                        </div>
                         <div class="space-y-6">
                             @php
                                 $totalItemsValue = 0;
@@ -261,12 +349,14 @@
                                     }
                                 @endphp
 
-                                <x-card class="shadow-sm hover:shadow-md transition-shadow duration-200">
+                                <div class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 p-6">
                                     <div class="flex items-start space-x-6">
                                         {{-- Product Image/Icon --}}
                                         <div class="flex-shrink-0">
                                             <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg">
-                                                <x-icon name="o-device-phone-mobile" class="w-10 h-10 text-white" />
+                                                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                                </svg>
                                             </div>
                                         </div>
 
@@ -281,38 +371,33 @@
                                                     {{-- Product Meta Information --}}
                                                     <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
                                                         @if($product || isset($item['model']))
-                                                            <x-badge
-                                                                value="Model: {{ $product->model ?? $item['model'] }}"
-                                                                class="badge-primary badge-outline"
-                                                            />
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                                                                Model: {{ $product->model ?? $item['model'] }}
+                                                            </span>
                                                         @endif
                                                         @if($product || isset($item['sku']))
-                                                            <x-badge
-                                                                value="SKU: {{ $product->sku ?? $item['sku'] }}"
-                                                                class="badge-secondary badge-outline"
-                                                            />
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200">
+                                                                SKU: {{ $product->sku ?? $item['sku'] }}
+                                                            </span>
                                                         @endif
                                                         @if(isset($item['item_id']))
-                                                            <x-badge
-                                                                value="ID: {{ $item['item_id'] }}"
-                                                                class="badge-accent badge-outline"
-                                                            />
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
+                                                                ID: {{ $item['item_id'] }}
+                                                            </span>
                                                         @endif
                                                     </div>
 
                                                     {{-- Product Categories --}}
                                                     <div class="flex flex-wrap gap-2 mb-4">
                                                         @if($product && $product->category)
-                                                            <x-badge
-                                                                value="{{ ucfirst($product->category) }}"
-                                                                class="badge-info"
-                                                            />
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                                {{ ucfirst($product->category) }}
+                                                            </span>
                                                         @endif
                                                         @if($product && $product->target_market)
-                                                            <x-badge
-                                                                value="{{ ucfirst(str_replace('-', ' ', $product->target_market)) }}"
-                                                                class="{{ $product->target_market === 'flagship' ? 'badge-primary' : ($product->target_market === 'mid-range' ? 'badge-success' : 'badge-warning') }}"
-                                                            />
+                                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $product->target_market === 'flagship' ? 'bg-blue-100 text-blue-800' : ($product->target_market === 'mid-range' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800') }}">
+                                                                {{ ucfirst(str_replace('-', ' ', $product->target_market)) }}
+                                                            </span>
                                                         @endif
                                                     </div>
 
@@ -326,35 +411,32 @@
 
                                                 {{-- Pricing Section --}}
                                                 <div class="flex-shrink-0 text-right ml-6">
-                                                    <x-card class="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 min-w-[160px]">
+                                                    <div class="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 min-w-[160px] rounded-lg border border-gray-200 shadow-sm p-4">
                                                         {{-- Quantity --}}
-                                                        <x-stat
-                                                            title="Quantity"
-                                                            value="{{ $quantity }}"
-                                                            class="text-center mb-3"
-                                                        />
+                                                        <div class="text-center mb-3">
+                                                            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Quantity</div>
+                                                            <div class="text-lg font-bold text-gray-900 dark:text-white">{{ $quantity }}</div>
+                                                        </div>
 
-                                                        <x-hr />
+                                                        <hr class="border-gray-200 dark:border-gray-700 my-3">
 
                                                         {{-- Unit Price --}}
-                                                        <x-stat
-                                                            title="Unit Price"
-                                                            value="${{ number_format($unitPrice, 2) }}"
-                                                            class="text-center mb-3"
-                                                        />
+                                                        <div class="text-center mb-3">
+                                                            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Unit Price</div>
+                                                            <div class="text-lg font-bold text-gray-900 dark:text-white">${{ number_format($unitPrice, 2) }}</div>
+                                                        </div>
 
                                                         {{-- Total Price --}}
-                                                        <x-card class="bg-green-100 dark:bg-green-800/50">
-                                                            <x-stat
-                                                                title="Total"
-                                                                value="${{ number_format($itemTotal, 2) }}"
-                                                                class="text-center"
-                                                            />
-                                                        </x-card>
+                                                        <div class="bg-green-100 dark:bg-green-800/50 rounded-lg border border-gray-200 p-3">
+                                                            <div class="text-center">
+                                                                <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Total</div>
+                                                                <div class="text-lg font-bold text-gray-900 dark:text-white">${{ number_format($itemTotal, 2) }}</div>
+                                                            </div>
+                                                        </div>
 
                                                         {{-- MSRP Comparison --}}
                                                         @if($product && $product->msrp && $product->msrp != $unitPrice)
-                                                            <x-hr />
+                                                            <hr class="border-gray-200 dark:border-gray-700 my-3">
                                                             <div class="text-center">
                                                                 <p class="text-xs text-green-600 dark:text-green-400">
                                                                     MSRP: ${{ number_format($product->msrp, 2) }}
@@ -363,36 +445,33 @@
                                                                     $discount = (($product->msrp - $unitPrice) / $product->msrp) * 100;
                                                                 @endphp
                                                                 @if($discount > 0)
-                                                                    <x-badge
-                                                                        value="{{ number_format($discount, 1) }}% OFF"
-                                                                        class="badge-error mt-1"
-                                                                    />
+                                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 mt-1">
+                                                                        {{ number_format($discount, 1) }}% OFF
+                                                                    </span>
                                                                 @endif
                                                             </div>
                                                         @endif
-                                                    </x-card>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </x-card>
+                                </div>
                             @endforeach
 
                             {{-- Order Summary Footer --}}
-                            <x-card class="bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-900/30 dark:via-purple-900/30 dark:to-pink-900/30 border-2 border-dashed border-indigo-200 dark:border-indigo-700">
+                            <div class="bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-900/30 dark:via-purple-900/30 dark:to-pink-900/30 border-2 border-dashed border-indigo-200 dark:border-indigo-700 rounded-lg p-6">
                                 <div class="flex justify-between items-center">
                                     <div class="space-y-2">
                                         <div class="flex items-center space-x-4">
-                                            <x-stat
-                                                title="Total Items"
-                                                value="{{ count($selectedOrder->items) }}"
-                                                class="bg-indigo-100 dark:bg-indigo-900/50 rounded-xl px-4 py-2"
-                                            />
-                                            <x-stat
-                                                title="Total Quantity"
-                                                value="{{ collect($selectedOrder->items)->sum('quantity') }}"
-                                                class="bg-purple-100 dark:bg-purple-900/50 rounded-xl px-4 py-2"
-                                            />
+                                            <div class="bg-indigo-100 dark:bg-indigo-900/50 rounded-xl px-4 py-2">
+                                                <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Items</div>
+                                                <div class="text-lg font-bold text-gray-900 dark:text-white">{{ count($selectedOrder->items) }}</div>
+                                            </div>
+                                            <div class="bg-purple-100 dark:bg-purple-900/50 rounded-xl px-4 py-2">
+                                                <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Quantity</div>
+                                                <div class="text-lg font-bold text-gray-900 dark:text-white">{{ collect($selectedOrder->items)->sum('quantity') }}</div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="text-right">
@@ -407,17 +486,19 @@
                                         @endif
                                     </div>
                                 </div>
-                            </x-card>
+                            </div>
                         </div>
-                    </x-card>
+                    </div>
                 @else
-                    <x-card>
+                    <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
                         <div class="text-center py-8">
-                            <x-icon name="o-inbox" class="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
+                            <svg class="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                            </svg>
                             <p class="text-lg font-medium text-gray-900 dark:text-white">No items found</p>
                             <p class="text-gray-500 dark:text-gray-400">This order doesn't contain detailed item information.</p>
                         </div>
-                    </x-card>
+                    </div>
                 @endif
             </div>
         @endif
@@ -431,18 +512,20 @@
                     @endif
                 </div>
                 <div class="flex space-x-4">
-                    <x-button
-                        label="Export Order"
-                        icon="o-arrow-down-tray"
-                        class="btn-outline"
+                    <button
                         wire:click="exportOrder({{ $selectedOrder?->id }})"
-                    />
+                        class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        Export Order
+                    </button>
 
-                    <x-button
-                        label="Close"
-                        class="btn-primary"
+                    <button
                         @click="$wire.closeModal()"
-                    />
+                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">
+                        Close
+                    </button>
                 </div>
             </div>
         </x-slot:actions>

@@ -19,7 +19,7 @@ class ApplicationFactory extends Factory
     public function definition(): array
     {
         return [
-            'status' => $this->faker->randomElement(['pending', 'partially approved', 'approved', 'rejected']),
+            'status' => $this->faker->randomElement(['pending', 'scored', 'meeting_scheduled', 'meeting_completed', 'approved', 'rejected']),
             'meeting_schedule' => $this->faker->optional(0.7)->dateTimeBetween('now', '+1 month'), // 70% chance of having a meeting
             'vendor_id' => null, // Will be set by the seeder to avoid circular dependency
             'pdf_path' => $this->faker->optional(0.8)->randomElement([
@@ -32,6 +32,8 @@ class ApplicationFactory extends Factory
             'processing_date' => $this->faker->optional(0.6)->dateTimeBetween('-1 month', 'now'),
             'processing_notes' => $this->faker->optional(0.5)->paragraph(),
             'application_reference' => 'APP-' . $this->faker->unique()->numerify('######'),
+            'score' => $this->faker->optional(0.7)->numberBetween(10, 100), // 70% chance of having a score
+            'meeting_notes' => $this->faker->optional(0.3)->paragraph(), // 30% chance of meeting notes
         ];
     }
 

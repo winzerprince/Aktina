@@ -26,10 +26,14 @@ class SalesRepository{
      */
     public function getSales(string $companyName, string $startDate = null, string $endDate = null, int $perPage = null)
     {
-        $query = Order::with(['buyer:id,name,email,company_name,role', 'seller:id,name,email,company_name'])
-            ->whereHas('seller', function($query) use ($companyName) {
+        $query = Order::with(['buyer:id,name,email,company_name,role', 'seller:id,name,email,company_name']);
+
+        // Only filter by company if not admin (companyName = '*' means show all)
+        if ($companyName !== '*') {
+            $query->whereHas('seller', function($query) use ($companyName) {
                 $query->where('company_name', $companyName);
             });
+        }
 
         // Add date filtering if provided
         if ($startDate && $endDate) {
@@ -49,9 +53,15 @@ class SalesRepository{
      */
     public function getTotalSales(string $companyName): float
     {
-        return Order::whereHas('seller', function($query) use ($companyName) {
-            $query->where('company_name', $companyName);
-        })->sum('price');
+        $query = Order::query();
+
+        if ($companyName !== '*') {
+            $query->whereHas('seller', function($query) use ($companyName) {
+                $query->where('company_name', $companyName);
+            });
+        }
+
+        return $query->sum('price');
     }
 
     /**
@@ -62,9 +72,15 @@ class SalesRepository{
      */
     public function getSalesSummary(string $companyName): array
     {
-        $summary = Order::whereHas('seller', function ($query) use ($companyName) {
-            $query->where('company_name', $companyName);
-        })->select(
+        $query = Order::query();
+
+        if ($companyName !== '*') {
+            $query->whereHas('seller', function ($q) use ($companyName) {
+                $q->where('company_name', $companyName);
+            });
+        }
+
+        $summary = $query->select(
             DB::raw('COUNT(*) as order_count'),
             DB::raw('SUM(price) as total_revenue'),
             DB::raw('AVG(price) as average_order_value')
@@ -88,10 +104,15 @@ class SalesRepository{
     public function getSalesGroupedByDay(string $companyName, string $startDate, string $endDate)
     {
         $endDate = Carbon::parse($endDate)->endOfDay();
-        return Order::whereHas('seller', function ($query) use ($companyName) {
-            $query->where('company_name', $companyName);
-        })
-            ->whereBetween('created_at', [$startDate, $endDate])
+        $query = Order::query();
+
+        if ($companyName !== '*') {
+            $query->whereHas('seller', function ($q) use ($companyName) {
+                $q->where('company_name', $companyName);
+            });
+        }
+
+        return $query->whereBetween('created_at', [$startDate, $endDate])
             ->select(
                 DB::raw('DATE(created_at) as date'),
                 DB::raw('SUM(price) as total_sales')

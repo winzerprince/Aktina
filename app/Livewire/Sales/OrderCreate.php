@@ -6,11 +6,10 @@ use App\Interfaces\Services\OrderServiceInterface;
 use App\Models\Product;
 use App\Models\User;
 use Livewire\Component;
-use Mary\Traits\Toast;
 
 class OrderCreate extends Component
 {
-    use Toast;
+
 
     public $buyers = [];
     public $sellers = [];
@@ -35,8 +34,11 @@ class OrderCreate extends Component
                          ->where('company_name', 'Aktina')
                          ->get();
 
-        // Available products
-        $this->products = Product::all();
+        // Available products - ensure unique products by selecting distinct names/models
+        $this->products = Product::select('id', 'name', 'model', 'msrp', 'sku')
+                                 ->distinct()
+                                 ->orderBy('name')
+                                 ->get();
     }
 
     public function addItem()
@@ -51,7 +53,7 @@ class OrderCreate extends Component
             $this->selectedItems = array_values($this->selectedItems);
             $this->calculateTotal();
         } else {
-            $this->error('Order must have at least one item.');
+            session()->flash('error', 'Order must have at least one item.');
         }
     }
 
@@ -68,13 +70,14 @@ class OrderCreate extends Component
             if (isset($item['product_id']) && !empty($item['product_id'])) {
                 $product = Product::find($item['product_id']);
                 if ($product) {
-                    $itemPrice = $product->price * $item['quantity'];
+                    // Use msrp instead of price
+                    $itemPrice = $product->msrp * $item['quantity'];
                     $this->totalPrice += $itemPrice;
 
                     // Update the price in the item for display
                     foreach ($this->selectedItems as $key => $selectedItem) {
                         if ($selectedItem['product_id'] == $item['product_id']) {
-                            $this->selectedItems[$key]['price'] = $product->price;
+                            $this->selectedItems[$key]['price'] = $product->msrp;
                         }
                     }
                 }
@@ -133,7 +136,7 @@ class OrderCreate extends Component
         }
 
         if ($outOfStock) {
-            $this->error('Cannot create order. Some items are out of stock.');
+            session()->flash('error', 'Cannot create order. Some items are out of stock.');
             return;
         }
 
@@ -151,13 +154,13 @@ class OrderCreate extends Component
             $order = $orderService->processNewOrder($orderData);
 
             if ($order) {
-                $this->success('Order created successfully!');
+                session()->flash('success', 'Order created successfully!');
                 return redirect()->route('orders.show', $order->id);
             } else {
-                $this->error('Failed to create order.');
+                session()->flash('error', 'Failed to create order.');
             }
         } catch (\Exception $e) {
-            $this->error('Error: ' . $e->getMessage());
+            session()->flash('error', 'Error: ' . $e->getMessage());
         }
     }
 

@@ -16,6 +16,8 @@ class Retailer extends Model
 
     protected $casts = [
         'male_female_ratio' => 'decimal:2',
+        'business_address' => 'array',
+        'demographics_completed' => 'boolean',
     ];
 
     public function user()

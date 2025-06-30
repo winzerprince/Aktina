@@ -6,11 +6,10 @@ use App\Interfaces\Services\ResourceOrderServiceInterface;
 use App\Models\Resource;
 use App\Models\User;
 use Livewire\Component;
-use Mary\Traits\Toast;
 
 class ResourceOrderCreate extends Component
 {
-    use Toast;
+
 
     public $suppliers = [];
     public $aktinaUsers = [];
@@ -27,6 +26,11 @@ class ResourceOrderCreate extends Component
 
     public function mount()
     {
+        // Check if user is from Aktina company
+        if (!auth()->user() || auth()->user()->company_name !== 'Aktina') {
+            abort(403, 'Access denied. This section is only available to Aktina employees.');
+        }
+
         // Get suppliers
         $this->suppliers = User::where('role', 'supplier')->get();
 

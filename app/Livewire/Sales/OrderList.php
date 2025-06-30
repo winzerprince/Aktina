@@ -7,18 +7,17 @@ use App\Models\Order;
 use Illuminate\Support\Carbon;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Mary\Traits\Toast;
 
 class OrderList extends Component
 {
     use WithPagination;
-    use Toast;
 
     public $searchTerm = '';
     public $statusFilter = '';
     public $dateFilter = 'all';
     public $startDate = '';
     public $endDate = '';
+    public $page = 1;
 
     protected $queryString = ['searchTerm', 'statusFilter', 'dateFilter'];
 
