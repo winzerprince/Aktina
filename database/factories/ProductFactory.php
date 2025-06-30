@@ -17,22 +17,144 @@ class ProductFactory extends Factory
      * @return array<string, mixed>
      */    public function definition(): array
     {
-        $categories = ['smartphone', 'tablet', 'laptop', 'smartwatch', 'headphones'];
-        $brands = ['Aktina Pro', 'Aktina Lite', 'Aktina Essential', 'Aktina Max', 'Aktina Ultra'];
+        // Using only specific product models as required
+        $products = [
+            [
+                'name' => 'Aktina 26 Pro',
+                'model' => 'AKT-26-PRO',
+                'category' => 'smartphone',
+                'target_market' => 'flagship',
+                'msrp' => 1299.99,
+                'specifications' => [
+                    'display' => '6.7-inch Super AMOLED',
+                    'processor' => 'Aktina A16 Bionic',
+                    'ram' => '12GB',
+                    'storage' => '256GB',
+                    'camera' => '108MP + 48MP + 12MP',
+                    'battery' => '5000mAh',
+                    'color' => $this->faker->randomElement(['Black', 'Silver', 'Gold']),
+                    'weight' => '210g',
+                    'warranty' => '2 years',
+                ],
+            ],
+            [
+                'name' => 'Sakina 26 Mini',
+                'model' => 'SAK-26-MINI',
+                'category' => 'smartphone',
+                'target_market' => 'mid-range',
+                'msrp' => 799.99,
+                'specifications' => [
+                    'display' => '5.4-inch AMOLED',
+                    'processor' => 'Aktina A15 Chip',
+                    'ram' => '8GB',
+                    'storage' => '128GB',
+                    'camera' => '64MP + 12MP',
+                    'battery' => '4000mAh',
+                    'color' => $this->faker->randomElement(['Blue', 'Red', 'Green']),
+                    'weight' => '180g',
+                    'warranty' => '1 year',
+                ],
+            ],
+            [
+                'name' => 'Akta Odyssey Tab',
+                'model' => 'AKT-ODY-TAB',
+                'category' => 'tablet',
+                'target_market' => 'flagship',
+                'msrp' => 999.99,
+                'specifications' => [
+                    'display' => '11-inch Retina XDR',
+                    'processor' => 'Aktina M2 Chip',
+                    'ram' => '16GB',
+                    'storage' => '512GB',
+                    'camera' => '12MP + 10MP',
+                    'battery' => '10000mAh',
+                    'color' => $this->faker->randomElement(['Space Gray', 'Silver']),
+                    'weight' => '470g',
+                    'warranty' => '2 years',
+                ],
+            ],
+            [
+                'name' => 'Aktina Buds Pro',
+                'model' => 'AKT-BUDS-PRO',
+                'category' => 'audio',
+                'target_market' => 'flagship',
+                'msrp' => 249.99,
+                'specifications' => [
+                    'type' => 'In-ear',
+                    'connectivity' => 'Wireless',
+                    'noise_cancellation' => 'Active',
+                    'battery' => '30 hours with case',
+                    'color' => $this->faker->randomElement(['Black', 'White', 'Navy']),
+                    'weight' => '5g per bud',
+                    'warranty' => '1 year',
+                ],
+            ],
+            [
+                'name' => 'Akta Sound',
+                'model' => 'AKT-SOUND-SPK',
+                'category' => 'audio',
+                'target_market' => 'mid-range',
+                'msrp' => 179.99,
+                'specifications' => [
+                    'type' => 'Bluetooth Speaker',
+                    'connectivity' => 'Bluetooth 5.2',
+                    'power' => '30W',
+                    'battery' => '12 hours',
+                    'color' => $this->faker->randomElement(['Black', 'White', 'Blue']),
+                    'weight' => '950g',
+                    'warranty' => '1 year',
+                ],
+            ],
+            [
+                'name' => 'Aktina 26',
+                'model' => 'AKT-26-REG',
+                'category' => 'smartphone',
+                'target_market' => 'mid-range',
+                'msrp' => 899.99,
+                'specifications' => [
+                    'display' => '6.1-inch OLED',
+                    'processor' => 'Aktina A15 Chip',
+                    'ram' => '6GB',
+                    'storage' => '128GB',
+                    'camera' => '50MP + 12MP',
+                    'battery' => '4500mAh',
+                    'color' => $this->faker->randomElement(['Black', 'White', 'Blue']),
+                    'weight' => '195g',
+                    'warranty' => '1 year',
+                ],
+            ],
+            [
+                'name' => 'Sakina 26',
+                'model' => 'SAK-26-REG',
+                'category' => 'smartphone',
+                'target_market' => 'budget',
+                'msrp' => 499.99,
+                'specifications' => [
+                    'display' => '6.1-inch LCD',
+                    'processor' => 'Aktina A14 Chip',
+                    'ram' => '4GB',
+                    'storage' => '64GB',
+                    'camera' => '48MP + 8MP',
+                    'battery' => '4000mAh',
+                    'color' => $this->faker->randomElement(['Black', 'White', 'Red']),
+                    'weight' => '190g',
+                    'warranty' => '1 year',
+                ],
+            ],
+        ];
+
+        $selectedProduct = $this->faker->randomElement($products);
+        $sku = 'SKU-' . strtoupper(substr($selectedProduct['model'], 0, 3)) . '-' . $this->faker->unique()->numerify('####');
 
         return [
-            'name' => $this->faker->randomElement($brands) . ' ' . $this->faker->numberBetween(10, 20),
-            'model' => 'AKT-' . strtoupper($this->faker->lexify('???')) . '-' . $this->faker->numberBetween(10, 99),
-            'sku' => 'SKU-' . $this->faker->unique()->numerify('########'),
+            'name' => $selectedProduct['name'],
+            'model' => $selectedProduct['model'],
+            'sku' => $sku,
             'description' => $this->faker->paragraph(2),
-            'msrp' => $this->faker->randomFloat(2, 99.99, 2999.99),
-            'category' => $this->faker->randomElement($categories),
-            'specifications' => json_encode([
-                'color' => $this->faker->colorName(),
-                'weight' => $this->faker->numberBetween(100, 500) . 'g',
-                'warranty' => $this->faker->randomElement(['1 year', '2 years', '3 years']),
-            ]),
-            'target_market' => $this->faker->randomElement(['flagship', 'mid-range', 'budget']),
+            'msrp' => $selectedProduct['msrp'],
+            'category' => $selectedProduct['category'],
+            'specifications' => $selectedProduct['specifications'],
+            'target_market' => $selectedProduct['target_market'],
             'owner_id' => User::factory(),
         ];
     }

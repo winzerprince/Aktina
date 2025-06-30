@@ -51,8 +51,14 @@ class DatabaseSeeder extends Seeder
             // 12. Create reports
             ReportSeeder::class,
 
-            // 12. Create orders (depend on users as buyers/sellers)
+            // 13. Create employees (standalone table)
+            EmployeeSeeder::class,
+
+            // 14. Create orders (depend on users as buyers/sellers)
             OrderSeeder::class,
+
+            // 15. Create resource orders (depend on suppliers and resources)
+            ResourceOrderSeeder::class,
         ]);
     }
 }

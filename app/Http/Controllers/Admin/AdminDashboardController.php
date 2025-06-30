@@ -89,4 +89,14 @@ class AdminDashboardController extends Controller
     {
         return view('admin.customer-insights');
     }
+
+    /**
+     * Display the orders management dashboard.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function orders()
+    {
+       return view('admin.orders');
+    }
 }

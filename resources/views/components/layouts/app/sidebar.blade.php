@@ -59,6 +59,9 @@
                         <flux:navlist.item icon="shopping-bag" :href="route('admin.sales')" :current="request()->routeIs('admin.sales')" wire:navigate>
                             {{ __('Sales')}}
                         </flux:navlist.item>
+                        <flux:navlist.item icon="shopping-cart" :href="route('admin.orders')" :current="request()->routeIs('admin.orders')" wire:navigate>
+                            {{ __('Orders')}}
+                        </flux:navlist.item>
                         <flux:navlist.group
                             :heading="__('User Management')"
                             class="grid"

@@ -26,3 +26,6 @@ This project is a laravel supply chain management system (SCM) named Aktina. The
 - Use proper security practices (input validation, authentication, authorization).
 - Use proper performance optimization techniques (caching, query optimization, etc.).Do not cache fequently changing data. Focus on caching data that does not change frequently.
 - Use mcp where necessary with a focus on memory retention related MCP to your advantage.
+- Use the plan/general/context.md file to understand more context
+- When adding fixes , only add what is absolutely necessary to fix the issue without breaking existing functionality or structure.
+- Wher unsure, ask for clarification or more information.

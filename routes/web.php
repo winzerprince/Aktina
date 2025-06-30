@@ -7,6 +7,12 @@ use App\Http\Controllers\Retailer\RetailerDashboardController;
 use App\Http\Controllers\Supplier\SupplierDashboardController;
 use App\Http\Controllers\Vendor\VendorDashboardController;
 use App\Livewire\Counter;
+use App\Livewire\Sales\OrderList;
+use App\Livewire\Sales\OrderDetail;
+use App\Livewire\Sales\OrderCreate;
+use App\Livewire\Sales\ResourceOrderList;
+use App\Livewire\Sales\ResourceOrderDetail;
+use App\Livewire\Sales\ResourceOrderCreate;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -21,6 +27,19 @@ Route::view('dashboard', 'dashboard')
 Route::view('components-demo', 'components-demo')
     ->middleware(['auth', 'verified'])
     ->name('components.demo');
+
+// Orders Routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Product Orders
+    Route::get('/orders', OrderList::class)->name('orders.index');
+    Route::get('/orders/create', OrderCreate::class)->name('orders.create');
+    Route::get('/orders/{id}', OrderDetail::class)->name('orders.show');
+
+    // Resource Orders
+    Route::get('/resource-orders', ResourceOrderList::class)->name('resource-orders.index');
+    Route::get('/resource-orders/create', ResourceOrderCreate::class)->name('resource-orders.create');
+    Route::get('/resource-orders/{id}', ResourceOrderDetail::class)->name('resource-orders.show');
+});
 
 // Route::view('orders', 'dashboard')
 //     ->middleware(['auth', 'verified'])
@@ -69,9 +88,10 @@ Route::middleware(['auth'])->group(function () {
     Route::controller(AdminDashboardController::class)->group(function () {
         Route::get('/overview', 'overview')->name('overview');
         Route::get('/sales', 'sales')->name('sales');
+        Route::get('/orders', 'orders')->name('orders');
         Route::get('/users', 'users')->name('users');
         Route::get('/vendors', 'vendors')->name('vendors');
-        Route::get('/pending-signups', 'pendingSignups')->name('pending-signups');
+        Route::get('/pending-signups', 'pendingSignups')->name('pending-sign-ups');
         Route::get('/trends-and-predictions', 'trendsAndPredictions')->name('trends-and-predictions');
         Route::get('/important-metrics', 'importantMetrics')->name('important-metrics');
         Route::get('/customer-insights', 'customerInsights')->name('customer-insights');
@@ -173,3 +193,9 @@ require __DIR__.'/auth.php';
 
 //Livewire routes
 Route::get('counter',Counter::class);
+Route::get('order-list', OrderList::class)->name('order.list');
+Route::get('order-detail/{order}', OrderDetail::class)->name('order.detail');
+Route::get('order-create', OrderCreate::class)->name('order.create');
+Route::get('resource-order-list', ResourceOrderList::class)->name('resource.order.list');
+Route::get('resource-order-detail/{order}', ResourceOrderDetail::class)->name('resource.order.detail');
+Route::get('resource-order-create', ResourceOrderCreate::class)->name('resource.order.create');
