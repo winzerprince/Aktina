@@ -17,7 +17,8 @@ return new class extends Migration
             $table->string('type'); // sales, inventory, production, etc.
             $table->text('description')->nullable();
             $table->json('data'); // Stores the report data in JSON format
-            $table->foreignId('generated_by')->constrained('users')->onDelete('set null')->nullable();
+            $table->foreignId('generated_by')->nullable();
+            $table->foreign('generated_by')->references('id')->on('users')->onDelete('set null');
             $table->dateTime('generated_at');
             $table->timestamps();
         });

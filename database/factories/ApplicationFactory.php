@@ -96,4 +96,28 @@ class ApplicationFactory extends Factory
             'meeting_schedule' => $this->faker->dateTimeBetween('now', '+2 weeks'),
         ]);
     }
+
+    /**
+     * Indicate that the application has been processed by Java server.
+     */
+    public function processed(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'processed_by_java_server' => true,
+            'processing_date' => $this->faker->dateTimeBetween('-1 month', 'now'),
+            'processing_notes' => $this->faker->paragraph(),
+        ]);
+    }
+
+    /**
+     * Indicate that the application has not been processed by Java server.
+     */
+    public function unprocessed(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'processed_by_java_server' => false,
+            'processing_date' => null,
+            'processing_notes' => null,
+        ]);
+    }
 }
