@@ -79,6 +79,12 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/password', 'settings.password')->name('settings.password');
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
 });
+//Route::middleware(['auth', 'verified'])->group(function () {
+    //Route::get('volt', Volt::class)->name('volt');
+//});
+
+// Authentication Routes
+
 
 // Admin-specific features
 Route::view('admin/home', 'admin.home')->middleware(['auth', 'verified'])->name('admin.home');
