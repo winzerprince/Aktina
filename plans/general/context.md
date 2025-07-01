@@ -92,96 +92,68 @@ The system follows Laravel best practices, including:
 - `EnsureRoleVerified` middleware for access control
 - Role-based routing and permission checks
 - File upload validation and security
+- **Comprehensive Security System (Phase 7.2):**
+  - PDF validation with header checks, size limits (10MB), MIME type validation
+  - Input sanitization service preventing XSS and SQL injection
+  - Policy-based authorization with role-specific permissions
+  - Rate limiting: file uploads (3/hour), forms, admin actions
+  - Security headers: CSP, XSS protection, HTTPS enforcement
+  - Strict validation rules with regex patterns for all business data
 
 **Status:** Fully implemented and integrated. Ready for Phase 7 testing and validation.
 
-The database schema currently includes separate tables for each role with foreign keys to the users table, as well as tables for products, orders, resources, BOMs, productions, applications, and ratings.
+## Java PDF Processing Microservice (Phase 7.1 Complete)
 
-Recent database refactoring improvements include:
-1. Added status field to Orders (pending, accepted, complete)
-2. Added owner_id to Products to track ownership changes
-3. Added demographic fields to Retailers (male-female ratio, city, urban-rural classification, etc.)
-4. Created a new Reports table for system-generated reports
-5. Enhanced the Application table for PDF processing with Java server integration
-6. Standardized all role names using snake_case (admin, hr_manager, production_manager, supplier, vendor, retailer)
-7. Moved foreign keys from separate migrations into their respective table migrations
-8. Updated controllers, routes, views, factories, and seeders to reflect the new schema and naming conventions
-9. Restructured controller namespaces to follow snake_case for consistency
+**Comprehensive Spring Boot microservice for intelligent PDF analysis:**
 
-## Planned Feature: Pre-Verification Views System
+### Core Features:
+- **Advanced PDF Text Extraction:** Apache PDFBox 3.0.1 for robust PDF processing
+- **Intelligent Scoring Algorithm:** Multi-criteria weighted scoring system (100-point scale)
+- **Asynchronous Processing:** Non-blocking PDF analysis with Laravel callbacks
+- **RESTful API:** Complete HTTP endpoints for integration
+- **Security:** Basic authentication and input validation
+- **Error Handling:** Comprehensive error recovery and reporting
 
-**Major upcoming enhancement:** Role-based verification system where unverified users see specific onboarding views before accessing main application features:
+### Scoring Methodology:
+1. **Financial Strength (25%):** Bank balance, revenue, financial statements analysis
+2. **Business Experience (20%):** Years in operation, partnerships, project history
+3. **Company Size (15%):** Employee count, facilities, operational scale
+4. **Certifications (15%):** ISO standards, quality certifications, licenses
+5. **Contact Completeness (10%):** Email, phone, address, website presence
+6. **Document Quality (10%):** Structure, length, professionalism assessment
+7. **Industry Relevance (5%):** Electronics/technology sector alignment
 
-**Verification Requirements by Role:**
-- **Admin**: No verification needed - bypasses all requirements
-- **Vendor**: PDF application upload → Java server scoring → Admin review → Meeting scheduling → Final approval
-- **Retailer**: Mandatory demographics form completion with all fields required
-- **Supplier/Production Manager/HR Manager**: Simple email verification with welcome instructions
+### Technical Architecture:
+- **Spring Boot 3.5.3** with reactive web stack
+- **Apache PDFBox** for PDF text extraction and analysis
+- **WebFlux** for asynchronous Laravel API communication
+- **Maven** dependency management with Docker support
+- **Comprehensive logging** and monitoring capabilities
 
-**Key Components:**
-1. **Database Updates**: Applications table enhancement with scoring and meeting fields
-2. **Middleware System**: Role-based verification checks with email_verified_at dependency
-3. **Pre-Verification Views**: Custom onboarding interfaces per role type
-4. **Admin Interface**: Application management dashboard with approval workflow
-5. **Notification System**: Email notifications for verification status changes
-6. **Audit Trail**: Complete workflow tracking for vendor applications
+### API Endpoints:
+- `POST /api/v1/process-application` - Synchronous PDF processing
+- `POST /api/v1/process-application-async` - Asynchronous processing with callbacks
+- `POST /api/v1/process-batch` - Batch processing for multiple applications
+- `GET /api/v1/health` - Service health monitoring
+- `GET /api/v1/test-laravel-connection` - Laravel API connectivity test
 
-**Technical Implementation:**
-- Service-Repository pattern for verification logic
-- Livewire components for dynamic UI
-- HTML + Tailwind CSS for styling
-- File upload system for PDF applications
-- Integration with existing Java server for scoring
+### Integration Features:
+- **Laravel API Integration:** Automatic result callbacks to main application
+- **Scoring Details:** Detailed breakdown of scoring criteria and analysis
+- **Processing Notes:** Human-readable analysis summaries for admin review
+- **Status Management:** Automatic status updates based on score thresholds
 
-## Pre-Verification System Implementation (Latest Update - June 30, 2025)
+### Performance & Scalability:
+- **Thread Pool Management:** Configurable concurrent processing
+- **Memory Optimization:** Streaming processing for large PDF files
+- **File Size Limits:** 10MB maximum with page count restrictions
+- **Connection Pooling:** Efficient HTTP client management
+- **Stateless Design:** Horizontal scaling capability
 
-**Completed role-based pre-verification system:**
+### Deployment Ready:
+- **Executable JAR:** Single file deployment with embedded Tomcat
+- **Configuration:** Externalized properties for different environments
+- **Startup Script:** Automated service management
+- **Health Monitoring:** Built-in health checks and metrics
 
-1. **Database Structure:**
-   - Updated `applications` table with new status enum and fields (score, meeting_notes)
-   - Added demographics fields to `retailers` table for business information
-   - Created `notifications` table for in-app/email notifications
-
-2. **Service Layer Architecture:**
-   - `VerificationService` - Handles role-based verification logic
-   - `ApplicationService` - Manages vendor application workflow
-   - `ApplicationRepository` - Data access layer for applications
-   - All services properly bound in `RepositoryServiceProvider`
-
-3. **Middleware & Routing:**
-   - `EnsureRoleVerified` middleware enforces verification requirements
-   - Verification routes for all roles (vendor, retailer, supplier, production-manager, hr-manager, general)
-   - Protected routes require verification before access
-
-4. **Pre-Verification Views:**
-   - **Vendor:** PDF upload with scoring system, status tracking, tabbed interface with instructions
-   - **Retailer:** Demographics form with business information, address, and market details
-   - **Basic Roles:** Welcome pages with role-specific feature descriptions and admin approval flow
-   - All views use consistent Tailwind CSS styling and responsive design
-
-5. **Livewire Components:**
-   - `VendorApplication` - PDF upload, status tracking, progress visualization
-   - `RetailerDemographics` - Comprehensive demographics form with validation
-
-6. **Application Workflow:**
-   - Vendors: Upload PDF → Java server scoring → Admin meeting → Approval/Rejection
-   - Retailers: Complete demographics → Immediate verification
-   - Others: Admin approval required
-
-7. **Admin Interface (Completed):**
-   - **Application Management:** Complete CRUD operations for vendor applications
-   - **Verification Dashboard:** Real-time stats, recent applications, status tracking
-   - **Integrated Overview:** Main admin dashboard includes verification management
-   - **Quick Actions:** Direct links to application management and user verification
-   - **Responsive Design:** Mobile-friendly interface with consistent styling
-
-8. **Notification System (Completed):**
-   - **Email Notifications:** Laravel notification classes for all workflow stages
-   - **Application Workflow Emails:** Received, scored, meeting scheduled, approved/rejected
-   - **Admin Notifications:** New application submissions requiring review
-   - **User Verification:** Welcome emails for completed verification
-   - **In-App Notifications:** Real-time notification components with unread counts
-   - **Notification Bell:** Dropdown navigation component with recent notifications
-   - **Notification List:** Full notification management with mark as read functionality
-
-**System supports complete role-based access control with pre-verification requirements, comprehensive admin management tools, and full notification workflow.**
+The Java microservice provides enterprise-grade PDF processing capabilities with sophisticated business logic for automated vendor qualification, significantly reducing manual review overhead while maintaining consistent evaluation standards.

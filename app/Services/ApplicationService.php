@@ -20,7 +20,8 @@ use Illuminate\Support\Str;
 class ApplicationService implements ApplicationServiceInterface
 {
     public function __construct(
-        private ApplicationRepositoryInterface $applicationRepository
+        private ApplicationRepositoryInterface $applicationRepository,
+        private FileValidationService $fileValidationService
     ) {}
 
     /**
@@ -28,15 +29,29 @@ class ApplicationService implements ApplicationServiceInterface
      */
     public function submitApplication(Vendor $vendor, UploadedFile $pdf): Application
     {
-        // Store PDF file
-        $filename = 'application_' . $vendor->id . '_' . time() . '.pdf';
-        $path = $pdf->storeAs('applications', $filename, 'public');
+        // Validate PDF file
+        $validationErrors = $this->fileValidationService->validatePdfFile($pdf);
+        if (!empty($validationErrors)) {
+            throw new \InvalidArgumentException('File validation failed: ' . implode(', ', $validationErrors));
+        }
+
+        // Generate secure filename
+        $filename = $this->fileValidationService->generateSecureFilename(
+            'vendor_application',
+            $vendor->user_id
+        );
+
+        // Store file securely
+        $path = $this->fileValidationService->storeFileSecurely($pdf, 'vendor-applications', $filename);
+        if (!$path) {
+            throw new \RuntimeException('Failed to store the uploaded file securely.');
+        }
 
         // Create application
         $applicationData = [
             'vendor_id' => $vendor->id,
             'status' => Application::STATUS_PENDING,
-            'pdf_path' => 'storage/' . $path,
+            'pdf_path' => $path,
             'application_reference' => 'APP-' . strtoupper(Str::random(6)),
         ];
 
@@ -194,5 +209,51 @@ class ApplicationService implements ApplicationServiceInterface
         }
 
         return true;
+    }
+
+    /**
+     * Send notification to vendor about application status
+     */
+    public function notifyVendor(Application $application, string $type): bool
+    {
+        $vendor = $application->vendor;
+
+        if (!$vendor || !$vendor->user) {
+            return false;
+        }
+
+        switch ($type) {
+            case 'received':
+                $vendor->user->notify(new VendorApplicationReceived($application));
+                break;
+            case 'scored':
+                $vendor->user->notify(new VendorApplicationScored($application));
+                break;
+            case 'meeting_scheduled':
+                $vendor->user->notify(new VendorMeetingScheduled($application));
+                break;
+            case 'approved':
+                $vendor->user->notify(new VendorApplicationApproved($application));
+                break;
+            case 'rejected':
+                $vendor->user->notify(new VendorApplicationRejected($application));
+                break;
+            default:
+                return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Get application for user (vendor)
+     */
+    public function getApplicationForUser(User $user): ?Application
+    {
+        if (!$user->isVendor() || !$user->vendor) {
+            return null;
+        }
+
+        return $this->applicationRepository->findByVendor($user->vendor);
     }
 }

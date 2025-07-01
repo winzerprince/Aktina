@@ -50,6 +50,11 @@ interface ApplicationServiceInterface
     public function getVendorApplicationStatus(Vendor $vendor): ?array;
 
     /**
+     * Get application for user (vendor)
+     */
+    public function getApplicationForUser(User $user): ?Application;
+
+    /**
      * Send notification to vendor about application status
      */
     public function notifyVendor(Application $application, string $type): bool;

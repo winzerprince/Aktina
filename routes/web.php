@@ -30,7 +30,7 @@ Route::view('components-demo', 'components-demo')
     ->name('components.demo');
 
 // Pre-verification routes (no middleware - accessible to unverified users)
-Route::middleware(['auth'])->prefix('verification')->name('verification.')->group(function () {
+Route::middleware(['auth', 'throttle:file-upload'])->prefix('verification')->name('verification.')->group(function () {
     Route::view('/vendor', 'verification.vendor')->name('vendor');
     Route::view('/retailer', 'verification.retailer')->name('retailer');
     Route::view('/supplier', 'verification.supplier')->name('supplier');

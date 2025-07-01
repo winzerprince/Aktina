@@ -31,6 +31,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'verified' => fake()->boolean(70), // 70% chance of being verified
+            'is_verified' => fake()->boolean(70), // 70% chance of being verified
             'company_name' => fake()->optional(0.8)->company(), // 80% chance of having a company name
             'address' => json_encode([
                 'street' => fake()->streetAddress(),

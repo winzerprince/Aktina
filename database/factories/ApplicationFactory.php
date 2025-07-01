@@ -21,7 +21,7 @@ class ApplicationFactory extends Factory
         return [
             'status' => $this->faker->randomElement(['pending', 'scored', 'meeting_scheduled', 'meeting_completed', 'approved', 'rejected']),
             'meeting_schedule' => $this->faker->optional(0.7)->dateTimeBetween('now', '+1 month'), // 70% chance of having a meeting
-            'vendor_id' => null, // Will be set by the seeder to avoid circular dependency
+            'vendor_id' => Vendor::factory(),
             'pdf_path' => $this->faker->optional(0.8)->randomElement([
                 'storage/applications/app_' . $this->faker->uuid . '.pdf',
                 'storage/applications/vendor_' . $this->faker->uuid . '.pdf',

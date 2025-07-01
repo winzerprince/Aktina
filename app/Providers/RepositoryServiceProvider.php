@@ -47,6 +47,11 @@ class RepositoryServiceProvider extends ServiceProvider
             ApplicationServiceInterface::class,
             ApplicationService::class
         );
+
+        // Bind additional services
+        $this->app->singleton(
+            \App\Services\FileValidationService::class
+        );
     }
 
     /**
