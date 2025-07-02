@@ -18,11 +18,26 @@ class Order extends Model
     protected $casts = [
         'price' => 'decimal:2',
         'items' => 'array',
+        'fulfillment_data' => 'array',
+        'approved_at' => 'datetime',
+        'rejected_at' => 'datetime',
+        'fulfillment_started_at' => 'datetime',
+        'shipped_at' => 'datetime',
+        'completed_at' => 'datetime',
+        'estimated_delivery' => 'datetime',
+        'expected_delivery_date' => 'datetime',
+        'fulfillment_failed_at' => 'datetime',
+        'is_backorder' => 'boolean',
     ];
 
     public const STATUS_PENDING = 'pending';
     public const STATUS_ACCEPTED = 'accepted';
     public const STATUS_COMPLETE = 'complete';
+    public const STATUS_REJECTED = 'rejected';
+    public const STATUS_IN_TRANSIT = 'in_transit';
+    public const STATUS_SHIPPED = 'shipped';
+    public const STATUS_PARTIALLY_FULFILLED = 'partially_fulfilled';
+    public const STATUS_FULFILLMENT_FAILED = 'fulfillment_failed';
 
     public function buyer()
     {
@@ -32,6 +47,26 @@ class Order extends Model
     public function seller(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'seller_id');
+    }
+
+    public function approver(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approver_id');
+    }
+
+    public function assignedWarehouse(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Warehouse::class, 'assigned_warehouse_id');
+    }
+
+    public function parentOrder(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Order::class, 'parent_order_id');
+    }
+
+    public function childOrders(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Order::class, 'parent_order_id');
     }
 
     /**
@@ -106,5 +141,53 @@ class Order extends Model
             }
         }
         return array_unique($models);
+    }
+
+    public function getStatusColorAttribute(): string
+    {
+        return match($this->status) {
+            self::STATUS_PENDING => 'yellow',
+            self::STATUS_ACCEPTED => 'blue',
+            self::STATUS_IN_TRANSIT, self::STATUS_SHIPPED => 'indigo',
+            self::STATUS_COMPLETE => 'green',
+            self::STATUS_REJECTED, self::STATUS_FULFILLMENT_FAILED => 'red',
+            self::STATUS_PARTIALLY_FULFILLED => 'orange',
+            default => 'gray'
+        };
+    }
+
+    public function getFormattedStatusAttribute(): string
+    {
+        return ucwords(str_replace('_', ' ', $this->status));
+    }
+
+    public function isEditable(): bool
+    {
+        return in_array($this->status, [self::STATUS_PENDING]);
+    }
+
+    public function canBeApproved(): bool
+    {
+        return $this->status === self::STATUS_PENDING;
+    }
+
+    public function canBeRejected(): bool
+    {
+        return $this->status === self::STATUS_PENDING;
+    }
+
+    public function canBeFulfilled(): bool
+    {
+        return $this->status === self::STATUS_ACCEPTED;
+    }
+
+    public function canBeShipped(): bool
+    {
+        return in_array($this->status, [self::STATUS_ACCEPTED, self::STATUS_PARTIALLY_FULFILLED]);
+    }
+
+    public function getTotalAmountAttribute(): float
+    {
+        return $this->price;
     }
 }
