@@ -52,8 +52,8 @@ class ApplicationPolicy
         }
 
         // Users can only update their own pending applications through vendor relationship
-        return $user->isVendor() && 
-               $user->vendor && 
+        return $user->isVendor() &&
+               $user->vendor &&
                $user->vendor->id === $application->vendor_id &&
                in_array($application->status, ['pending', 'scored']);
     }
@@ -105,8 +105,8 @@ class ApplicationPolicy
         }
 
         // Users can only download their own PDFs through vendor relationship
-        return $user->isVendor() && 
-               $user->vendor && 
+        return $user->isVendor() &&
+               $user->vendor &&
                $user->vendor->id === $application->vendor_id;
     }
 }

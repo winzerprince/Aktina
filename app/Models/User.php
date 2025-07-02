@@ -58,6 +58,50 @@ class User extends Authenticatable
             ->implode('');
     }
 
+    // Communication relationships
+    public function sentMessages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    public function conversations()
+    {
+        return $this->belongsToMany(Conversation::class, 'conversation_user')
+                    ->withTimestamps();
+    }
+
+    public function conversationsAsUser1()
+    {
+        return $this->hasMany(Conversation::class, 'user1_id');
+    }
+
+    public function conversationsAsUser2()
+    {
+        return $this->hasMany(Conversation::class, 'user2_id');
+    }
+
+    // Inventory relationships
+    public function inventoryMovements()
+    {
+        return $this->hasMany(InventoryMovement::class, 'moved_by');
+    }
+
+    public function resolvedAlerts()
+    {
+        return $this->hasMany(InventoryAlert::class, 'resolved_by');
+    }
+
+    // Analytics relationships
+    public function dailyMetrics()
+    {
+        return $this->hasMany(DailyMetric::class);
+    }
+
+    public function salesAnalytics()
+    {
+        return $this->hasMany(SalesAnalytic::class);
+    }
+
     // Role-based relationships
     public function supplier()
     {
