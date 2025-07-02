@@ -109,4 +109,24 @@ class AdminDashboardController extends Controller
     {
         return view('admin.verification');
     }
+
+    /**
+     * Display the advanced analytics dashboard.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function analytics()
+    {
+        return view('admin.analytics');
+    }
+
+    /**
+     * Display the real-time monitoring dashboard.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function monitoring()
+    {
+        return view('admin.monitoring');
+    }
 }

@@ -26,14 +26,18 @@ class UserManagementService
     public function createUser(array $data)
     {
         return DB::transaction(function () use ($data) {
-            $user = User::create([
+            $userData = [
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'role' => $data['role'],
-                'status' => $data['status'],
+                'is_active' => $data['is_active'] ?? true,
+                'company_name' => $data['company_name'] ?? null,
+                'phone' => $data['phone'] ?? null,
                 'password' => Hash::make('password123'), // Default password
                 'email_verified_at' => now()
-            ]);
+            ];
+
+            $user = User::create($userData);
             
             // Log the action
             $this->logUserAction('created', $user->id);
@@ -47,15 +51,19 @@ class UserManagementService
         return DB::transaction(function () use ($userId, $data) {
             $user = User::findOrFail($userId);
             
-            $user->update([
+            $updateData = [
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'role' => $data['role'],
-                'status' => $data['status']
-            ]);
+                'is_active' => $data['is_active'],
+                'company_name' => $data['company_name'] ?? null,
+                'phone' => $data['phone'] ?? null,
+            ];
+
+            $user->update($updateData);
             
             // Log the action
-            $this->logUserAction('updated', $user->id);
+            $this->logUserAction('updated', $user->id, $updateData);
             
             return $user;
         });
@@ -66,29 +74,33 @@ class UserManagementService
         return DB::transaction(function () use ($userId) {
             $user = User::findOrFail($userId);
             
-            // Prevent deletion of admin users
-            if ($user->role === 'admin' && User::where('role', 'admin')->count() <= 1) {
-                throw new \Exception('Cannot delete the last admin user');
+            // Check if user can be deleted (no orders, etc.)
+            if ($user->orders()->exists()) {
+                throw new \Exception('Cannot delete user with existing orders');
             }
             
-            // Log the action before deletion
-            $this->logUserAction('deleted', $user->id);
-            
             $user->delete();
+            
+            // Log the action
+            $this->logUserAction('deleted', $userId);
             
             return true;
         });
     }
     
-    public function updateUserStatus($userId, $status)
+    public function toggleUserStatus($userId)
     {
-        return DB::transaction(function () use ($userId, $status) {
+        return DB::transaction(function () use ($userId) {
             $user = User::findOrFail($userId);
+            $newStatus = !$user->is_active;
             
-            $user->update(['status' => $status]);
+            $user->update(['is_active' => $newStatus]);
             
             // Log the action
-            $this->logUserAction("status_changed_to_{$status}", $user->id);
+            $this->logUserAction('status_changed', $userId, [
+                'old_status' => !$newStatus,
+                'new_status' => $newStatus
+            ]);
             
             return $user;
         });
@@ -96,31 +108,7 @@ class UserManagementService
     
     public function bulkAction(array $userIds, $action)
     {
-        return DB::transaction(function () use ($userIds, $action) {
-            $count = 0;
-            
-            foreach ($userIds as $userId) {
-                try {
-                    switch ($action) {
-                        case 'activate':
-                            $this->updateUserStatus($userId, 'active');
-                            break;
-                        case 'deactivate':
-                            $this->updateUserStatus($userId, 'inactive');
-                            break;
-                        case 'delete':
-                            $this->deleteUser($userId);
-                            break;
-                    }
-                    $count++;
-                } catch (\Exception $e) {
-                    // Log error but continue with other users
-                    \Log::error("Bulk action failed for user {$userId}: " . $e->getMessage());
-                }
-            }
-            
-            return $count;
-        });
+        return $this->executeBulkAction($action, $userIds);
     }
     
     public function exportUsers($format = 'csv', $filters = [])
@@ -214,14 +202,94 @@ class UserManagementService
         ];
     }
     
-    protected function logUserAction($action, $userId)
+    private function logUserAction($action, $userId, $details = null)
     {
-        // Log to Laravel log for now - could be expanded to audit log table
-        \Log::info("User action: {$action}", [
+        // Simplified logging - in production, use proper audit logging
+        logger()->info("User {$action}", [
             'user_id' => $userId,
             'admin_id' => auth()->id(),
+            'details' => $details,
             'timestamp' => now()
         ]);
+    }
+
+    public function getFilteredUsers(array $filters, int $perPage = 20)
+    {
+        $query = User::query();
+
+        if (!empty($filters['search'])) {
+            $query->where(function($q) use ($filters) {
+                $q->where('name', 'like', '%' . $filters['search'] . '%')
+                  ->orWhere('email', 'like', '%' . $filters['search'] . '%')
+                  ->orWhere('company_name', 'like', '%' . $filters['search'] . '%');
+            });
+        }
+
+        if (!empty($filters['role'])) {
+            $query->where('role', $filters['role']);
+        }
+
+        if (isset($filters['status'])) {
+            $query->where('is_active', $filters['status']);
+        }
+
+        return $query->orderBy('created_at', 'desc')->paginate($perPage);
+    }
+
+    public function executeBulkAction(string $action, array $userIds)
+    {
+        return DB::transaction(function () use ($action, $userIds) {
+            $users = User::whereIn('id', $userIds);
+            $count = 0;
+
+            switch ($action) {
+                case 'activate':
+                    $count = $users->update(['is_active' => true]);
+                    $message = "{$count} users activated successfully";
+                    break;
+
+                case 'deactivate':
+                    $count = $users->update(['is_active' => false]);
+                    $message = "{$count} users deactivated successfully";
+                    break;
+
+                case 'delete':
+                    // Soft delete or hard delete based on business rules
+                    $count = $users->delete();
+                    $message = "{$count} users deleted successfully";
+                    break;
+
+                case 'export':
+                    $this->exportUsers(['user_ids' => $userIds]);
+                    $message = "Export initiated for {$count} users";
+                    break;
+
+                case 'send_notification':
+                    $this->sendBulkNotification($userIds);
+                    $message = "Notifications sent to {$count} users";
+                    break;
+
+                default:
+                    throw new \InvalidArgumentException('Invalid bulk action');
+            }
+
+            // Log bulk action
+            $this->logUserAction('bulk_' . $action, null, [
+                'user_ids' => $userIds,
+                'count' => $count
+            ]);
+
+            return ['message' => $message, 'count' => $count];
+        });
+    }
+
+    private function sendBulkNotification(array $userIds)
+    {
+        // In a real implementation, this would send notifications
+        // For now, we'll just log the action
+        $this->logUserAction('bulk_notification_sent', null, ['user_ids' => $userIds]);
+        
+        return true;
     }
     
     protected function generateRandomPassword($length = 12)

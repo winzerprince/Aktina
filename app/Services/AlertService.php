@@ -134,4 +134,78 @@ class AlertService implements AlertServiceInterface
     {
         return $this->alertRepository->getStats();
     }
+
+    public function markAsRead(int $alertId)
+    {
+        $alert = $this->alertRepository->findById($alertId);
+        
+        if (!$alert) {
+            return false;
+        }
+        
+        return $this->alertRepository->update($alertId, [
+            'is_read' => true,
+            'read_at' => now(),
+        ]);
+    }
+
+    public function dismissAlert(int $alertId)
+    {
+        $alert = $this->alertRepository->findById($alertId);
+        
+        if (!$alert) {
+            return false;
+        }
+        
+        return $this->alertRepository->update($alertId, [
+            'is_dismissed' => true,
+            'dismissed_at' => now(),
+        ]);
+    }
+
+    public function bulkResolveAlerts(array $alertIds)
+    {
+        foreach ($alertIds as $alertId) {
+            $this->alertRepository->update($alertId, [
+                'is_resolved' => true,
+                'resolved_at' => now(),
+            ]);
+        }
+        
+        return true;
+    }
+
+    public function bulkDismissAlerts(array $alertIds)
+    {
+        foreach ($alertIds as $alertId) {
+            $this->alertRepository->update($alertId, [
+                'is_dismissed' => true,
+                'dismissed_at' => now(),
+            ]);
+        }
+        
+        return true;
+    }
+
+    public function getLowStockAlertsCount(int $warehouseId = null)
+    {
+        $query = $this->alertRepository->getActive('low_stock');
+        
+        if ($warehouseId) {
+            $query->where('warehouse_id', $warehouseId);
+        }
+        
+        return $query->count();
+    }
+
+    public function getAlertStatistics()
+    {
+        return [
+            'total_active' => $this->alertRepository->getActive()->count(),
+            'critical' => $this->alertRepository->getCritical()->count(),
+            'low_stock' => $this->alertRepository->getActive('low_stock')->count(),
+            'overstock' => $this->alertRepository->getActive('overstock')->count(),
+            'resolved_today' => $this->alertRepository->getByDateRange(now()->startOfDay(), now()->endOfDay())->where('is_resolved', true)->count(),
+        ];
+    }
 }

@@ -26,6 +26,12 @@ class AppServiceProvider extends ServiceProvider
         // Bind Service Interfaces
         $this->app->bind(OrderServiceInterface::class, OrderService::class);
         $this->app->bind(ResourceOrderServiceInterface::class, ResourceOrderService::class);
+
+        // Register additional services
+        $this->app->singleton(\App\Services\RetailerOrderService::class);
+        $this->app->singleton(\App\Services\RetailerSalesService::class);
+        $this->app->singleton(\App\Services\RetailerInventoryService::class);
+        $this->app->singleton(\App\Services\SupplierService::class);
     }
 
     /**

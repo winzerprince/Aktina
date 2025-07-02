@@ -1,3 +1,6 @@
 <x-layouts.app>
-   <h1>Welcome to the overview page </h1>
+    <div class="space-y-6">
+        <!-- Production Dashboard Overview -->
+        <livewire:production-manager.production-dashboard />
+    </div>
 </x-layouts.app>

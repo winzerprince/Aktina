@@ -107,6 +107,8 @@ Route::middleware(['auth', 'role.verified'])->prefix('admin')->name('admin.')->g
         Route::get('/trends-and-predictions', 'trendsAndPredictions')->name('trends-and-predictions');
         Route::get('/important-metrics', 'importantMetrics')->name('important-metrics');
         Route::get('/customer-insights', 'customerInsights')->name('customer-insights');
+        Route::get('/analytics', 'analytics')->name('analytics');
+        Route::get('/monitoring', 'monitoring')->name('monitoring');
     });
 
     // Application management routes
