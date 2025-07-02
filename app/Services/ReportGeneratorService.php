@@ -70,7 +70,7 @@ class ReportGeneratorService
             'data' => $reportData,
             'metadata' => [
                 'generated_at' => now()->format('Y-m-d H:i:s'),
-                'generated_by' => auth()->user()->name ?? 'System',
+                'generated_by' => auth()->check() ? auth()->user()->name : 'System',
                 'report_type' => ucfirst($type) . ' Report',
                 'date_range' => $this->formatDateRange($filters),
                 'total_records' => count($reportData['data'] ?? [])
@@ -87,12 +87,12 @@ class ReportGeneratorService
         $query = Order::whereBetween('created_at', [$startDate, $endDate]);
         
         if ($role) {
-            $query->whereHas('user', function ($q) use ($role) {
+            $query->whereHas('buyer', function ($q) use ($role) {
                 $q->where('role', $role);
             });
         }
 
-        $orders = $query->with(['orderItems'])->get();
+        $orders = $query->get();
         
         $totalRevenue = $orders->sum('total_amount');
         $totalOrders = $orders->count();
@@ -127,15 +127,20 @@ class ReportGeneratorService
      */
     private function generateInventoryReport(Carbon $startDate, Carbon $endDate): array
     {
-        $products = Product::with('inventory')->get();
-        $resources = Resource::with('inventory')->get();
+        $products = Product::all();
+        $resources = Resource::with('inventoryMovements')->get();
 
+        // For demonstration, we'll use a simplified approach
         $lowStockProducts = $products->filter(function ($product) {
-            return ($product->inventory->quantity ?? 0) < 10;
+            // Assuming stock level is stored directly in the product model
+            return ($product->stock_quantity ?? 0) < 10;
         });
 
         $lowStockResources = $resources->filter(function ($resource) {
-            return ($resource->inventory->quantity ?? 0) < 5;
+            // For resources, calculate quantity from the most recent movement
+            $latestMovement = $resource->inventoryMovements()->latest()->first();
+            $quantity = $latestMovement ? $latestMovement->quantity_after : 0;
+            return $quantity < 5;
         });
 
         return [
@@ -148,30 +153,37 @@ class ReportGeneratorService
             ],
             'data' => [
                 'products' => $products->map(function ($product) {
+                    $stockQuantity = $product->stock_quantity ?? 0;
                     return [
-                        'name' => $product->name,
-                        'category' => $product->category,
-                        'current_stock' => $product->inventory->quantity ?? 0,
-                        'price' => $product->price,
-                        'value' => ($product->inventory->quantity ?? 0) * $product->price,
-                        'status' => $this->getStockStatus($product->inventory->quantity ?? 0)
+                        'name' => $product->name ?? 'Product',
+                        'category' => $product->category ?? 'Uncategorized',
+                        'current_stock' => $stockQuantity,
+                        'price' => $product->price ?? $product->msrp ?? 0,
+                        'value' => $stockQuantity * ($product->price ?? $product->msrp ?? 0),
+                        'status' => $this->getStockStatus($stockQuantity)
                     ];
                 })->toArray(),
                 'resources' => $resources->map(function ($resource) {
+                    $latestMovement = $resource->inventoryMovements()->latest()->first();
+                    $stockQuantity = $latestMovement ? $latestMovement->quantity_after : 0;
                     return [
-                        'name' => $resource->name,
-                        'unit' => $resource->unit,
-                        'current_stock' => $resource->inventory->quantity ?? 0,
-                        'cost_per_unit' => $resource->cost_per_unit,
-                        'total_value' => ($resource->inventory->quantity ?? 0) * $resource->cost_per_unit,
-                        'status' => $this->getStockStatus($resource->inventory->quantity ?? 0)
+                        'name' => $resource->name ?? 'Resource',
+                        'unit' => $resource->unit ?? 'unit',
+                        'current_stock' => $stockQuantity,
+                        'cost_per_unit' => $resource->unit_cost ?? 0,
+                        'total_value' => $stockQuantity * ($resource->unit_cost ?? 0),
+                        'status' => $this->getStockStatus($stockQuantity)
                     ];
                 })->toArray()
             ],
             'alerts' => [
                 'low_stock_items' => $lowStockProducts->merge($lowStockResources)->count(),
-                'out_of_stock_items' => $products->merge($resources)->filter(function ($item) {
-                    return ($item->inventory->quantity ?? 0) === 0;
+                'out_of_stock_items' => $products->filter(function ($product) {
+                    return ($product->stock_quantity ?? 0) === 0;
+                })->count() + $resources->filter(function ($resource) {
+                    $latestMovement = $resource->inventoryMovements()->latest()->first();
+                    $quantity = $latestMovement ? $latestMovement->quantity_after : 0;
+                    return $quantity === 0;
                 })->count()
             ]
         ];
@@ -237,12 +249,13 @@ class ReportGeneratorService
         $query = Order::whereBetween('created_at', [$startDate, $endDate]);
         
         if ($role) {
-            $query->whereHas('user', function ($q) use ($role) {
+            // If role is specified, filter by buyer role
+            $query->whereHas('buyer', function ($q) use ($role) {
                 $q->where('role', $role);
             });
         }
 
-        $orders = $query->with('user')->get();
+        $orders = $query->get();
 
         $ordersByStatus = $orders->countBy('status')->toArray();
         $orderTrends = $orders->groupBy(function ($order) {
@@ -440,12 +453,12 @@ class ReportGeneratorService
 
     private function getTopCustomers(Collection $orders): array
     {
-        return $orders->groupBy('user_id')
+        return $orders->groupBy('buyer_id')
             ->map(function ($customerOrders) {
-                $user = $customerOrders->first()->user;
+                $buyer = $customerOrders->first()->buyer;
                 return [
-                    'name' => $user->name,
-                    'email' => $user->email,
+                    'buyer_id' => $customerOrders->first()->buyer_id,
+                    'name' => $buyer->name ?? 'Unknown',
                     'orders_count' => $customerOrders->count(),
                     'total_spent' => $customerOrders->sum('total_amount')
                 ];
@@ -464,11 +477,13 @@ class ReportGeneratorService
     private function calculateInventoryValue(Collection $products, Collection $resources): float
     {
         $productValue = $products->sum(function ($product) {
-            return ($product->inventory->quantity ?? 0) * $product->price;
+            return ($product->stock_quantity ?? 0) * ($product->price ?? $product->msrp ?? 0);
         });
 
         $resourceValue = $resources->sum(function ($resource) {
-            return ($resource->inventory->quantity ?? 0) * $resource->cost_per_unit;
+            $latestMovement = $resource->inventoryMovements()->latest()->first();
+            $quantity = $latestMovement ? $latestMovement->quantity_after : 0;
+            return $quantity * ($resource->unit_cost ?? 0);
         });
 
         return $productValue + $resourceValue;

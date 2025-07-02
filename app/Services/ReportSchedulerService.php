@@ -137,11 +137,12 @@ class ReportSchedulerService
             // Send to relevant users
             $this->sendReportToUsers($type, $frequency, $csvPath, $pdfPath, $filters);
 
+            $recipients = $this->getReportRecipients($type, $frequency);
             return [
                 'success' => true,
                 'csv_path' => $csvPath,
                 'pdf_path' => $pdfPath,
-                'sent_to' => $this->getReportRecipients($type, $frequency)
+                'sent_to' => $recipients
             ];
 
         } catch (\Exception $e) {
@@ -179,14 +180,24 @@ class ReportSchedulerService
                 // In a real implementation, you'd send actual emails
                 // Mail::to($user->email)->send(new ReportNotification($type, $frequency, $csvPath, $pdfPath, $filters));
                 
-                Log::info("Report sent to {$user->email}", [
+                // For simulation, just log it
+                if (is_object($user) && isset($user->email)) {
+                    $userEmail = $user->email;
+                    $userId = $user->id ?? 'unknown';
+                } else {
+                    $userEmail = $user['email'] ?? 'unknown@example.com';
+                    $userId = $user['id'] ?? 'unknown';
+                }
+                
+                Log::info("Report sent to {$userEmail}", [
                     'type' => $type,
                     'frequency' => $frequency,
-                    'user_id' => $user->id
+                    'user_id' => $userId
                 ]);
                 
             } catch (\Exception $e) {
-                Log::error("Failed to send report to {$user->email}: " . $e->getMessage());
+                $userEmail = is_object($user) && isset($user->email) ? $user->email : 'unknown@example.com';
+                Log::error("Failed to send report to {$userEmail}: " . $e->getMessage());
             }
         }
     }
@@ -196,37 +207,49 @@ class ReportSchedulerService
      */
     private function getReportRecipients(string $type, string $frequency): array
     {
-        $recipients = [];
+        $recipientRoles = [];
 
         switch ($type) {
             case 'sales':
             case 'orders':
-                $recipients = User::whereIn('role', ['admin', 'vendor', 'production_manager'])->get();
+                $recipientRoles = ['admin', 'vendor', 'production_manager'];
                 break;
                 
             case 'inventory':
-                $recipients = User::whereIn('role', ['admin', 'production_manager', 'supplier'])->get();
+                $recipientRoles = ['admin', 'production_manager', 'supplier'];
                 break;
                 
             case 'users':
-                $recipients = User::whereIn('role', ['admin', 'hr_manager'])->get();
+                $recipientRoles = ['admin', 'hr_manager'];
                 break;
                 
             case 'production':
-                $recipients = User::whereIn('role', ['admin', 'production_manager'])->get();
+                $recipientRoles = ['admin', 'production_manager'];
                 break;
                 
             case 'comprehensive':
                 if ($frequency === 'monthly') {
-                    $recipients = User::where('role', 'admin')->get();
+                    $recipientRoles = ['admin'];
                 } else {
-                    $recipients = User::whereIn('role', ['admin', 'production_manager'])->get();
+                    $recipientRoles = ['admin', 'production_manager'];
                 }
                 break;
                 
             default:
-                $recipients = User::where('role', 'admin')->get();
+                $recipientRoles = ['admin'];
         }
+        
+        // Just return basic data structure rather than User objects
+        return User::whereIn('role', $recipientRoles)
+            ->get(['id', 'name', 'email'])
+            ->map(function($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email
+                ];
+            })
+            ->toArray();
 
         return $recipients->toArray();
     }
