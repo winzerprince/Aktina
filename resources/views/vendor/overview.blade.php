@@ -2,5 +2,8 @@
     <div class="space-y-6">
         <!-- Vendor Dashboard Overview -->
         <livewire:vendor.vendor-dashboard />
+        
+        <!-- Reports Section -->
+        <livewire:shared.report-download />
     </div>
 </x-layouts.app>

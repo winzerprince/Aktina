@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Services\AnalyticsService;
 use App\Services\MetricsService;
 use App\Services\EnhancedOrderService;
+use App\Services\RealtimeDataService;
 use App\Models\User;
 use App\Models\Order;
 use App\Models\Resource;
@@ -17,7 +18,7 @@ class AdminDashboardOverview extends Component
 {
     public $timeRange = '30d';
     public $loading = false;
-    public $refreshInterval = 30000; // 30 seconds for real-time updates
+    public $refreshInterval = 15000; // 15 seconds for enhanced real-time updates
     
     // Stats
     public $totalUsers = 0;
@@ -28,26 +29,36 @@ class AdminDashboardOverview extends Component
     public $recentActivities = [];
     public $systemHealth = [];
 
+    // Real-time data
+    public $realtimeMetrics = [];
+    public $lowStockAlerts = [];
+    public $lastUpdated = null;
+
     // Chart data
     public $orderTrends = [];
     public $userGrowth = [];
     public $revenueChart = [];
     public $roleDistribution = [];
 
-    protected $listeners = ['refreshDashboard' => 'loadDashboardData'];
+    protected $listeners = ['refreshDashboard' => 'loadDashboardData', 'realtimeUpdate' => 'loadRealtimeData'];
 
     public function __construct(
         private AnalyticsService $analyticsService,
         private MetricsService $metricsService,
-        private EnhancedOrderService $orderService
+        private EnhancedOrderService $orderService,
+        private RealtimeDataService $realtimeService
     ) {}
 
     public function boot(
         AnalyticsService $analyticsService,
         MetricsService $metricsService,
-        EnhancedOrderService $orderService
+        EnhancedOrderService $orderService,
+        RealtimeDataService $realtimeService
     ) {
         $this->analyticsService = $analyticsService;
+        $this->metricsService = $metricsService;
+        $this->orderService = $orderService;
+        $this->realtimeService = $realtimeService;
         $this->metricsService = $metricsService;
         $this->orderService = $orderService;
     }
@@ -55,6 +66,7 @@ class AdminDashboardOverview extends Component
     public function mount()
     {
         $this->loadDashboardData();
+        $this->loadRealtimeData();
     }
 
     public function updatedTimeRange()
@@ -335,6 +347,21 @@ class AdminDashboardOverview extends Component
     {
         // Implementation for data export
         $this->dispatch('export-initiated', ['type' => $type]);
+    }
+
+    public function loadRealtimeData()
+    {
+        $this->realtimeMetrics = $this->realtimeService->getRealtimeDashboardMetrics();
+        $inventoryData = $this->realtimeService->getRealtimeInventoryData();
+        $this->lowStockAlerts = $inventoryData['alerts'] ?? [];
+        $this->lastUpdated = now()->format('H:i:s');
+        
+        // Update key metrics with real-time data
+        $this->totalUsers = $this->realtimeMetrics['total_users'];
+        $this->pendingOrders = $this->realtimeMetrics['active_orders'];
+        $this->recentActivities = $this->realtimeMetrics['recent_activities'];
+        
+        $this->dispatch('realtimeDataUpdated', $this->realtimeMetrics);
     }
 
     public function render()

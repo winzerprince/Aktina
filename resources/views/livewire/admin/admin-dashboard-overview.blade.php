@@ -1,10 +1,18 @@
-<div class="space-y-6" wire:poll.{{ $refreshInterval }}ms="refreshDashboard">
-    <!-- Header with Time Range Filter -->
+<div class="space-y-6" 
+     wire:poll.{{ $refreshInterval }}ms="loadRealtimeData">
+    
+    <!-- Header with Time Range Filter and Real-time Status -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Dashboard Overview</h2>
                 <p class="text-gray-600 dark:text-gray-400 mt-1">Real-time system monitoring and analytics</p>
+                @if($lastUpdated)
+                    <p class="text-xs text-green-600 mt-1">
+                        <span class="inline-block w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+                        Live • Last updated: {{ $lastUpdated }}
+                    </p>
+                @endif
             </div>
             <div class="flex items-center space-x-4 mt-4 md:mt-0">
                 <select wire:model.live="timeRange" 
@@ -15,7 +23,7 @@
                     <option value="1y">Last Year</option>
                 </select>
                 
-                <button wire:click="refreshDashboard" 
+                <button wire:click="loadRealtimeData" 
                         class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
@@ -222,6 +230,36 @@
             @endforelse
         </div>
     </div>
+
+    <!-- Real-time Alerts Section -->
+    @if(!empty($lowStockAlerts))
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Real-time Inventory Alerts</h3>
+                <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+                    {{ count($lowStockAlerts) }} alerts
+                </span>
+            </div>
+            <div class="space-y-3">
+                @foreach($lowStockAlerts as $alert)
+                    <div class="flex items-center justify-between p-3 {{ $alert['severity'] === 'critical' ? 'bg-red-50 border border-red-200' : 'bg-yellow-50 border border-yellow-200' }} rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <svg class="w-5 h-5 {{ $alert['severity'] === 'critical' ? 'text-red-500' : 'text-yellow-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.732 13.5c-.77.833.192 2.5 1.732 2.5z"/>
+                            </svg>
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">{{ $alert['item'] }}</p>
+                                <p class="text-xs text-gray-500">Current stock: {{ $alert['current_stock'] }}</p>
+                            </div>
+                        </div>
+                        <span class="px-2 py-1 text-xs font-medium {{ $alert['severity'] === 'critical' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800' }} rounded-full">
+                            {{ ucfirst($alert['severity']) }}
+                        </span>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    @endif
 
     <!-- Loading Overlay -->
     @if($loading)

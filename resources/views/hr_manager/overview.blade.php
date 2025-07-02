@@ -6,5 +6,10 @@
         </div>
         
         @livewire('h-r-manager.h-r-dashboard')
+        
+        <!-- Reports Section -->
+        <div class="mt-6">
+            <livewire:shared.report-download />
+        </div>
     </div>
 </x-layouts.app>

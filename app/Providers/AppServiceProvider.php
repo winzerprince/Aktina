@@ -33,6 +33,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(\App\Services\RetailerInventoryService::class);
         $this->app->singleton(\App\Services\SupplierService::class);
         $this->app->singleton(\App\Services\HRService::class);
+        $this->app->singleton(\App\Services\RealtimeDataService::class);
+        $this->app->singleton(\App\Services\ReportGeneratorService::class);
+        $this->app->singleton(\App\Services\ReportSchedulerService::class);
     }
 
     /**
