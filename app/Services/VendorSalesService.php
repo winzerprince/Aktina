@@ -163,7 +163,7 @@ class VendorSalesService
         ];
     }
 
-    private function getTotalRevenue($vendorId, $startDate)
+    public function getTotalRevenue($vendorId, $startDate)
     {
         return Order::where('seller_id', $vendorId)
             ->where('created_at', '>=', $startDate)
@@ -177,7 +177,7 @@ class VendorSalesService
             ->count();
     }
 
-    private function getAverageOrderValue($vendorId, $startDate)
+    public function getAverageOrderValue($vendorId, $startDate)
     {
         return Order::where('seller_id', $vendorId)
             ->where('created_at', '>=', $startDate)
@@ -272,8 +272,10 @@ class VendorSalesService
     {
         return Order::where('seller_id', $vendorId)
             ->where('created_at', '>=', $startDate)
+            ->select('buyer_id')
             ->groupBy('buyer_id')
             ->havingRaw('COUNT(*) > 1')
+            ->get()
             ->count();
     }
 
