@@ -23,7 +23,7 @@ class Product extends Model
     {
         // Get resources through BOM relationship
         if (!$this->bom) {
-            return new \Illuminate\Database\Eloquent\Collection();
+            return collect();
         }
         
         return $this->bom->resources;

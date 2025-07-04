@@ -297,7 +297,6 @@
                                         </div>
                                     @endif
                                 </div>
-                            @endif
                         </div>
                     </x-card>
 
@@ -501,10 +500,9 @@
                     </div>
                 @endif
             </div>
-        @endif
 
         {{-- Modal Actions --}}
-        <x-slot:actions>
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-2xl">
             <div class="flex justify-between items-center w-full">
                 <div class="text-sm text-gray-500 dark:text-gray-400">
                     @if($selectedOrder)
@@ -528,9 +526,9 @@
                     </button>
                 </div>
             </div>
-        </x-slot:actions>
-    </x-modal>
-</div>
+        </div>
+    </div>
+    @endif
 </div>
 
 @push('scripts')

@@ -78,7 +78,7 @@ class SystemMetric extends Model
 
     public static function calculateForDate($date)
     {
-        $activeUsers = User::whereDate('last_login_at', $date)->count();
+        $activeUsers = User::whereDate('updated_at', $date)->count();
         $newUsers = User::whereDate('created_at', $date)->count();
         $totalOrders = Order::whereDate('created_at', $date)->count();
         $completedOrders = Order::whereDate('created_at', $date)->where('status', 'completed')->count();

@@ -39,18 +39,20 @@ class RealtimeDataService
     public function getRealtimeInventoryData(): array
     {
         return Cache::remember('realtime_inventory', $this->cacheTimeout, function () {
-            $products = Product::with('inventory')->get();
-            $resources = Resource::with('inventory')->get();
+            $products = Product::with('bom.resources')->get();
+            $resources = Resource::all();
 
             return [
                 'products' => $products->map(function ($product) {
+                    $inventoryItems = $product->inventoryItems();
+                    $totalStock = $inventoryItems->sum('available_quantity');
                     return [
                         'id' => $product->id,
                         'name' => $product->name,
-                        'current_stock' => $product->inventory->quantity ?? 0,
-                        'reserved_stock' => 0, // Could be enhanced with reserved quantity
-                        'available_stock' => $product->inventory->quantity ?? 0,
-                        'status' => $this->getStockStatus($product->inventory->quantity ?? 0),
+                        'current_stock' => $totalStock,
+                        'reserved_stock' => $inventoryItems->sum('reserved_quantity'),
+                        'available_stock' => $inventoryItems->sum('available_quantity'),
+                        'status' => $this->getStockStatus($totalStock),
                         'last_updated' => $product->updated_at->toISOString(),
                     ];
                 }),
@@ -58,9 +60,9 @@ class RealtimeDataService
                     return [
                         'id' => $resource->id,
                         'name' => $resource->name,
-                        'current_stock' => $resource->inventory->quantity ?? 0,
-                        'unit' => $resource->unit,
-                        'status' => $this->getStockStatus($resource->inventory->quantity ?? 0),
+                        'current_stock' => $resource->available_quantity,
+                        'unit' => $resource->component_type,
+                        'status' => $this->getStockStatus($resource->available_quantity),
                         'last_updated' => $resource->updated_at->toISOString(),
                     ];
                 }),
@@ -144,7 +146,7 @@ class RealtimeDataService
     /**
      * Clear cache for specific data type
      */
-    public function clearRealtimeCache(string $type = null): bool
+    public function clearRealtimeCache(?string $type = null): bool
     {
         $cacheKeys = [
             'realtime_dashboard_metrics',
@@ -169,13 +171,14 @@ class RealtimeDataService
      */
     private function getLowStockCount(): int
     {
-        $lowStockProducts = Product::whereHas('inventory', function ($query) {
-            $query->where('quantity', '<', 10); // Threshold of 10
+        // Count products that have BOMs with low stock resources
+        $lowStockProducts = Product::whereHas('bom.resources', function ($query) {
+            $query->where('available_quantity', '<', 10); // Threshold of 10
         })->count();
 
-        $lowStockResources = Resource::whereHas('inventory', function ($query) {
-            $query->where('quantity', '<', 5); // Threshold of 5
-        })->count();
+        // Count resources directly
+        $lowStockResources = Resource::where('available_quantity', '<', 5) // Threshold of 5
+                                   ->count();
 
         return $lowStockProducts + $lowStockResources;
     }
@@ -193,16 +196,24 @@ class RealtimeDataService
         foreach ($recentOrders as $order) {
             $activities[] = [
                 'type' => 'order',
+                'title' => "Order #{$order->id} created",
+                'description' => "New order created - $" . number_format($order->total_price ?? 0, 2),
                 'message' => "New order #{$order->id} created",
                 'time' => $order->created_at->diffForHumans(),
+                'icon' => 'shopping-cart',
+                'color' => 'blue'
             ];
         }
 
         foreach ($recentUsers as $user) {
             $activities[] = [
                 'type' => 'user',
+                'title' => "New user registered",
+                'description' => "{$user->name} ({$user->role})",
                 'message' => "New user {$user->name} registered",
                 'time' => $user->created_at->diffForHumans(),
+                'icon' => 'user-plus',
+                'color' => 'green'
             ];
         }
 
@@ -218,7 +229,7 @@ class RealtimeDataService
             'status' => 'healthy',
             'uptime' => '99.9%',
             'response_time' => '120ms',
-            'active_users' => User::where('last_login_at', '>', now()->subHours(24))->count(),
+            'active_users' => User::where('updated_at', '>', now()->subHours(24))->count(),
         ];
     }
 
@@ -240,17 +251,18 @@ class RealtimeDataService
     {
         $alerts = [];
 
-        // Check for low stock products
-        $lowStockProducts = Product::whereHas('inventory', function ($query) {
-            $query->where('quantity', '<', 10);
-        })->with('inventory')->get();
+        // Check for low stock products (using BOM resources)
+        $lowStockProducts = Product::whereHas('bom.resources', function ($query) {
+            $query->where('available_quantity', '<', 10);
+        })->with('bom.resources')->get();
 
         foreach ($lowStockProducts as $product) {
+            $totalStock = $product->inventoryItems()->sum('available_quantity');
             $alerts[] = [
                 'type' => 'low_stock',
                 'item' => $product->name,
-                'current_stock' => $product->inventory->quantity,
-                'severity' => $product->inventory->quantity === 0 ? 'critical' : 'warning',
+                'current_stock' => $totalStock,
+                'severity' => $totalStock === 0 ? 'critical' : 'warning',
                 'created_at' => now()->toISOString(),
             ];
         }
@@ -264,9 +276,7 @@ class RealtimeDataService
     private function getResourceUtilization(): array
     {
         $totalResources = Resource::count();
-        $usedResources = Resource::whereHas('inventory', function ($query) {
-            $query->where('quantity', '>', 0);
-        })->count();
+        $usedResources = Resource::where('available_quantity', '>', 0)->count();
 
         return [
             'total' => $totalResources,

@@ -207,22 +207,26 @@
             @forelse($recentActivities as $activity)
                 <div class="flex items-start space-x-4">
                     <div class="flex-shrink-0">
-                        <div class="w-10 h-10 bg-{{ $activity['color'] }}-100 rounded-full flex items-center justify-center">
-                            @if($activity['icon'] === 'shopping-cart')
-                                <svg class="w-5 h-5 text-{{ $activity['color'] }}-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="w-10 h-10 bg-{{ $activity['color'] ?? 'gray' }}-100 rounded-full flex items-center justify-center">
+                            @if(($activity['icon'] ?? '') === 'shopping-cart')
+                                <svg class="w-5 h-5 text-{{ $activity['color'] ?? 'gray' }}-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l-1 12H6L5 9z" />
                                 </svg>
-                            @elseif($activity['icon'] === 'user-plus')
-                                <svg class="w-5 h-5 text-{{ $activity['color'] }}-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            @elseif(($activity['icon'] ?? '') === 'user-plus')
+                                <svg class="w-5 h-5 text-{{ $activity['color'] ?? 'gray' }}-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                                </svg>
+                            @else
+                                <svg class="w-5 h-5 text-{{ $activity['color'] ?? 'gray' }}-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             @endif
                         </div>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $activity['title'] }}</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ $activity['description'] }}</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-500">{{ $activity['time'] }}</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $activity['title'] ?? $activity['message'] ?? 'Activity' }}</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ $activity['description'] ?? $activity['message'] ?? 'Recent activity' }}</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-500">{{ $activity['time'] ?? 'Just now' }}</p>
                     </div>
                 </div>
             @empty

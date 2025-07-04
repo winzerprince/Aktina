@@ -103,10 +103,10 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
         $startDate = now()->subDays($days);
         
         return User::select(
-            DB::raw('DATE(last_login_at) as date'),
+            DB::raw('DATE(updated_at) as date'),
             DB::raw('COUNT(*) as active_users')
         )
-        ->where('last_login_at', '>=', $startDate)
+        ->where('updated_at', '>=', $startDate)
         ->groupBy('date')
         ->orderBy('date')
         ->get();

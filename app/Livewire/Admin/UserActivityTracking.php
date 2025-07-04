@@ -273,7 +273,7 @@ class UserActivityTracking extends Component
             'recent_orders' => $recentOrders,
             'session_history' => $sessionHistory,
             'total_orders' => Order::where('created_by', $userId)->count(),
-            'last_login' => $user->last_login_at ? $user->last_login_at->diffForHumans() : 'Never',
+            'last_login' => $user->updated_at ? $user->updated_at->diffForHumans() : 'Never',
         ];
     }
 

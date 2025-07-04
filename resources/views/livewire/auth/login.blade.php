@@ -95,67 +95,213 @@ new #[Layout('components.layouts.auth')] class extends Component {
     }
 }; ?>
 
-<div
-    class="w-full max-w-md border rounded-lg p-6 my-16 text-zinc-900 dark:text-zinc-100"
-    style="border-color: #008800; box-shadow: 0 4px 24px 0 #00880033;"
-    id="login-border"
->
-    <x-auth-header :title="__('Log in to your account')" :description="__('Enter your email and password below to log in')" />
+<div class="w-full">
+    <style>
+        .input-focus {
+            transition: all 0.3s ease;
+        }
+        
+        .input-focus:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.2);
+        }
+        
+        .btn-gradient {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-gradient::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-gradient:hover::before {
+            left: 100%;
+        }
+        
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px -5px rgba(16, 185, 129, 0.4);
+        }
+        
+        .form-group {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .checkbox-custom {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .checkbox-custom input[type="checkbox"] {
+            opacity: 0;
+            position: absolute;
+        }
+        
+        .checkbox-custom .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 20px;
+            width: 20px;
+            background: linear-gradient(135deg, #e5e7eb 0%, #f3f4f6 100%);
+            border-radius: 4px;
+            border: 2px solid #d1d5db;
+            transition: all 0.3s ease;
+        }
+        
+        .checkbox-custom input[type="checkbox"]:checked ~ .checkmark {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-color: #10b981;
+        }
+        
+        .checkbox-custom .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+        
+        .checkbox-custom input[type="checkbox"]:checked ~ .checkmark:after {
+            display: block;
+        }
+        
+        .checkbox-custom .checkmark:after {
+            left: 7px;
+            top: 3px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+    </style>
+
+    <div class="text-center mb-8">
+        <h2 class="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent mb-2">
+            {{ __('Welcome Back!') }}
+        </h2>
+        <p class="text-gray-600 dark:text-gray-300">
+            {{ __('Enter your credentials to access your account') }}
+        </p>
+    </div>
 
     <!-- Session Status -->
-    <x-auth-session-status class="text-center" :status="session('status')" />
+    <x-auth-session-status class="text-center mb-4" :status="session('status')" />
 
-    <form wire:submit="login" class="flex flex-col gap-6" novalidate>
+    <form wire:submit="login" class="space-y-6" novalidate>
         <!-- Email Address -->
-        <flux:input
-            wire:model="email"
-            :label="__('Email address')"
-            type="email"
-            required
-            autofocus
-            autocomplete="email"
-            placeholder="email@example.com"
-        />
+        <div class="form-group">
+            <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {{ __('Email Address') }}
+            </label>
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/>
+                    </svg>
+                </div>
+                <input
+                    wire:model="email"
+                    type="email"
+                    id="email"
+                    required
+                    autofocus
+                    autocomplete="email"
+                    placeholder="email@example.com"
+                    class="input-focus block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                />
+            </div>
+            @error('email') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
+        </div>
 
         <!-- Password -->
-        <div class="relative">
-            <flux:input
-                wire:model="password"
-                :label="__('Password')"
-                type="password"
-                required
-                autocomplete="current-password"
-                :placeholder="__('Password')"
-                viewable
-            />
-
-            @if (Route::has('password.request'))
-                <flux:link class="absolute end-0 top-0 text-sm" :href="route('password.request')" wire:navigate>
-                    {{ __('Forgot your password?') }}
-                </flux:link>
-            @endif
+        <div class="form-group">
+            <div class="flex justify-between items-center mb-2">
+                <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {{ __('Password') }}
+                </label>
+                @if (Route::has('password.request'))
+                    <a href="{{ route('password.request') }}" 
+                       class="text-sm text-orange-600 hover:text-orange-500 transition-colors"
+                       wire:navigate>
+                        {{ __('Forgot password?') }}
+                    </a>
+                @endif
+            </div>
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                </div>
+                <input
+                    wire:model="password"
+                    type="password"
+                    id="password"
+                    required
+                    autocomplete="current-password"
+                    placeholder="{{ __('Enter your password') }}"
+                    class="input-focus block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                />
+            </div>
+            @error('password') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
         </div>
 
         <!-- Remember Me -->
-        <flux:checkbox wire:model="remember" :label="__('Remember me')" />
+        <div class="form-group flex items-center">
+            <label class="checkbox-custom flex items-center cursor-pointer">
+                <input type="checkbox" wire:model="remember" class="sr-only">
+                <span class="checkmark"></span>
+                <span class="ml-8 text-sm text-gray-700 dark:text-gray-300">{{ __('Remember me') }}</span>
+            </label>
+        </div>
 
-        <div class="flex items-center justify-end">
-            <flux:button
+        <!-- Submit Button -->
+        <div class="form-group">
+            <button
                 type="submit"
-                class="w-full border-none"
-                style="background-color: #30cf36; color: #fff; border: none; transition: background 0.2s;"
-                onmouseover="this.style.backgroundColor = (document.documentElement.classList.contains('dark') ? '#30cf36' : '#008800')"
-                onmouseout="this.style.backgroundColor = (document.documentElement.classList.contains('dark') ? '#044c03' : '#30cf36')"
+                class="btn-gradient w-full py-3 px-4 rounded-lg text-white font-medium text-sm relative overflow-hidden transform transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
             >
-                {{ __('Log in') }}
-            </flux:button>
+                {{ __('Sign In') }}
+            </button>
         </div>
     </form>
 
     @if (Route::has('register'))
-        <div class="space-x-1 rtl:space-x-reverse text-center text-sm text-zinc-600 dark:text-zinc-400">
-            {{ __('Don\'t have an account?') }}
-            <flux:link :href="route('register')" wire:navigate>{{ __('Sign up') }}</flux:link>
+        <div class="mt-8 text-center">
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+                {{ __("Don't have an account?") }}
+                <a href="{{ route('register') }}" 
+                   class="font-medium text-blue-600 hover:text-blue-500 transition-colors ml-1"
+                   wire:navigate>
+                    {{ __('Create one now') }}
+                </a>
+            </p>
         </div>
     @endif
 </div>

@@ -42,12 +42,11 @@ class AdminDashboardOverview extends Component
 
     protected $listeners = ['refreshDashboard' => 'loadDashboardData', 'realtimeUpdate' => 'loadRealtimeData'];
 
-    public function __construct(
-        private AnalyticsService $analyticsService,
-        private MetricsService $metricsService,
-        private EnhancedOrderService $orderService,
-        private RealtimeDataService $realtimeService
-    ) {}
+    // Service dependencies
+    protected $analyticsService;
+    protected $metricsService;
+    protected $orderService;
+    protected $realtimeService;
 
     public function boot(
         AnalyticsService $analyticsService,
@@ -59,8 +58,6 @@ class AdminDashboardOverview extends Component
         $this->metricsService = $metricsService;
         $this->orderService = $orderService;
         $this->realtimeService = $realtimeService;
-        $this->metricsService = $metricsService;
-        $this->orderService = $orderService;
     }
 
     public function mount()
@@ -110,7 +107,9 @@ class AdminDashboardOverview extends Component
             'totalUsers' => User::count(),
             'totalOrders' => Order::count(),
             'totalRevenue' => Order::where('status', 'completed')->sum('price'),
-            'activeUsers' => User::where('last_login_at', '>=', now()->subDays(7))->count(),
+            'activeUsers' => User::where('email_verified_at', '!=', null)
+                                ->where('updated_at', '>=', now()->subDays(7))
+                                ->count(),
             'pendingOrders' => Order::where('status', 'pending')->count(),
             'orderTrends' => $this->getOrderTrends($period),
             'userGrowth' => $this->getUserGrowth($period),
