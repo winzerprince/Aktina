@@ -3,7 +3,6 @@
 namespace App\Livewire\Vendor;
 
 use App\Models\Order;
-use App\Models\OrderItem;
 use App\Services\VendorSalesService;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -63,7 +62,7 @@ class VendorOrderManagement extends Component
 
     public function viewOrderDetails($orderId)
     {
-        $this->selectedOrder = Order::with(['user', 'orderItems.product', 'approvals'])
+        $this->selectedOrder = Order::with(['buyer', 'seller'])
             ->find($orderId);
         $this->showOrderDetails = true;
     }
@@ -113,15 +112,19 @@ class VendorOrderManagement extends Component
             $orders = $this->getOrdersQuery()->get();
             
             $filename = 'vendor_orders_' . now()->format('Y_m_d') . '.csv';
-            $headers = ['order_id', 'customer', 'status', 'total_amount', 'items_count', 'created_at'];
+            $headers = ['order_id', 'customer', 'status', 'price', 'items_count', 'created_at'];
             
             $csv = $orders->map(function ($order) {
+                // Count items from JSON
+                $items = is_string($order->items) ? json_decode($order->items, true) : $order->items;
+                $itemsCount = is_array($items) ? count($items) : 0;
+                
                 return [
                     $order->id,
-                    $order->user->name,
+                    $order->buyer->name,
                     $order->status,
-                    number_format($order->total_amount, 2),
-                    $order->order_items_count,
+                    number_format($order->price, 2),
+                    $itemsCount,
                     $order->created_at->format('Y-m-d H:i:s'),
                 ];
             });
@@ -139,14 +142,15 @@ class VendorOrderManagement extends Component
 
     public function getOrdersQuery()
     {
-        $query = Order::with(['user', 'orderItems'])
-            ->withCount('orderItems');
+        $vendorId = auth()->id();
+        $query = Order::with(['buyer', 'seller'])
+            ->where('seller_id', $vendorId);
 
         // Apply search filter
         if (!empty($this->search)) {
             $query->where(function ($q) {
                 $q->where('id', 'like', '%' . $this->search . '%')
-                  ->orWhereHas('user', function ($userQuery) {
+                  ->orWhereHas('buyer', function ($userQuery) {
                       $userQuery->where('name', 'like', '%' . $this->search . '%')
                                ->orWhere('email', 'like', '%' . $this->search . '%');
                   });
@@ -172,7 +176,8 @@ class VendorOrderManagement extends Component
 
     public function getOrderStatusCounts()
     {
-        $baseQuery = Order::query();
+        $vendorId = auth()->id();
+        $baseQuery = Order::where('seller_id', $vendorId);
         
         if ($this->dateRange !== 'all') {
             $days = (int) $this->dateRange;
@@ -191,14 +196,16 @@ class VendorOrderManagement extends Component
 
     public function getOrderMetrics()
     {
+        $vendorId = auth()->id();
         $vendorSalesService = new VendorSalesService();
         
         try {
+            $startDate = now()->subDays(30);
             return [
-                'total_revenue' => $vendorSalesService->getTotalRevenue(),
-                'average_order_value' => $vendorSalesService->getAverageOrderValue(),
-                'orders_today' => Order::whereDate('created_at', today())->count(),
-                'fulfillment_rate' => $vendorSalesService->getOrderFulfillmentRate(),
+                'total_revenue' => $vendorSalesService->getTotalRevenue($vendorId, $startDate),
+                'average_order_value' => $vendorSalesService->getAverageOrderValue($vendorId, $startDate),
+                'orders_today' => Order::where('seller_id', $vendorId)->whereDate('created_at', today())->count(),
+                'fulfillment_rate' => $this->getOrderFulfillmentRate($vendorId),
             ];
         } catch (\Exception $e) {
             return [
@@ -208,6 +215,15 @@ class VendorOrderManagement extends Component
                 'fulfillment_rate' => 0,
             ];
         }
+    }
+
+    private function getOrderFulfillmentRate($vendorId)
+    {
+        $totalOrders = Order::where('seller_id', $vendorId)->count();
+        $fulfilledOrders = Order::where('seller_id', $vendorId)
+            ->whereIn('status', ['complete', 'delivered'])->count();
+        
+        return $totalOrders > 0 ? ($fulfilledOrders / $totalOrders) * 100 : 0;
     }
 
     public function render()

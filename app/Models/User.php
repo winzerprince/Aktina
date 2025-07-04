@@ -144,6 +144,11 @@ class User extends Authenticatable
         return $this->hasMany(Order::class, 'seller_id');
     }
 
+    public function soldOrders()
+    {
+        return $this->hasMany(Order::class, 'seller_id');
+    }
+
     // Role checking methods
     public function isAdmin()
     {

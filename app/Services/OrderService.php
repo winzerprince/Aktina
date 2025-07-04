@@ -260,4 +260,16 @@ class OrderService implements OrderServiceInterface
             Log::error('Failed to send order notification: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Get recent orders by vendor
+     */
+    public function getRecentOrdersByVendor($vendorId, $limit = 10)
+    {
+        return Order::where('seller_id', $vendorId)
+            ->with(['buyer'])
+            ->orderBy('created_at', 'desc')
+            ->limit($limit)
+            ->get();
+    }
 }

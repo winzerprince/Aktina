@@ -12,8 +12,8 @@ class VendorManagementService
     public function getVendors(array $filters = [], int $perPage = 20)
     {
         $query = User::where('role', 'vendor')
-                    ->with(['orders' => function($q) {
-                        $q->select('id', 'created_by', 'total_amount', 'status', 'created_at');
+                    ->with(['soldOrders' => function($q) {
+                        $q->select('id', 'seller_id', 'price', 'status', 'created_at');
                     }]);
 
         $this->applyFilters($query, $filters);
@@ -24,8 +24,8 @@ class VendorManagementService
     public function getSuppliers(array $filters = [], int $perPage = 20)
     {
         $query = User::where('role', 'supplier')
-                    ->with(['orders' => function($q) {
-                        $q->select('id', 'created_by', 'total_amount', 'status', 'created_at');
+                    ->with(['soldOrders' => function($q) {
+                        $q->select('id', 'seller_id', 'price', 'status', 'created_at');
                     }]);
 
         $this->applyFilters($query, $filters);
@@ -63,22 +63,22 @@ class VendorManagementService
     {
         // This would join with a calculated performance table or use raw SQL
         // For now, we'll use a simple approximation based on order completion rates
-        $subQuery = Order::select('created_by')
-            ->selectRaw('(COUNT(CASE WHEN status = "completed" THEN 1 END) * 100.0 / COUNT(*)) as completion_rate')
-            ->groupBy('created_by');
+        $subQuery = Order::select('seller_id')
+            ->selectRaw('(COUNT(CASE WHEN status = "complete" THEN 1 END) * 100.0 / COUNT(*)) as completion_rate')
+            ->groupBy('seller_id');
 
         switch ($performance) {
             case 'excellent':
-                $query->whereIn('id', $subQuery->having('completion_rate', '>=', 90)->pluck('created_by'));
+                $query->whereIn('id', $subQuery->having('completion_rate', '>=', 90)->pluck('seller_id'));
                 break;
             case 'good':
-                $query->whereIn('id', $subQuery->havingRaw('completion_rate >= 70 AND completion_rate < 90')->pluck('created_by'));
+                $query->whereIn('id', $subQuery->havingRaw('completion_rate >= 70 AND completion_rate < 90')->pluck('seller_id'));
                 break;
             case 'average':
-                $query->whereIn('id', $subQuery->havingRaw('completion_rate >= 50 AND completion_rate < 70')->pluck('created_by'));
+                $query->whereIn('id', $subQuery->havingRaw('completion_rate >= 50 AND completion_rate < 70')->pluck('seller_id'));
                 break;
             case 'poor':
-                $query->whereIn('id', $subQuery->having('completion_rate', '<', 50)->pluck('created_by'));
+                $query->whereIn('id', $subQuery->having('completion_rate', '<', 50)->pluck('seller_id'));
                 break;
         }
     }
@@ -144,21 +144,21 @@ class VendorManagementService
 
     private function getVendorOrderStatistics(int $vendorId)
     {
-        $orders = Order::where('created_by', $vendorId);
+        $orders = Order::where('seller_id', $vendorId);
 
         return [
             'total_orders' => $orders->count(),
-            'completed_orders' => $orders->where('status', 'completed')->count(),
+            'completed_orders' => $orders->where('status', 'complete')->count(),
             'pending_orders' => $orders->where('status', 'pending')->count(),
             'cancelled_orders' => $orders->where('status', 'cancelled')->count(),
-            'total_value' => $orders->sum('total_amount'),
-            'avg_order_value' => $orders->avg('total_amount'),
+            'total_value' => $orders->sum('price'),
+            'avg_order_value' => $orders->avg('price'),
         ];
     }
 
     private function getVendorPerformanceMetrics(int $vendorId)
     {
-        $orders = Order::where('created_by', $vendorId);
+        $orders = Order::where('seller_id', $vendorId);
         $totalOrders = $orders->count();
 
         if ($totalOrders === 0) {
@@ -171,9 +171,9 @@ class VendorManagementService
             ];
         }
 
-        $completedOrders = $orders->where('status', 'completed')->count();
-        $onTimeDeliveries = $orders->where('status', 'completed')
-                                  ->where('delivered_at', '<=', DB::raw('expected_delivery_date'))
+        $completedOrders = $orders->where('status', 'complete')->count();
+        $onTimeDeliveries = $orders->where('status', 'complete')
+                                  ->where('completed_at', '<=', DB::raw('expected_delivery_date'))
                                   ->count();
 
         return [
@@ -207,9 +207,9 @@ class VendorManagementService
 
     private function getRevenueByRole(string $role)
     {
-        return Order::whereHas('creator', function ($query) use ($role) {
+        return Order::whereHas('seller', function ($query) use ($role) {
             $query->where('role', $role);
-        })->where('status', 'completed')->sum('total_amount');
+        })->where('status', 'complete')->sum('price');
     }
 
     private function getCostSavingsByRole(string $role)
@@ -281,11 +281,11 @@ class VendorManagementService
         
         for ($i = 11; $i >= 0; $i--) {
             $date = Carbon::now()->subMonths($i);
-            $revenue = Order::where('created_by', $vendorId)
-                           ->where('status', 'completed')
+            $revenue = Order::where('seller_id', $vendorId)
+                           ->where('status', 'complete')
                            ->whereYear('created_at', $date->year)
                            ->whereMonth('created_at', $date->month)
-                           ->sum('total_amount');
+                           ->sum('price');
             
             $months->push([
                 'month' => $date->format('M Y'),

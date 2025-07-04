@@ -121,7 +121,7 @@ class RetailerOrderService
     {
         $deliveredOrders = Order::where('buyer_id', $retailer->id)
             ->where('status', 'delivered')
-            ->whereNotNull('delivered_at')
+            ->whereNotNull('completed_at')
             ->get();
 
         if ($deliveredOrders->isEmpty()) {
@@ -129,7 +129,7 @@ class RetailerOrderService
         }
 
         $totalDays = $deliveredOrders->sum(function ($order) {
-            return $order->created_at->diffInDays($order->delivered_at);
+            return $order->created_at->diffInDays($order->completed_at);
         });
 
         return round($totalDays / $deliveredOrders->count(), 1);

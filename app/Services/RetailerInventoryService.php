@@ -381,22 +381,6 @@ class RetailerInventoryService
             });
         
         return $suggestions;
-                    $orderQuery->where('created_at', '>=', now()->subDays(90))
-                              ->whereHas('user', function ($userQuery) {
-                                  $userQuery->where('role', 'retailer');
-                              });
-                });
-            }])
-            ->orderByDesc('popularity_score')
-            ->limit(6)
-            ->get()
-            ->map(function ($product) {
-                return [
-                    'product' => $product,
-                    'popularity_score' => $product->popularity_score,
-                    'suggestion_reason' => 'Popular among similar retailers',
-                ];
-            });
     }
 
     private function calculateRecommendationScore($frequency, $daysSinceLastOrder)
@@ -419,36 +403,65 @@ class RetailerInventoryService
 
     private function getTotalProductsPurchased()
     {
-        return OrderItem::whereHas('order', function ($query) {
-            $query->where('user_id', auth()->id());
-        })->distinct('product_id')->count();
+        $orders = Order::where('buyer_id', auth()->id())->get();
+        $productIds = [];
+        
+        foreach ($orders as $order) {
+            $items = $order->getItemsAsArray();
+            foreach ($items as $item) {
+                $productId = $item['product_id'] ?? null;
+                if ($productId) {
+                    $productIds[] = $productId;
+                }
+            }
+        }
+        
+        return count(array_unique($productIds));
     }
 
     private function getAverageOrderSize()
     {
-        return OrderItem::whereHas('order', function ($query) {
-            $query->where('user_id', auth()->id());
-        })->avg('quantity') ?? 0;
+        $orders = Order::where('buyer_id', auth()->id())->get();
+        $totalQuantity = 0;
+        $totalItems = 0;
+        
+        foreach ($orders as $order) {
+            $items = $order->getItemsAsArray();
+            foreach ($items as $item) {
+                $quantity = $item['quantity'] ?? 0;
+                $totalQuantity += $quantity;
+                $totalItems++;
+            }
+        }
+        
+        return $totalItems > 0 ? $totalQuantity / $totalItems : 0;
     }
 
     private function getTopCategoriesPurchased()
     {
-        return Product::whereHas('orderItems', function ($query) {
-            $query->whereHas('order', function ($orderQuery) {
-                $orderQuery->where('user_id', auth()->id());
-            });
-        })
-            ->select('category', DB::raw('COUNT(*) as purchase_count'))
-            ->groupBy('category')
-            ->orderByDesc('purchase_count')
-            ->limit(5)
-            ->pluck('purchase_count', 'category')
-            ->toArray();
+        $orders = Order::where('buyer_id', auth()->id())->get();
+        $categoryStats = [];
+        
+        foreach ($orders as $order) {
+            $items = $order->getItemsAsArray();
+            foreach ($items as $item) {
+                $productId = $item['product_id'] ?? null;
+                if ($productId) {
+                    $product = Product::find($productId);
+                    if ($product && $product->category) {
+                        $categoryStats[$product->category] = ($categoryStats[$product->category] ?? 0) + 1;
+                    }
+                }
+            }
+        }
+        
+        arsort($categoryStats);
+        return array_slice($categoryStats, 0, 5, true);
     }
 
     private function getPurchaseVelocity()
     {
-        $orders = Order::where('user_id', auth()->id())
+        $orders = Order::where('buyer_id', auth()->id())
             ->where('created_at', '>=', now()->subDays(90))
             ->count();
         
@@ -471,14 +484,47 @@ class RetailerInventoryService
 
     private function analyzePurchaseHistory()
     {
-        return OrderItem::whereHas('order', function ($query) {
-            $query->where('user_id', auth()->id())
-                  ->where('created_at', '>=', now()->subDays(180));
-        })
-            ->with('product')
-            ->select('product_id', DB::raw('COUNT(*) as frequency'), DB::raw('AVG(quantity) as avg_quantity'))
-            ->groupBy('product_id')
+        $orders = Order::where('buyer_id', auth()->id())
+            ->where('created_at', '>=', now()->subDays(180))
             ->get();
+        
+        $productStats = [];
+        
+        foreach ($orders as $order) {
+            $items = $order->getItemsAsArray();
+            foreach ($items as $item) {
+                $productId = $item['product_id'] ?? null;
+                $quantity = $item['quantity'] ?? 0;
+                
+                if ($productId) {
+                    if (!isset($productStats[$productId])) {
+                        $productStats[$productId] = [
+                            'product_id' => $productId,
+                            'frequency' => 0,
+                            'total_quantity' => 0,
+                            'quantities' => [],
+                        ];
+                    }
+                    
+                    $productStats[$productId]['frequency']++;
+                    $productStats[$productId]['total_quantity'] += $quantity;
+                    $productStats[$productId]['quantities'][] = $quantity;
+                }
+            }
+        }
+        
+        return collect($productStats)->map(function ($stats) {
+            $avgQuantity = count($stats['quantities']) > 0 
+                ? array_sum($stats['quantities']) / count($stats['quantities']) 
+                : 0;
+            
+            return (object) [
+                'product_id' => $stats['product_id'],
+                'product' => Product::find($stats['product_id']),
+                'frequency' => $stats['frequency'],
+                'avg_quantity' => $avgQuantity,
+            ];
+        });
     }
 
     private function generateStockSuggestion($product)
@@ -496,7 +542,7 @@ class RetailerInventoryService
 
     private function calculateOrderConsistency()
     {
-        $orders = Order::where('user_id', auth()->id())
+        $orders = Order::where('buyer_id', auth()->id())
             ->where('created_at', '>=', now()->subDays(90))
             ->orderBy('created_at')
             ->pluck('created_at')

@@ -124,4 +124,69 @@ class InventoryService implements InventoryServiceInterface
     {
         return $this->inventoryRepository->getStockLevel($resource->id, $warehouse?->id);
     }
+    
+    public function getTotalProductsByVendor($vendorId)
+    {
+        return \App\Models\Product::where('owner_id', $vendorId)->count();
+    }
+    
+    public function getLowStockCountByVendor($vendorId)
+    {
+        return \App\Models\Product::where('owner_id', $vendorId)
+            ->where('stock_quantity', '<=', \DB::raw('reorder_level'))
+            ->count();
+    }
+    
+    public function getOutOfStockCountByVendor($vendorId)
+    {
+        return \App\Models\Product::where('owner_id', $vendorId)
+            ->where('stock_quantity', '<=', 0)
+            ->count();
+    }
+    
+    public function getTotalInventoryValueByVendor($vendorId)
+    {
+        return \App\Models\Product::where('owner_id', $vendorId)
+            ->selectRaw('SUM(stock_quantity * unit_cost) as total_value')
+            ->value('total_value') ?? 0;
+    }
+    
+    public function getInventoryTurnoverRate($vendorId, $timeframe = '30d')
+    {
+        // Calculate inventory turnover rate based on sales vs average inventory
+        $days = match($timeframe) {
+            '7d' => 7,
+            '30d' => 30,
+            '90d' => 90,
+            '1y' => 365,
+            default => 30,
+        };
+        
+        $startDate = now()->subDays($days);
+        
+        // Get total sales (cost of goods sold)
+        $orders = \App\Models\Order::where('seller_id', $vendorId)
+            ->where('created_at', '>=', $startDate)
+            ->get();
+        
+        $totalCogs = 0;
+        foreach ($orders as $order) {
+            $items = is_string($order->items) ? json_decode($order->items, true) : $order->items;
+            if (is_array($items)) {
+                foreach ($items as $item) {
+                    $product = \App\Models\Product::find($item['product_id'] ?? null);
+                    if ($product) {
+                        $totalCogs += ($item['quantity'] ?? 0) * $product->unit_cost;
+                    }
+                }
+            }
+        }
+        
+        // Get average inventory value
+        $avgInventoryValue = $this->getTotalInventoryValueByVendor($vendorId);
+        
+        // Calculate turnover rate (annualized)
+        $periodMultiplier = 365 / $days;
+        return $avgInventoryValue > 0 ? ($totalCogs * $periodMultiplier) / $avgInventoryValue : 0;
+    }
 }

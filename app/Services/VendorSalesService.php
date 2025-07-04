@@ -37,10 +37,10 @@ class VendorSalesService
             $startDate = $this->getTimeframeDate($timeframe);
             $groupBy = $this->getGroupByFormat($timeframe);
             
-            return Order::where('vendor_id', $vendorId)
+            return Order::where('seller_id', $vendorId)
                 ->where('created_at', '>=', $startDate)
                 ->selectRaw("DATE_FORMAT(created_at, '{$groupBy}') as period")
-                ->selectRaw('SUM(total_amount) as revenue')
+                ->selectRaw('SUM(price) as revenue')
                 ->selectRaw('COUNT(*) as order_count')
                 ->groupBy('period')
                 ->orderBy('period')
@@ -58,14 +58,14 @@ class VendorSalesService
     {
         $startDate = $this->getTimeframeDate($timeframe);
         
-        return Order::join('users', 'orders.user_id', '=', 'users.id')
-            ->where('orders.vendor_id', $vendorId)
+        return Order::join('users', 'orders.buyer_id', '=', 'users.id')
+            ->where('orders.seller_id', $vendorId)
             ->where('orders.created_at', '>=', $startDate)
             ->where('users.role', 'retailer')
             ->select('users.id', 'users.name', 'users.email')
-            ->selectRaw('SUM(orders.total_amount) as total_spent')
+            ->selectRaw('SUM(orders.price) as total_spent')
             ->selectRaw('COUNT(orders.id) as order_count')
-            ->selectRaw('AVG(orders.total_amount) as average_order')
+            ->selectRaw('AVG(orders.price) as average_order')
             ->groupBy('users.id', 'users.name', 'users.email')
             ->orderByDesc('total_spent')
             ->limit($limit)
@@ -86,25 +86,55 @@ class VendorSalesService
     {
         $startDate = $this->getTimeframeDate($timeframe);
         
-        return DB::table('order_items')
-            ->join('orders', 'order_items.order_id', '=', 'orders.id')
-            ->join('products', 'order_items.product_id', '=', 'products.id')
-            ->where('orders.vendor_id', $vendorId)
-            ->where('orders.created_at', '>=', $startDate)
-            ->select('products.name', 'products.id')
-            ->selectRaw('SUM(order_items.quantity * order_items.unit_price) as revenue')
-            ->selectRaw('SUM(order_items.quantity) as quantity_sold')
-            ->groupBy('products.id', 'products.name')
-            ->orderByDesc('revenue')
-            ->get()
-            ->map(function ($product) {
-                return [
-                    'product_id' => $product->id,
-                    'name' => $product->name,
-                    'revenue' => (float) $product->revenue,
-                    'quantity_sold' => (int) $product->quantity_sold,
-                ];
-            });
+        $orders = Order::where('seller_id', $vendorId)
+            ->where('created_at', '>=', $startDate)
+            ->get();
+        
+        $productRevenues = [];
+        
+        foreach ($orders as $order) {
+            $items = is_string($order->items) ? json_decode($order->items, true) : $order->items;
+            
+            if (!is_array($items)) {
+                continue;
+            }
+            
+            foreach ($items as $item) {
+                $productId = $item['product_id'] ?? null;
+                $quantity = $item['quantity'] ?? 0;
+                $unitPrice = $item['unit_price'] ?? 0;
+                
+                if ($productId) {
+                    if (!isset($productRevenues[$productId])) {
+                        // Get product name from database
+                        $product = \App\Models\Product::find($productId);
+                        $productRevenues[$productId] = [
+                            'product_id' => $productId,
+                            'name' => $product ? $product->name : 'Unknown Product',
+                            'revenue' => 0,
+                            'quantity_sold' => 0,
+                        ];
+                    }
+                    
+                    $productRevenues[$productId]['revenue'] += $quantity * $unitPrice;
+                    $productRevenues[$productId]['quantity_sold'] += $quantity;
+                }
+            }
+        }
+        
+        // Sort by revenue desc
+        usort($productRevenues, function($a, $b) {
+            return $b['revenue'] <=> $a['revenue'];
+        });
+        
+        return collect($productRevenues)->map(function ($product) {
+            return [
+                'product_id' => $product['product_id'],
+                'name' => $product['name'],
+                'revenue' => (float) $product['revenue'],
+                'quantity_sold' => (int) $product['quantity_sold'],
+            ];
+        });
     }
 
     public function getSalesGoalProgress($vendorId, $goalAmount, $timeframe = '30d')
@@ -135,23 +165,23 @@ class VendorSalesService
 
     private function getTotalRevenue($vendorId, $startDate)
     {
-        return Order::where('vendor_id', $vendorId)
+        return Order::where('seller_id', $vendorId)
             ->where('created_at', '>=', $startDate)
-            ->sum('total_amount') ?? 0;
+            ->sum('price') ?? 0;
     }
 
     private function getOrderCount($vendorId, $startDate)
     {
-        return Order::where('vendor_id', $vendorId)
+        return Order::where('seller_id', $vendorId)
             ->where('created_at', '>=', $startDate)
             ->count();
     }
 
     private function getAverageOrderValue($vendorId, $startDate)
     {
-        return Order::where('vendor_id', $vendorId)
+        return Order::where('seller_id', $vendorId)
             ->where('created_at', '>=', $startDate)
-            ->avg('total_amount') ?? 0;
+            ->avg('price') ?? 0;
     }
 
     private function getGrowthRate($vendorId, $startDate)
@@ -168,18 +198,45 @@ class VendorSalesService
 
     private function getTopProducts($vendorId, $startDate, $limit = 5)
     {
-        return DB::table('order_items')
-            ->join('orders', 'order_items.order_id', '=', 'orders.id')
-            ->join('products', 'order_items.product_id', '=', 'products.id')
-            ->where('orders.vendor_id', $vendorId)
-            ->where('orders.created_at', '>=', $startDate)
-            ->select('products.name')
-            ->selectRaw('SUM(order_items.quantity) as total_sold')
-            ->groupBy('products.id', 'products.name')
-            ->orderByDesc('total_sold')
-            ->limit($limit)
-            ->pluck('total_sold', 'name')
-            ->toArray();
+        $orders = Order::where('seller_id', $vendorId)
+            ->where('created_at', '>=', $startDate)
+            ->get();
+        
+        $productSales = [];
+        
+        foreach ($orders as $order) {
+            $items = is_string($order->items) ? json_decode($order->items, true) : $order->items;
+            
+            if (!is_array($items)) {
+                continue;
+            }
+            
+            foreach ($items as $item) {
+                $productId = $item['product_id'] ?? null;
+                $quantity = $item['quantity'] ?? 0;
+                
+                if ($productId) {
+                    if (!isset($productSales[$productId])) {
+                        // Get product name from database
+                        $product = \App\Models\Product::find($productId);
+                        $productSales[$productId] = [
+                            'name' => $product ? $product->name : 'Unknown Product',
+                            'total_sold' => 0,
+                        ];
+                    }
+                    
+                    $productSales[$productId]['total_sold'] += $quantity;
+                }
+            }
+        }
+        
+        // Sort by total sold desc and take top N
+        arsort($productSales);
+        $topProducts = array_slice($productSales, 0, $limit, true);
+        
+        return array_map(function($product) {
+            return $product['total_sold'];
+        }, $topProducts);
     }
 
     private function getConversionRate($vendorId, $startDate)
@@ -190,32 +247,32 @@ class VendorSalesService
 
     private function getTotalActiveRetailers($vendorId, $startDate)
     {
-        return Order::where('vendor_id', $vendorId)
+        return Order::where('seller_id', $vendorId)
             ->where('created_at', '>=', $startDate)
-            ->distinct('user_id')
-            ->count('user_id');
+            ->distinct('buyer_id')
+            ->count('buyer_id');
     }
 
     private function getNewRetailers($vendorId, $startDate)
     {
-        return Order::where('vendor_id', $vendorId)
+        return Order::where('seller_id', $vendorId)
             ->where('created_at', '>=', $startDate)
             ->whereNotExists(function ($query) use ($vendorId, $startDate) {
                 $query->select(DB::raw(1))
                     ->from('orders as o2')
-                    ->whereColumn('o2.user_id', 'orders.user_id')
-                    ->where('o2.vendor_id', $vendorId)
+                    ->whereColumn('o2.buyer_id', 'orders.buyer_id')
+                    ->where('o2.seller_id', $vendorId)
                     ->where('o2.created_at', '<', $startDate);
             })
-            ->distinct('user_id')
-            ->count('user_id');
+            ->distinct('buyer_id')
+            ->count('buyer_id');
     }
 
     private function getRepeatCustomers($vendorId, $startDate)
     {
-        return Order::where('vendor_id', $vendorId)
+        return Order::where('seller_id', $vendorId)
             ->where('created_at', '>=', $startDate)
-            ->groupBy('user_id')
+            ->groupBy('buyer_id')
             ->havingRaw('COUNT(*) > 1')
             ->count();
     }

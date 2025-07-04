@@ -32,12 +32,12 @@ class AdminOrderService
             'cancelled' => Order::whereBetween('created_at', [$dates['start'], $dates['end']])
                 ->where('status', 'cancelled')->count(),
             'total_revenue' => Order::whereBetween('created_at', [$dates['start'], $dates['end']])
-                ->where('status', 'completed')->sum('total_amount'),
+                ->where('status', 'complete')->sum('price'),
             'average_order_value' => Order::whereBetween('created_at', [$dates['start'], $dates['end']])
-                ->where('status', 'completed')->avg('total_amount') ?? 0,
+                ->where('status', 'complete')->avg('price') ?? 0,
             'completion_rate' => $totalOrders > 0 ? 
                 (Order::whereBetween('created_at', [$dates['start'], $dates['end']])
-                    ->where('status', 'completed')->count() / $totalOrders) * 100 : 0,
+                    ->where('status', 'complete')->count() / $totalOrders) * 100 : 0,
             'daily_average' => $totalOrders / max(1, $dates['end']->diffInDays($dates['start'])),
             'by_priority' => $this->getOrdersByPriority($dates),
             'top_customers' => $this->getTopCustomers($dates),
