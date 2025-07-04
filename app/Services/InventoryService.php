@@ -186,4 +186,181 @@ class InventoryService implements InventoryServiceInterface
         $periodMultiplier = 365 / $days;
         return $avgInventoryValue > 0 ? ($totalCogs * $periodMultiplier) / $avgInventoryValue : 0;
     }
+    
+    // Production Manager specific methods
+    public function getWarehouses()
+    {
+        return \App\Models\Warehouse::select('id', 'name', 'location', 'total_capacity', 'current_usage', 'type')
+            ->where('is_active', true)
+            ->get();
+    }
+    
+    public function getMaterialUsage($timeframe, $warehouseId = null)
+    {
+        // Calculate material usage based on inventory movements
+        $query = \App\Models\Resource::query();
+        
+        if ($warehouseId) {
+            $query->where('warehouse_id', $warehouseId);
+        }
+        
+        return $query->selectRaw('component_type, SUM(units) as total_used')
+            ->groupBy('component_type')
+            ->get()
+            ->pluck('total_used', 'component_type')
+            ->toArray();
+    }
+    
+    public function getTotalItems($warehouseId = null)
+    {
+        $query = \App\Models\Resource::query();
+        
+        if ($warehouseId) {
+            $query->where('warehouse_id', $warehouseId);
+        }
+        
+        return $query->sum('units');
+    }
+    
+    public function getLowStockCount($warehouseId = null)
+    {
+        $query = \App\Models\Resource::where('units', '<=', \DB::raw('reorder_level'));
+        
+        if ($warehouseId) {
+            $query->where('warehouse_id', $warehouseId);
+        }
+        
+        return $query->count();
+    }
+    
+    public function getOutOfStockCount($warehouseId = null)
+    {
+        $query = \App\Models\Resource::where('units', '<=', 0);
+        
+        if ($warehouseId) {
+            $query->where('warehouse_id', $warehouseId);
+        }
+        
+        return $query->count();
+    }
+    
+    public function getWarehouseCapacity($warehouseId = null)
+    {
+        if ($warehouseId) {
+            $warehouse = \App\Models\Warehouse::find($warehouseId);
+            return $warehouse ? $warehouse->total_capacity : 0;
+        }
+        
+        return \App\Models\Warehouse::sum('total_capacity');
+    }
+    
+    public function getCapacityUtilization($warehouseId = null)
+    {
+        $totalCapacity = $this->getWarehouseCapacity($warehouseId);
+        $totalItems = $this->getTotalItems($warehouseId);
+        
+        return $totalCapacity > 0 ? ($totalItems / $totalCapacity) * 100 : 0;
+    }
+    
+    public function getRecentMovements($warehouseId = null, $limit = 10)
+    {
+        $query = \DB::table('resources')
+            ->select('resources.name', 'resources.component_type', 'resources.units', 'resources.updated_at');
+            
+        if ($warehouseId) {
+            $query->where('resources.warehouse_id', $warehouseId);
+        }
+        
+        return $query->orderBy('updated_at', 'desc')
+            ->limit($limit)
+            ->get()
+            ->map(function($item) {
+                return [
+                    'resource_name' => $item->name,
+                    'type' => $item->component_type,
+                    'quantity' => $item->units,
+                    'timestamp' => $item->updated_at,
+                    'movement_type' => 'adjustment', // Simplified
+                ];
+            });
+    }
+    
+    public function getInventoryAlerts()
+    {
+        $lowStockItems = \App\Models\Resource::where('units', '<=', \DB::raw('reorder_level'))
+            ->select('id', 'name', 'units', 'reorder_level')
+            ->get();
+            
+        $outOfStockItems = \App\Models\Resource::where('units', '<=', 0)
+            ->select('id', 'name', 'component_type')
+            ->get();
+        
+        $alerts = [];
+        
+        foreach ($lowStockItems as $item) {
+            $alerts[] = [
+                'id' => 'low_stock_' . $item->id,
+                'type' => 'inventory',
+                'severity' => 'warning',
+                'title' => 'Low Stock Alert',
+                'message' => "Low stock for {$item->name}: {$item->units} remaining (reorder at {$item->reorder_level})",
+                'timestamp' => now()->diffForHumans(),
+                'acknowledged' => false,
+            ];
+        }
+        
+        foreach ($outOfStockItems as $item) {
+            $alerts[] = [
+                'id' => 'out_of_stock_' . $item->id,
+                'type' => 'inventory',
+                'severity' => 'critical',
+                'title' => 'Out of Stock Alert',
+                'message' => "Out of stock: {$item->name} ({$item->component_type})",
+                'timestamp' => now()->diffForHumans(),
+                'acknowledged' => false,
+            ];
+        }
+        
+        return collect($alerts);
+    }
+    
+    public function getProductCategories()
+    {
+        return \App\Models\Product::distinct()
+            ->pluck('category')
+            ->filter()
+            ->sort()
+            ->values();
+    }
+    
+    public function getResourceTypes()
+    {
+        return \App\Models\Resource::distinct()
+            ->pluck('component_type')
+            ->filter()
+            ->sort()
+            ->values();
+    }
+    
+    public function requestResource($resourceId, $quantity)
+    {
+        $resource = \App\Models\Resource::findOrFail($resourceId);
+        
+        if ($resource->available_quantity < $quantity) {
+            throw new \Exception("Insufficient stock available. Available: {$resource->available_quantity}, Requested: {$quantity}");
+        }
+        
+        // Reserve the requested quantity
+        $resource->reserveQuantity($quantity);
+        
+        // Log the resource request (you may want to create a ResourceRequest model later)
+        \Log::info("Resource requested", [
+            'resource_id' => $resourceId,
+            'quantity' => $quantity,
+            'user_id' => auth()->id(),
+            'timestamp' => now()
+        ]);
+        
+        return true;
+    }
 }

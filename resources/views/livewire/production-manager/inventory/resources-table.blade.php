@@ -151,8 +151,8 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 @php
-                                    $totalStock = $resource->inventoryItems->sum('quantity');
-                                    $lowStockThreshold = $resource->low_stock_threshold ?? 5;
+                                    $totalStock = $resource->units;
+                                    $lowStockThreshold = $resource->reorder_level;
                                 @endphp
                                 <div class="flex items-center">
                                     <span class="text-lg font-semibold {{ $totalStock <= $lowStockThreshold ? 'text-red-600' : 'text-green-600' }}">
@@ -164,8 +164,8 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @php
-                                    $totalStock = $resource->inventoryItems->sum('quantity');
-                                    $lowStockThreshold = $resource->low_stock_threshold ?? 5;
+                                    $totalStock = $resource->units;
+                                    $lowStockThreshold = $resource->reorder_level;
                                 @endphp
                                 @if($totalStock == 0)
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
@@ -209,14 +209,16 @@
                                     </button>
                                 @endif
                                 <div class="text-xs text-gray-500">
-                                    @foreach($resource->inventoryItems as $item)
+                                    @if($resource->warehouse)
                                         <div class="flex justify-between">
-                                            <span>{{ $item->warehouse->name }}:</span>
-                                            <span class="{{ $item->quantity <= ($resource->low_stock_threshold ?? 5) ? 'text-red-600' : 'text-green-600' }}">
-                                                {{ $item->quantity }}
+                                            <span>{{ $resource->warehouse->name }}:</span>
+                                            <span class="{{ $resource->units <= $resource->reorder_level ? 'text-red-600' : 'text-green-600' }}">
+                                                {{ $resource->units }}
                                             </span>
                                         </div>
-                                    @endforeach
+                                    @else
+                                        <span class="text-gray-400">No warehouse assigned</span>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

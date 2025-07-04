@@ -76,13 +76,27 @@ class ProductionDashboard extends Component
     {
         $timeframe = $this->getTimeframeDate();
         
+        // Get efficiency trend data for charts
+        $trendData = $this->productionEfficiencyService->getEfficiencyTrend($timeframe);
+        
+        // Calculate trend percentage (current vs previous period)
+        $trendPercentage = 0;
+        if (count($trendData) >= 2) {
+            $latestEfficiency = end($trendData)['efficiency'];
+            $previousEfficiency = prev($trendData)['efficiency'];
+            if ($previousEfficiency > 0) {
+                $trendPercentage = (($latestEfficiency - $previousEfficiency) / $previousEfficiency) * 100;
+            }
+        }
+        
         $this->efficiencyMetrics = [
             'overall_efficiency' => $this->productionEfficiencyService->getOverallEfficiency($timeframe),
             'production_rate' => $this->productionEfficiencyService->getProductionRate($timeframe),
             'quality_score' => $this->productionEfficiencyService->getQualityScore($timeframe),
             'downtime_hours' => $this->productionEfficiencyService->getDowntimeHours($timeframe),
             'throughput' => $this->productionEfficiencyService->getThroughput($timeframe),
-            'efficiency_trend' => $this->productionEfficiencyService->getEfficiencyTrend($timeframe),
+            'efficiency_trend' => $trendPercentage,
+            'efficiency_trend_data' => $trendData, // Keep the full data for charts
         ];
     }
 

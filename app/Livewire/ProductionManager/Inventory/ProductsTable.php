@@ -75,11 +75,11 @@ class ProductsTable extends Component
                 $query->where('category', $this->selectedCategory);
             })
             ->when($this->selectedWarehouse, function ($query) {
-                $query->whereHas('inventoryItems', function ($q) {
+                $query->whereHas('bom.resources', function ($q) {
                     $q->where('warehouse_id', $this->selectedWarehouse);
                 });
             })
-            ->with(['inventoryItems.warehouse'])
+            ->with(['bom.resources.warehouse'])
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate($this->perPage);
     }

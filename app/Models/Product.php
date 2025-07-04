@@ -19,6 +19,16 @@ class Product extends Model
         'specifications' => 'array',
     ];
 
+    public function inventoryItems()
+    {
+        // Get resources through BOM relationship
+        if (!$this->bom) {
+            return new \Illuminate\Database\Eloquent\Collection();
+        }
+        
+        return $this->bom->resources;
+    }
+
     public function owner()
     {
         return $this->belongsTo(User::class, 'owner_id');

@@ -38,7 +38,7 @@ class AdminOrderService
             'completion_rate' => $totalOrders > 0 ? 
                 (Order::whereBetween('created_at', [$dates['start'], $dates['end']])
                     ->where('status', 'complete')->count() / $totalOrders) * 100 : 0,
-            'daily_average' => $totalOrders / max(1, $dates['end']->diffInDays($dates['start'])),
+            'daily_average' => $totalOrders / max(1, abs(intval($dates['end']->diffInDays($dates['start'])))),
             'by_priority' => $this->getOrdersByPriority($dates),
             'top_customers' => $this->getTopCustomers($dates),
             'recent_orders' => $this->getRecentOrders(10)

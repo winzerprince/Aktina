@@ -84,10 +84,10 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock Levels</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" 
-                            wire:click="sortBy('unit_price')">
+                            wire:click="sortBy('msrp')">
                             <div class="flex items-center space-x-1">
-                                <span>Unit Price</span>
-                                @if($sortField === 'unit_price')
+                                <span>MSRP</span>
+                                @if($sortField === 'msrp')
                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                         @if($sortDirection === 'asc')
                                             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
@@ -131,8 +131,9 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 @php
-                                    $totalStock = $product->inventoryItems->sum('quantity');
-                                    $lowStockThreshold = $product->low_stock_threshold ?? 10;
+                                    $inventoryItems = $product->inventoryItems();
+                                    $totalStock = $inventoryItems->sum('units');
+                                    $lowStockThreshold = 10; // Default threshold
                                 @endphp
                                 <div class="flex items-center">
                                     <span class="text-lg font-semibold {{ $totalStock <= $lowStockThreshold ? 'text-red-600' : 'text-green-600' }}">
@@ -144,8 +145,9 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @php
-                                    $totalStock = $product->inventoryItems->sum('quantity');
-                                    $lowStockThreshold = $product->low_stock_threshold ?? 10;
+                                    $inventoryItems = $product->inventoryItems();
+                                    $totalStock = $inventoryItems->sum('units');
+                                    $lowStockThreshold = 10; // Default threshold
                                 @endphp
                                 @if($totalStock == 0)
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
@@ -162,20 +164,24 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                ${{ number_format($product->unit_price, 2) }}
+                                ${{ number_format($product->msrp ?? 0, 2) }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 <div class="space-y-1">
-                                    @foreach($product->inventoryItems as $item)
+                                    @php
+                                        $inventoryItems = $product->inventoryItems();
+                                        $lowStockThreshold = 10;
+                                    @endphp
+                                    @foreach($inventoryItems as $item)
                                         <div class="flex items-center justify-between bg-gray-50 rounded px-2 py-1">
-                                            <span class="text-xs font-medium">{{ $item->warehouse->name }}</span>
-                                            <span class="text-xs {{ $item->quantity <= ($product->low_stock_threshold ?? 10) ? 'text-red-600' : 'text-green-600' }}">
-                                                {{ $item->quantity }}
+                                            <span class="text-xs font-medium">{{ $item->warehouse->name ?? 'No Warehouse' }}</span>
+                                            <span class="text-xs {{ $item->units <= $lowStockThreshold ? 'text-red-600' : 'text-green-600' }}">
+                                                {{ $item->units }}
                                             </span>
                                         </div>
                                     @endforeach
-                                    @if($product->inventoryItems->isEmpty())
-                                        <span class="text-xs text-gray-400">No warehouse assigned</span>
+                                    @if($inventoryItems->isEmpty())
+                                        <span class="text-xs text-gray-400">No inventory items</span>
                                     @endif
                                 </div>
                             </td>

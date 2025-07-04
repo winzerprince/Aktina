@@ -45,13 +45,22 @@
                             <div class="text-2xl font-semibold text-gray-900">
                                 {{ number_format($efficiencyMetrics['overall_efficiency'] ?? 0, 1) }}%
                             </div>
-                            @if(isset($efficiencyMetrics['efficiency_trend']) && $efficiencyMetrics['efficiency_trend'] > 0)
-                                <div class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
-                                    <svg class="self-center flex-shrink-0 h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-                                    </svg>
-                                    {{ number_format($efficiencyMetrics['efficiency_trend'], 1) }}%
-                                </div>
+                            @if(isset($efficiencyMetrics['efficiency_trend']) && $efficiencyMetrics['efficiency_trend'] != 0)
+                                @if($efficiencyMetrics['efficiency_trend'] > 0)
+                                    <div class="ml-2 flex items-baseline text-sm font-semibold text-green-600">
+                                        <svg class="self-center flex-shrink-0 h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                        {{ number_format(abs($efficiencyMetrics['efficiency_trend']), 1) }}%
+                                    </div>
+                                @else
+                                    <div class="ml-2 flex items-baseline text-sm font-semibold text-red-600">
+                                        <svg class="self-center flex-shrink-0 h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                        {{ number_format(abs($efficiencyMetrics['efficiency_trend']), 1) }}%
+                                    </div>
+                                @endif
                             @endif
                         </dd>
                     </dl>
@@ -205,9 +214,16 @@
                 @endphp
                 
                 @forelse($allAlerts as $alert)
-                    <div class="flex items-start justify-between p-3 border-l-4 
-                        {{ $alert['severity'] === 'high' ? 'border-red-400 bg-red-50' : 
-                           ($alert['severity'] === 'medium' ? 'border-yellow-400 bg-yellow-50' : 'border-blue-400 bg-blue-50') }} rounded-r-lg">
+                    @php
+                        $severity = $alert['severity'] ?? 'info';
+                        $borderColor = match($severity) {
+                            'critical' => 'border-red-400 bg-red-50',
+                            'warning' => 'border-yellow-400 bg-yellow-50',
+                            'info' => 'border-blue-400 bg-blue-50',
+                            default => 'border-gray-400 bg-gray-50'
+                        };
+                    @endphp
+                    <div class="flex items-start justify-between p-3 border-l-4 {{ $borderColor }} rounded-r-lg">
                         <div class="flex-1">
                             <div class="text-sm font-medium text-gray-900">{{ $alert['title'] ?? 'Alert' }}</div>
                             <div class="text-xs text-gray-600 mt-1">{{ $alert['message'] ?? '' }}</div>
@@ -244,7 +260,7 @@
                 <div class="text-sm text-gray-600">Labor Hours</div>
             </div>
             <div class="text-center">
-                <div class="text-2xl font-bold text-gray-900">${{ number_format($resourceConsumption['energy_consumption'] ?? 0) }}</div>
+                <div class="text-2xl font-bold text-gray-900">${{ number_format($resourceConsumption['energy_consumption']['cost'] ?? 0) }}</div>
                 <div class="text-sm text-gray-600">Energy Cost</div>
             </div>
             <div class="text-center">

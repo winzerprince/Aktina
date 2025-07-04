@@ -128,7 +128,7 @@ class AdminAnalyticsService
     protected function getPreviousDateRange($range)
     {
         $current = $this->getDateRange($range);
-        $diff = $current['end']->diffInDays($current['start']);
+        $diff = abs(intval($current['end']->diffInDays($current['start'])));
         
         return [
             'start' => $current['start']->copy()->subDays($diff),
@@ -143,7 +143,7 @@ class AdminAnalyticsService
             ->sum('total_amount');
         
         $previousRevenue = Order::whereBetween('created_at', [
-                $dates['start']->copy()->subDays($dates['end']->diffInDays($dates['start'])),
+                $dates['start']->copy()->subDays(abs(intval($dates['end']->diffInDays($dates['start'])))),
                 $dates['start']
             ])
             ->where('status', 'completed')
@@ -171,7 +171,7 @@ class AdminAnalyticsService
             'completed' => $completedOrders,
             'pending' => $pendingOrders,
             'completion_rate' => $totalOrders > 0 ? ($completedOrders / $totalOrders) * 100 : 0,
-            'daily_average' => $totalOrders / max(1, $dates['end']->diffInDays($dates['start']))
+            'daily_average' => $totalOrders / max(1, abs(intval($dates['end']->diffInDays($dates['start']))))
         ];
     }
     
@@ -303,7 +303,7 @@ class AdminAnalyticsService
     
     protected function calculateGrowthRate($newUsers, $dates)
     {
-        $days = $dates['end']->diffInDays($dates['start']);
+        $days = abs(intval($dates['end']->diffInDays($dates['start'])));
         return $days > 0 ? ($newUsers / $days) * 30 : 0; // Monthly growth rate
     }
     

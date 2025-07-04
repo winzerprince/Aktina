@@ -82,29 +82,24 @@ class ResourcesTable extends Component
         return Resource::query()
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('code', 'like', '%' . $this->search . '%')
-                      ->orWhere('supplier', 'like', '%' . $this->search . '%');
+                      ->orWhere('part_number', 'like', '%' . $this->search . '%');
             })
             ->when($this->selectedType, function ($query) {
-                $query->where('type', $this->selectedType);
+                $query->where('component_type', $this->selectedType);
             })
             ->when($this->selectedWarehouse, function ($query) {
-                $query->whereHas('inventoryItems', function ($q) {
-                    $q->where('warehouse_id', $this->selectedWarehouse);
-                });
+                $query->where('warehouse_id', $this->selectedWarehouse);
             })
             ->when($this->selectedStatus, function ($query) {
                 if ($this->selectedStatus === 'low_stock') {
-                    $query->whereRaw('quantity <= low_stock_threshold');
+                    $query->whereRaw('available_quantity <= reorder_level');
                 } elseif ($this->selectedStatus === 'out_of_stock') {
-                    $query->where('quantity', 0);
+                    $query->where('units', 0);
                 } elseif ($this->selectedStatus === 'available') {
-                    $query->where('quantity', '>', 0)->where('status', 'active');
-                } else {
-                    $query->where('status', $this->selectedStatus);
+                    $query->where('units', '>', 0);
                 }
             })
-            ->with(['inventoryItems.warehouse', 'supplier'])
+            ->with(['warehouse'])
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate($this->perPage);
     }

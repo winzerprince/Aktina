@@ -62,13 +62,13 @@ class ProductionEfficiencyService
 
     public function getEfficiencyTrend($timeframe)
     {
-        $days = $timeframe->diffInDays(now());
+        $now = now();
+        $days = abs(intval($timeframe->diffInDays($now)));
         $trend = collect();
         
         for ($i = $days; $i >= 0; $i--) {
-            $date = now()->subDays($i);
-            $dayStart = $date->startOfDay();
-            $dayEnd = $date->endOfDay();
+            $date = $now->copy()->subDays($i);
+            $dayStart = $date->copy()->startOfDay();
             
             $efficiency = $this->getOverallEfficiency($dayStart);
             
@@ -85,7 +85,7 @@ class ProductionEfficiencyService
     {
         // Calculate total labor hours
         // This would typically come from time tracking systems
-        $workingDays = $timeframe->diffInWeekdays(now());
+        $workingDays = abs(intval($timeframe->diffInWeekdays(now())));
         $avgHoursPerDay = 8; // Standard working hours
         $avgWorkersPerDay = 25; // Average number of workers
         
@@ -96,7 +96,7 @@ class ProductionEfficiencyService
     {
         // Energy consumption metrics
         // This would come from energy monitoring systems
-        $days = $timeframe->diffInDays(now());
+        $days = abs(intval($timeframe->diffInDays(now())));
         
         return [
             'total_kwh' => $days * mt_rand(800, 1200), // Simulated daily consumption
@@ -235,29 +235,41 @@ class ProductionEfficiencyService
     {
         // Get planned production output for the timeframe
         // This would come from production schedules
-        $days = $timeframe->diffInDays(now());
+        $days = abs(intval($timeframe->diffInDays(now())));
         return $days * mt_rand(800, 1200); // Simulated daily target
     }
 
     private function getActualOutput($timeframe)
     {
-        // Get actual production output
-        return Order::where('status', 'completed')
-                   ->where('completed_at', '>=', $timeframe)
-                   ->sum('quantity');
+        // Get actual production output from completed orders
+        $orders = Order::where('status', 'completed')
+                      ->where('completed_at', '>=', $timeframe)
+                      ->get();
+        
+        $totalQuantity = 0;
+        foreach ($orders as $order) {
+            $items = is_string($order->items) ? json_decode($order->items, true) : $order->items;
+            if (is_array($items)) {
+                foreach ($items as $item) {
+                    $totalQuantity += $item['quantity'] ?? 0;
+                }
+            }
+        }
+        
+        return $totalQuantity;
     }
 
     private function getProductionHours($timeframe)
     {
         // Get actual production hours
-        $days = $timeframe->diffInWeekdays(now());
+        $days = abs(intval($timeframe->diffInWeekdays(now())));
         return $days * mt_rand(16, 20); // Simulated daily production hours
     }
 
     private function getPlannedProductionHours($timeframe)
     {
         // Get planned production hours
-        $days = $timeframe->diffInWeekdays(now());
+        $days = abs(intval($timeframe->diffInWeekdays(now())));
         return $days * 20; // Planned 20 hours per day
     }
 
@@ -271,15 +283,15 @@ class ProductionEfficiencyService
     private function getTotalProductionCost($timeframe)
     {
         // Calculate total production cost
-        $days = $timeframe->diffInDays(now());
+        $days = abs(intval($timeframe->diffInDays(now())));
         return $days * mt_rand(15000, 25000); // Simulated daily cost
     }
 
     private function getTotalMaterialsUsed($timeframe)
     {
-        // Get total materials used
+        // Get total materials used - sum of all resource units that have been updated
         return Resource::where('updated_at', '>=', $timeframe)
-                      ->sum('consumed_quantity');
+                      ->sum('units');
     }
 
     private function getWastedMaterials($timeframe)

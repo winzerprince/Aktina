@@ -272,4 +272,83 @@ class OrderService implements OrderServiceInterface
             ->limit($limit)
             ->get();
     }
+    
+    // Production Manager specific methods
+    public function getFulfillmentRate($timeframe)
+    {
+        $totalOrders = Order::where('created_at', '>=', $timeframe)->count();
+        $fulfilledOrders = Order::where('created_at', '>=', $timeframe)
+            ->whereIn('status', ['complete', 'completed'])->count();
+        
+        return $totalOrders > 0 ? ($fulfilledOrders / $totalOrders) * 100 : 0;
+    }
+    
+    public function getAverageFulfillmentTime($timeframe)
+    {
+        $orders = Order::where('created_at', '>=', $timeframe)
+            ->whereNotNull('completed_at')
+            ->select('created_at', 'completed_at')
+            ->get();
+        
+        if ($orders->isEmpty()) {
+            return 0;
+        }
+        
+        $totalHours = $orders->sum(function($order) {
+            return $order->created_at->diffInHours($order->completed_at);
+        });
+        
+        return round($totalHours / $orders->count(), 1);
+    }
+    
+    public function getOnTimeDeliveryRate($timeframe)
+    {
+        $totalDelivered = Order::where('created_at', '>=', $timeframe)
+            ->whereNotNull('completed_at')->count();
+            
+        $onTimeDelivered = Order::where('created_at', '>=', $timeframe)
+            ->whereNotNull('completed_at')
+            ->whereNotNull('expected_delivery_date')
+            ->whereRaw('completed_at <= expected_delivery_date')
+            ->count();
+        
+        return $totalDelivered > 0 ? ($onTimeDelivered / $totalDelivered) * 100 : 0;
+    }
+    
+    public function getPendingOrdersCount()
+    {
+        return Order::where('status', 'pending')->count();
+    }
+    
+    public function getCompletedTodayCount()
+    {
+        return Order::whereDate('completed_at', today())->count();
+    }
+    
+    public function getFulfillmentTrend($timeframe)
+    {
+        $days = abs(intval(now()->diffInDays($timeframe)));
+        $groupBy = $days <= 7 ? '%Y-%m-%d' : '%Y-%m';
+        
+        return Order::where('created_at', '>=', $timeframe)
+            ->selectRaw("DATE_FORMAT(created_at, '{$groupBy}') as period")
+            ->selectRaw('COUNT(*) as total_orders')
+            ->selectRaw('COUNT(CASE WHEN status IN ("complete", "completed") THEN 1 END) as fulfilled_orders')
+            ->groupBy('period')
+            ->orderBy('period')
+            ->get()
+            ->mapWithKeys(function ($item) {
+                $rate = $item->total_orders > 0 ? ($item->fulfilled_orders / $item->total_orders) * 100 : 0;
+                return [$item->period => round($rate, 1)];
+            });
+    }
+    
+    public function getRecentOrdersForProduction($limit = 20)
+    {
+        return Order::with(['buyer', 'seller'])
+            ->whereIn('status', ['pending', 'accepted', 'processing'])
+            ->orderBy('created_at', 'desc')
+            ->limit($limit)
+            ->get();
+    }
 }

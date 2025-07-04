@@ -304,7 +304,7 @@ class VendorSalesService
 
     private function getPreviousPeriodDate($startDate)
     {
-        $daysDiff = Carbon::now()->diffInDays($startDate);
+        $daysDiff = abs(intval(Carbon::now()->diffInDays($startDate)));
         return Carbon::now()->subDays($daysDiff * 2);
     }
 
