@@ -14,25 +14,30 @@
 
         @if($role === 'admin')
             <!-- Admin Dashboard -->
-      <h1>Welcome to the Admin dashboard</h1>
+            <livewire:admin.admin-dashboard-overview />
 
 
         @elseif($role === 'production_manager')
-            <h1>Welcome to the Production Manager dashboard</h1>
+            <!-- Production Manager Dashboard -->
+            <livewire:production-manager.production-dashboard />
 
         @elseif($role === 'supplier')
-            <h1>Welcome to the Supplier dashboard </h1>
+            <!-- Supplier Dashboard -->
+            <livewire:supplier.supplier-dashboard />
 
 
         @elseif($role === 'hr_manager')
-            <h1>Welcome to the HR Manager dashboard </h1>
+            <!-- HR Manager Dashboard -->
+            <livewire:h-r-manager.h-r-dashboard />
 
         @elseif($role === 'vendor')
-            <h1>Welcome to the Vendor dashboard </h1>
+            <!-- Vendor Dashboard -->
+            <livewire:vendor.vendor-dashboard />
 
 
         @elseif($role === 'retailer')
-            <h1>Welcome to the Retailer dashboard </h1>
+            <!-- Retailer Dashboard -->
+            <livewire:retailer.retailer-dashboard />
 
 
 
@@ -42,6 +47,7 @@
 
     @push('styles')
     <link href="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     @endpush
 
     @push('scripts')

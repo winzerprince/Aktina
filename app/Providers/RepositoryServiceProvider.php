@@ -25,6 +25,7 @@ use App\Interfaces\Services\AnalyticsServiceInterface;
 use App\Interfaces\Services\MetricsServiceInterface;
 use App\Interfaces\Services\ReportServiceInterface;
 use App\Interfaces\Services\EnhancedOrderServiceInterface;
+use App\Interfaces\Services\AlertEnhancementServiceInterface;
 use App\Repositories\SalesRepository;
 use App\Repositories\ApplicationRepository;
 use App\Repositories\MessageRepository;
@@ -44,6 +45,7 @@ use App\Services\ConversationService;
 use App\Services\WarehouseService;
 use App\Services\InventoryService;
 use App\Services\AlertService;
+use App\Services\AlertEnhancementService;
 use App\Services\AnalyticsService;
 use App\Services\MetricsService;
 use App\Services\ReportService;
@@ -174,6 +176,11 @@ class RepositoryServiceProvider extends ServiceProvider
             EnhancedOrderService::class
         );
 
+        $this->app->bind(
+            AlertEnhancementServiceInterface::class,
+            AlertEnhancementService::class
+        );
+        
         // Bind additional services
         $this->app->singleton(
             \App\Services\FileValidationService::class

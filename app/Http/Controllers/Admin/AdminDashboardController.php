@@ -129,4 +129,24 @@ class AdminDashboardController extends Controller
     {
         return view('admin.monitoring');
     }
+    
+    /**
+     * Display the alert threshold management screen.
+     * 
+     * @return \Illuminate\View\View
+     */
+    public function alertThresholds()
+    {
+        return view('admin.alert-thresholds');
+    }
+    
+    /**
+     * Display the system performance dashboard.
+     * 
+     * @return \Illuminate\View\View
+     */
+    public function systemPerformance()
+    {
+        return view('admin.system-performance');
+    }
 }

@@ -109,6 +109,8 @@ Route::middleware(['auth', 'role.verified'])->prefix('admin')->name('admin.')->g
         Route::get('/customer-insights', 'customerInsights')->name('customer-insights');
         Route::get('/analytics', 'analytics')->name('analytics');
         Route::get('/monitoring', 'monitoring')->name('monitoring');
+        Route::get('/alert-thresholds', 'alertThresholds')->name('alert-thresholds');
+        Route::get('/system/performance', 'systemPerformance')->name('system.performance');
     });
 
     // Application management routes

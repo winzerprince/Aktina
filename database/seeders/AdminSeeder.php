@@ -11,8 +11,10 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
         // Get users with admin role to link to admins
-        $adminUsers = User::where('role', 'admin')->get();        // Create admins linked to existing users
-        foreach ($adminUsers->take(5) as $user) {
+        $adminUsers = User::where('role', 'admin')->get();
+        
+        // Create admins linked to existing users
+        foreach ($adminUsers as $user) {
             Admin::factory()->forUser($user->id)->create();
         }
 

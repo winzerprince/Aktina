@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Order;
-use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
@@ -13,15 +12,15 @@ class RetailerSalesService
     public function getSalesMetrics()
     {
         return Cache::remember('retailer_sales_metrics', 300, function () {
-            $totalOrders = Order::where('user_id', auth()->id())->count();
-            $totalRevenue = Order::where('user_id', auth()->id())->sum('total_amount');
+            $totalOrders = Order::where('buyer_id', auth()->id())->count();
+            $totalRevenue = Order::where('buyer_id', auth()->id())->sum('price');
             $avgOrderValue = $totalOrders > 0 ? $totalRevenue / $totalOrders : 0;
             
-            $thisMonthOrders = Order::where('user_id', auth()->id())
+            $thisMonthOrders = Order::where('buyer_id', auth()->id())
                 ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
                 ->count();
             
-            $lastMonthOrders = Order::where('user_id', auth()->id())
+            $lastMonthOrders = Order::where('buyer_id', auth()->id())
                 ->whereBetween('created_at', [
                     now()->subMonth()->startOfMonth(), 
                     now()->subMonth()->endOfMonth()
@@ -38,10 +37,10 @@ class RetailerSalesService
                 'average_order_value' => $avgOrderValue,
                 'orders_this_month' => $thisMonthOrders,
                 'order_growth_percentage' => round($orderGrowth, 1),
-                'pending_orders' => Order::where('user_id', auth()->id())
+                'pending_orders' => Order::where('buyer_id', auth()->id())
                     ->where('status', 'pending')
                     ->count(),
-                'completed_orders' => Order::where('user_id', auth()->id())
+                'completed_orders' => Order::where('buyer_id', auth()->id())
                     ->whereIn('status', ['delivered', 'completed'])
                     ->count(),
             ];
@@ -57,13 +56,13 @@ class RetailerSalesService
                 $monthStart = $date->startOfMonth()->copy();
                 $monthEnd = $date->endOfMonth()->copy();
 
-                $orders = Order::where('user_id', auth()->id())
+                $orders = Order::where('buyer_id', auth()->id())
                     ->whereBetween('created_at', [$monthStart, $monthEnd])
                     ->count();
 
-                $revenue = Order::where('user_id', auth()->id())
+                $revenue = Order::where('buyer_id', auth()->id())
                     ->whereBetween('created_at', [$monthStart, $monthEnd])
-                    ->sum('total_amount');
+                    ->sum('price');
 
                 $data[] = [
                     'month' => $date->format('M Y'),
@@ -80,25 +79,50 @@ class RetailerSalesService
     public function getTopPurchasedProducts($limit = 10)
     {
         return Cache::remember('retailer_top_products', 300, function () use ($limit) {
-            return OrderItem::whereHas('order', function ($query) {
-                $query->where('user_id', auth()->id());
-            })
-                ->with('product')
-                ->select('product_id', DB::raw('SUM(quantity) as total_quantity'), DB::raw('SUM(quantity * price) as total_spent'))
-                ->groupBy('product_id')
-                ->orderByDesc('total_quantity')
-                ->limit($limit)
-                ->get()
+            $orders = Order::where('buyer_id', auth()->id())
+                ->get();
+
+            $productStats = [];
+            
+            foreach ($orders as $order) {
+                $items = $order->getItemsAsArray();
+                foreach ($items as $item) {
+                    $productId = $item['product_id'] ?? null;
+                    $quantity = $item['quantity'] ?? 0;
+                    $price = $item['price'] ?? 0;
+                    
+                    if ($productId) {
+                        if (!isset($productStats[$productId])) {
+                            $productStats[$productId] = [
+                                'product_id' => $productId,
+                                'total_quantity' => 0,
+                                'total_spent' => 0,
+                            ];
+                        }
+                        
+                        $productStats[$productId]['total_quantity'] += $quantity;
+                        $productStats[$productId]['total_spent'] += ($quantity * $price);
+                    }
+                }
+            }
+
+            // Sort by total quantity and limit
+            $sortedProducts = collect($productStats)
+                ->sortByDesc('total_quantity')
+                ->take($limit)
                 ->map(function ($item) {
+                    $product = Product::find($item['product_id']);
                     return [
-                        'product_id' => $item->product_id,
-                        'product_name' => $item->product->name ?? 'Unknown Product',
-                        'product_sku' => $item->product->sku ?? '',
-                        'total_quantity' => $item->total_quantity,
-                        'total_spent' => $item->total_spent,
-                        'average_price' => $item->total_quantity > 0 ? $item->total_spent / $item->total_quantity : 0,
+                        'product_id' => $item['product_id'],
+                        'product_name' => $product->name ?? 'Unknown Product',
+                        'product_sku' => $product->sku ?? '',
+                        'total_quantity' => $item['total_quantity'],
+                        'total_spent' => $item['total_spent'],
+                        'average_price' => $item['total_quantity'] > 0 ? $item['total_spent'] / $item['total_quantity'] : 0,
                     ];
                 });
+
+            return $sortedProducts;
         });
     }
 
@@ -106,7 +130,7 @@ class RetailerSalesService
     {
         return Cache::remember('retailer_purchase_patterns', 300, function () {
             // Get purchase frequency by day of week
-            $dayPatterns = Order::where('user_id', auth()->id())
+            $dayPatterns = Order::where('buyer_id', auth()->id())
                 ->where('created_at', '>=', now()->subMonths(3))
                 ->select(DB::raw('DAYOFWEEK(created_at) as day_of_week'), DB::raw('COUNT(*) as order_count'))
                 ->groupBy('day_of_week')
@@ -117,7 +141,7 @@ class RetailerSalesService
                 });
 
             // Get purchase frequency by hour
-            $hourPatterns = Order::where('user_id', auth()->id())
+            $hourPatterns = Order::where('buyer_id', auth()->id())
                 ->where('created_at', '>=', now()->subMonths(1))
                 ->select(DB::raw('HOUR(created_at) as hour'), DB::raw('COUNT(*) as order_count'))
                 ->groupBy('hour')
@@ -127,7 +151,7 @@ class RetailerSalesService
                 });
 
             // Get average time between orders
-            $orders = Order::where('user_id', auth()->id())
+            $orders = Order::where('buyer_id', auth()->id())
                 ->orderBy('created_at')
                 ->pluck('created_at')
                 ->toArray();
@@ -154,8 +178,8 @@ class RetailerSalesService
     public function getOrderStatusBreakdown()
     {
         return Cache::remember('retailer_order_status', 300, function () {
-            return Order::where('user_id', auth()->id())
-                ->select('status', DB::raw('COUNT(*) as count'), DB::raw('SUM(total_amount) as total_value'))
+            return Order::where('buyer_id', auth()->id())
+                ->select('status', DB::raw('COUNT(*) as count'), DB::raw('SUM(price) as total_value'))
                 ->groupBy('status')
                 ->get()
                 ->mapWithKeys(function ($item) {
@@ -172,19 +196,31 @@ class RetailerSalesService
 
     public function getRecentOrderActivity($limit = 10)
     {
-        return Order::where('user_id', auth()->id())
-            ->with(['orderItems.product'])
+        return Order::where('buyer_id', auth()->id())
             ->orderByDesc('created_at')
             ->limit($limit)
             ->get()
             ->map(function ($order) {
+                $items = $order->getItemsAsArray();
+                $itemsPreview = [];
+                
+                foreach (array_slice($items, 0, 3) as $item) {
+                    $productId = $item['product_id'] ?? null;
+                    if ($productId) {
+                        $product = Product::find($productId);
+                        if ($product) {
+                            $itemsPreview[] = $product->name;
+                        }
+                    }
+                }
+                
                 return [
                     'id' => $order->id,
                     'status' => $order->status,
-                    'total_amount' => $order->total_amount,
-                    'items_count' => $order->orderItems->count(),
+                    'total_amount' => $order->price,
+                    'items_count' => count($items),
                     'created_at' => $order->created_at,
-                    'items_preview' => $order->orderItems->take(3)->pluck('product.name')->implode(', '),
+                    'items_preview' => implode(', ', $itemsPreview),
                 ];
             });
     }
@@ -198,13 +234,13 @@ class RetailerSalesService
                 $quarterStart = $quarter->copy()->startOfQuarter();
                 $quarterEnd = $quarter->copy()->endOfQuarter();
 
-                $orders = Order::where('user_id', auth()->id())
+                $orders = Order::where('buyer_id', auth()->id())
                     ->whereBetween('created_at', [$quarterStart, $quarterEnd])
                     ->count();
 
-                $revenue = Order::where('user_id', auth()->id())
+                $revenue = Order::where('buyer_id', auth()->id())
                     ->whereBetween('created_at', [$quarterStart, $quarterEnd])
-                    ->sum('total_amount');
+                    ->sum('price');
 
                 $quarters[] = [
                     'quarter' => 'Q' . $quarter->quarter . ' ' . $quarter->year,

@@ -43,22 +43,22 @@ new #[Layout('components.layouts.auth')] class extends Component {
         //Role-based redirection
         $role = auth()->user()->role ?? null;
         if ($role === 'retailer') {
-            $this->redirectIntended(default: route('retailer.dashboard', absolute: false), navigate: true);
+            $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
         }
         elseif ($role === 'admin') {
             $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
         }
         elseif ($role === 'production_manager') {
-            $this->redirectIntended(default: route('production_manager.dashboard', absolute: false), navigate: true);
+            $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
         }
         elseif ($role === 'hr_manager') {
-            $this->redirectIntended(default: route('hr_manager.dashboard', absolute: false), navigate: true);
+            $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
         }
         elseif ($role === 'supplier') {
-           $this->redirectIntended(default: route('supplier.dashboard', absolute: false), navigate: true);
+           $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
         }
         elseif ($role === 'vendor') {
-           $this->redirectIntended(default: route('vendor.dashboard', absolute: false), navigate: true);
+           $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
         }
         else {
             $this->redirectIntended(default: route('access.denied', absolute: false), navigate: true);

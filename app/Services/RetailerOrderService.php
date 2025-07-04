@@ -12,23 +12,22 @@ class RetailerOrderService
     public function getOrderStats(User $retailer): array
     {
         return Cache::remember("retailer_{$retailer->id}_order_stats", 300, function () use ($retailer) {
-            $orders = Order::where('user_id', $retailer->id);
+            $orders = Order::where('buyer_id', $retailer->id);
             
             return [
                 'total_orders' => $orders->count(),
                 'pending_orders' => $orders->where('status', 'pending')->count(),
                 'completed_orders' => $orders->where('status', 'completed')->count(),
                 'cancelled_orders' => $orders->where('status', 'cancelled')->count(),
-                'total_spent' => $orders->sum('total_amount'),
-                'average_order_value' => $orders->avg('total_amount'),
+                'total_spent' => $orders->sum('price'),
+                'average_order_value' => $orders->avg('price'),
             ];
         });
     }
 
     public function getRecentOrders(User $retailer, int $limit = 10)
     {
-        return Order::where('user_id', $retailer->id)
-            ->with(['orderItems.product'])
+        return Order::where('buyer_id', $retailer->id)
             ->orderBy('created_at', 'desc')
             ->limit($limit)
             ->get();
@@ -36,8 +35,7 @@ class RetailerOrderService
 
     public function getOrdersByStatus(User $retailer, string $status = null)
     {
-        $query = Order::where('user_id', $retailer->id)
-            ->with(['orderItems.product']);
+        $query = Order::where('buyer_id', $retailer->id);
 
         if ($status) {
             $query->where('status', $status);
@@ -49,9 +47,9 @@ class RetailerOrderService
     public function getOrderTrends(User $retailer, int $days = 30): array
     {
         return Cache::remember("retailer_{$retailer->id}_order_trends_{$days}", 300, function () use ($retailer, $days) {
-            $orders = Order::where('user_id', $retailer->id)
+            $orders = Order::where('buyer_id', $retailer->id)
                 ->where('created_at', '>=', now()->subDays($days))
-                ->selectRaw('DATE(created_at) as date, COUNT(*) as count, SUM(total_amount) as total')
+                ->selectRaw('DATE(created_at) as date, COUNT(*) as count, SUM(price) as total')
                 ->groupBy('date')
                 ->orderBy('date')
                 ->get();
@@ -67,7 +65,7 @@ class RetailerOrderService
     public function getOrderStatusDistribution(User $retailer): array
     {
         return Cache::remember("retailer_{$retailer->id}_order_status_dist", 300, function () use ($retailer) {
-            return Order::where('user_id', $retailer->id)
+            return Order::where('buyer_id', $retailer->id)
                 ->selectRaw('status, COUNT(*) as count')
                 ->groupBy('status')
                 ->pluck('count', 'status')
@@ -81,7 +79,7 @@ class RetailerOrderService
             return DB::table('order_items')
                 ->join('orders', 'order_items.order_id', '=', 'orders.id')
                 ->join('products', 'order_items.product_id', '=', 'products.id')
-                ->where('orders.user_id', $retailer->id)
+                ->where('orders.buyer_id', $retailer->id)
                 ->selectRaw('products.name, SUM(order_items.quantity) as total_quantity, SUM(order_items.price * order_items.quantity) as total_value')
                 ->groupBy('products.id', 'products.name')
                 ->orderBy('total_quantity', 'desc')
@@ -93,18 +91,18 @@ class RetailerOrderService
     public function getOrderPerformanceMetrics(User $retailer): array
     {
         return Cache::remember("retailer_{$retailer->id}_performance_metrics", 300, function () use ($retailer) {
-            $thisMonth = Order::where('user_id', $retailer->id)
+            $thisMonth = Order::where('buyer_id', $retailer->id)
                 ->whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year);
 
-            $lastMonth = Order::where('user_id', $retailer->id)
+            $lastMonth = Order::where('buyer_id', $retailer->id)
                 ->whereMonth('created_at', now()->subMonth()->month)
                 ->whereYear('created_at', now()->subMonth()->year);
 
             $thisMonthOrders = $thisMonth->count();
             $lastMonthOrders = $lastMonth->count();
-            $thisMonthRevenue = $thisMonth->sum('total_amount');
-            $lastMonthRevenue = $lastMonth->sum('total_amount');
+            $thisMonthRevenue = $thisMonth->sum('price');
+            $lastMonthRevenue = $lastMonth->sum('price');
 
             return [
                 'orders_growth' => $lastMonthOrders > 0 
@@ -121,7 +119,7 @@ class RetailerOrderService
 
     private function getAverageDeliveryTime(User $retailer): float
     {
-        $deliveredOrders = Order::where('user_id', $retailer->id)
+        $deliveredOrders = Order::where('buyer_id', $retailer->id)
             ->where('status', 'delivered')
             ->whereNotNull('delivered_at')
             ->get();
@@ -139,10 +137,10 @@ class RetailerOrderService
 
     private function getOrderFulfillmentRate(User $retailer): float
     {
-        $totalOrders = Order::where('user_id', $retailer->id)->count();
+        $totalOrders = Order::where('buyer_id', $retailer->id)->count();
         if ($totalOrders === 0) return 0;
 
-        $fulfilledOrders = Order::where('user_id', $retailer->id)
+        $fulfilledOrders = Order::where('buyer_id', $retailer->id)
             ->whereIn('status', ['completed', 'delivered'])
             ->count();
 

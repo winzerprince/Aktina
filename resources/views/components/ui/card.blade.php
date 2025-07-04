@@ -1,33 +1,45 @@
 @props([
     'title' => null,
     'subtitle' => null,
-    'padding' => 'normal', // none, sm, normal, lg
+    'padding' => 'normal',
     'shadow' => true,
     'border' => false,
     'header' => false,
     'footer' => false,
-    'variant' => 'default', // default, gradient, image
+    'variant' => 'default',
     'backgroundImage' => null,
     'gradientFrom' => null,
     'gradientTo' => null,
+    'hover' => false,
 ])
 
 @php
-    $paddingClasses = [
+    $paddingClasses = match ($padding) {
         'none' => '',
+        'xs' => 'p-3',
         'sm' => 'p-4',
         'normal' => 'p-6',
         'lg' => 'p-8',
-    ];
+        default => 'p-6',
+    };
 
-    $baseClasses = 'relative flex flex-col min-w-0 break-words bg-white dark:bg-zinc-800 bg-clip-border rounded-2xl';
+    $baseClasses = 'relative flex flex-col min-w-0 break-words bg-white dark:bg-neutral-800 bg-clip-border rounded-lg';
 
-    if ($shadow) {
-        $baseClasses .= ' shadow-soft-xl';
-    }
+    // Shadow variations
+    $shadowClasses = match ($shadow) {
+        true => ' shadow-card',
+        'sm' => ' shadow-sm',
+        'md' => ' shadow-md',
+        'lg' => ' shadow-lg',
+        'xl' => ' shadow-xl',
+        false => '',
+        default => ' shadow-card',
+    };
+    $baseClasses .= $shadowClasses;
 
+    // Border
     if ($border) {
-        $baseClasses .= ' border border-gray-200 dark:border-gray-700';
+        $baseClasses .= ' border border-neutral-200 dark:border-neutral-700';
     }
 
     $cardClasses = $baseClasses;

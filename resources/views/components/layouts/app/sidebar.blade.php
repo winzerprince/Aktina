@@ -93,6 +93,22 @@
                                 {{__('Customer Insights')}}
                             </flux:navlist.item>
                         </flux:navlist.group>
+                        
+                        <flux:navlist.group
+                            :heading="__('System')"
+                            class="grid"
+                            expandable
+                            :expanded="request()->routeIs('admin.monitoring', 'admin.system.performance', 'admin.alert-thresholds')">
+                            <flux:navlist.item icon="cpu-chip" :href="route('admin.monitoring')" :current="request()->routeIs('admin.monitoring')" wire:navigate>
+                                {{__('System Monitoring')}}
+                            </flux:navlist.item>
+                            <flux:navlist.item icon="chart-bar" :href="route('admin.system.performance')" :current="request()->routeIs('admin.system.performance')" wire:navigate>
+                                {{__('Performance Dashboard')}}
+                            </flux:navlist.item>
+                            <flux:navlist.item icon="bell-alert" :href="route('admin.alert-thresholds')" :current="request()->routeIs('admin.alert-thresholds')" wire:navigate>
+                                {{__('Alert Thresholds')}}
+                            </flux:navlist.item>
+                        </flux:navlist.group>
                     </flux:navlist.group>
                 </flux:navlist>
             @endif

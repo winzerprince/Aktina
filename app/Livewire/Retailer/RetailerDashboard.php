@@ -37,7 +37,36 @@ class RetailerDashboard extends Component
             $this->recentActivity = $salesService->getRecentOrderActivity(6);
             $this->inventoryRecommendations = $inventoryService->getInventoryRecommendations();
             $this->purchaseAnalytics = $inventoryService->getPurchaseAnalytics();
+            
+            // Ensure all required keys exist in salesMetrics with default values
+            $this->salesMetrics = array_merge([
+                'total_orders' => 0,
+                'total_revenue' => 0,
+                'average_order_value' => 0,
+                'orders_this_month' => 0,
+                'order_growth_percentage' => 0,
+                'pending_orders' => 0,
+                'completed_orders' => 0,
+            ], $this->salesMetrics);
+            
         } catch (\Exception $e) {
+            // Set default values if service fails
+            $this->salesMetrics = [
+                'total_orders' => 0,
+                'total_revenue' => 0,
+                'average_order_value' => 0,
+                'orders_this_month' => 0,
+                'order_growth_percentage' => 0,
+                'pending_orders' => 0,
+                'completed_orders' => 0,
+            ];
+            $this->salesTrends = [];
+            $this->topProducts = [];
+            $this->purchasePatterns = [];
+            $this->recentActivity = [];
+            $this->inventoryRecommendations = [];
+            $this->purchaseAnalytics = [];
+            
             session()->flash('error', 'Failed to load dashboard data: ' . $e->getMessage());
         }
     }

@@ -10,6 +10,28 @@ class SupplierSeeder extends Seeder
 {
     public function run(): void
     {
+        // Get users with supplier role
+        $supplierUsers = User::where('role', 'supplier')->get();
+
+        // Create suppliers linked to existing users, including the test supplier
+        foreach ($supplierUsers as $user) {
+            if ($user->email === 'supplier@gmail.com') {
+                // Special setup for test supplier user
+                Supplier::factory()->create([
+                    'user_id' => $user->id,
+                    'company_name' => 'Test Supplier Company',
+                    'region' => 'North America',
+                    'component_categories' => ['Test Components', 'Electronics'],
+                    'reliability_rating' => 4.9,
+                    'is_preferred' => true,
+                    'certifications' => 'ISO 9001, RoHS compliance',
+                ]);
+            } else {
+                // Create supplier for other users
+                Supplier::factory()->create(['user_id' => $user->id]);
+            }
+        }
+
         // The 6 specific suppliers for different components
         $suppliers = [
             [

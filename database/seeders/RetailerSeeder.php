@@ -14,16 +14,28 @@ class RetailerSeeder extends Seeder
         $retailerUsers = User::where('role', 'retailer')->get();
 
         // Create retailers linked to existing users with explicit demographic data
-        foreach ($retailerUsers->take(10) as $user) {
-            Retailer::factory()->forUser($user->id)->create([
-                // Each existing user gets specific demographic data
-                'city' => fake()->city(),
-                'urban_rural_classification' => fake()->randomElement(['urban', 'suburban', 'rural']),
-                'customer_age_class' => fake()->randomElement(['teenager', 'youth', 'adult']), // Main retail demographics
-                'customer_income_bracket' => fake()->randomElement(['medium', 'high']), // Tech retailers usually target medium to high income
-                'customer_education_level' => fake()->randomElement(['mid', 'high']), // Tech early adopters usually have higher education
-                'male_female_ratio' => fake()->randomFloat(2, 1.2, 2.2), // Tech industry often has more male customers
-            ]);
+        foreach ($retailerUsers as $user) {
+            // Special setup for test retailer user
+            if ($user->email === 'retailer@gmail.com') {
+                Retailer::factory()->forUser($user->id)->create([
+                    'city' => 'Test City',
+                    'urban_rural_classification' => 'urban',
+                    'customer_age_class' => 'adult',
+                    'customer_income_bracket' => 'high',
+                    'customer_education_level' => 'high',
+                    'male_female_ratio' => 1.5,
+                ]);
+            } else {
+                Retailer::factory()->forUser($user->id)->create([
+                    // Each existing user gets specific demographic data
+                    'city' => fake()->city(),
+                    'urban_rural_classification' => fake()->randomElement(['urban', 'suburban', 'rural']),
+                    'customer_age_class' => fake()->randomElement(['teenager', 'youth', 'adult']),
+                    'customer_income_bracket' => fake()->randomElement(['medium', 'high']),
+                    'customer_education_level' => fake()->randomElement(['mid', 'high']),
+                    'male_female_ratio' => fake()->randomFloat(2, 1.2, 2.2),
+                ]);
+            }
         }
 
         // Create retailers for different market segments
@@ -33,7 +45,7 @@ class RetailerSeeder extends Seeder
             'urban_rural_classification' => 'urban',
             'customer_age_class' => 'youth',
             'customer_income_bracket' => 'medium',
-            'male_female_ratio' => fake()->randomFloat(2, 1.0, 1.2), // More balanced ratio
+            'male_female_ratio' => fake()->randomFloat(2, 1.0, 1.2),
         ]);
 
         // Premium urban retailers (3)
@@ -49,7 +61,7 @@ class RetailerSeeder extends Seeder
             'urban_rural_classification' => 'suburban',
             'customer_age_class' => 'adult',
             'customer_income_bracket' => 'medium',
-            'male_female_ratio' => fake()->randomFloat(2, 0.8, 1.2), // Balanced ratio for family stores
+            'male_female_ratio' => fake()->randomFloat(2, 0.8, 1.2),
         ]);
 
         // Rural retailers (3)
@@ -64,7 +76,7 @@ class RetailerSeeder extends Seeder
         Retailer::factory(3)->create([
             'customer_age_class' => 'teenager',
             'customer_education_level' => 'high',
-            'male_female_ratio' => 1.0, // Equal ratio
+            'male_female_ratio' => 1.0,
         ]);
 
         // Senior-focused retailers (3)

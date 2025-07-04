@@ -10,48 +10,78 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create specific admin user
+        // Create specific test users with exact credentials as requested
+        
+        // 1. Admin user
         User::factory()->create([
-            'name' => 'Sarah Chen',
-            'email' => 'admin@aktina.com',
+            'name' => 'admin',
+            'email' => 'admin@gmail.com',
             'password' => Hash::make('password'),
             'role' => 'admin',
             'verified' => true,
+            'email_verified_at' => now(),
             'company_name' => 'Aktina Technologies',
-            'address' => json_encode(['street' => '1 Infinite Loop', 'city' => 'Cupertino', 'zip' => '95014']),
+            'address' => json_encode(['street' => '1 Admin Street', 'city' => 'Admin City', 'zip' => '00001']),
         ]);
 
-        // Create specific supplier user
+        // 2. Vendor user
         User::factory()->create([
-            'name' => 'Mike Rodriguez',
-            'email' => 'supplier@qualcomm.com',
-            'password' => Hash::make('password'),
-            'role' => 'supplier',
-            'verified' => true,
-            'company_name' => 'Qualcomm Inc.',
-            'address' => json_encode(['street' => '5775 Morehouse Dr', 'city' => 'San Diego', 'zip' => '92121']),
-        ]);
-
-        // Create specific vendor user
-        User::factory()->create([
-            'name' => 'Emily Watson',
-            'email' => 'vendor@technovation.com',
+            'name' => 'vendor',
+            'email' => 'vendor@gmail.com',
             'password' => Hash::make('password'),
             'role' => 'vendor',
             'verified' => true,
-            'company_name' => 'Technovation Ltd.',
-            'address' => json_encode(['street' => '456 Innovation Blvd', 'city' => 'Austin', 'zip' => '78701']),
+            'email_verified_at' => now(),
+            'company_name' => 'Vendor Company',
+            'address' => json_encode(['street' => '1 Vendor Street', 'city' => 'Vendor City', 'zip' => '00002']),
         ]);
 
-        // Create specific retailer user
+        // 3. Retailer user
         User::factory()->create([
-            'name' => 'David Kim',
-            'email' => 'retailer@mobilezone.com',
+            'name' => 'retailer',
+            'email' => 'retailer@gmail.com',
             'password' => Hash::make('password'),
             'role' => 'retailer',
             'verified' => true,
-            'company_name' => 'MobileZone Retail',
-            'address' => json_encode(['street' => '456 Commerce St', 'city' => 'New York', 'zip' => '10001']),
+            'email_verified_at' => now(),
+            'company_name' => 'Retailer Company',
+            'address' => json_encode(['street' => '1 Retailer Street', 'city' => 'Retailer City', 'zip' => '00003']),
+        ]);
+
+        // 4. Supplier user
+        User::factory()->create([
+            'name' => 'supplier',
+            'email' => 'supplier@gmail.com',
+            'password' => Hash::make('password'),
+            'role' => 'supplier',
+            'verified' => true,
+            'email_verified_at' => now(),
+            'company_name' => 'Supplier Company',
+            'address' => json_encode(['street' => '1 Supplier Street', 'city' => 'Supplier City', 'zip' => '00004']),
+        ]);
+
+        // 5. Production Manager user
+        User::factory()->create([
+            'name' => 'production_manager',
+            'email' => 'production_manager@gmail.com',
+            'password' => Hash::make('password'),
+            'role' => 'production_manager',
+            'verified' => true,
+            'email_verified_at' => now(),
+            'company_name' => 'Production Company',
+            'address' => json_encode(['street' => '1 Production Street', 'city' => 'Production City', 'zip' => '00005']),
+        ]);
+
+        // 6. HR Manager user
+        User::factory()->create([
+            'name' => 'hr_manager',
+            'email' => 'hr_manager@gmail.com',
+            'password' => Hash::make('password'),
+            'role' => 'hr_manager',
+            'verified' => true,
+            'email_verified_at' => now(),
+            'company_name' => 'HR Company',
+            'address' => json_encode(['street' => '1 HR Street', 'city' => 'HR City', 'zip' => '00006']),
         ]);
 
         // Create additional random users for different roles using snake_case

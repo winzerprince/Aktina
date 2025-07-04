@@ -8,25 +8,36 @@
     'readonly' => false,
     'value' => null,
     'icon' => null,
-    'iconPosition' => 'left', // left, right
+    'iconPosition' => 'left',
     'error' => null,
     'help' => null,
-    'size' => 'md', // sm, md, lg
+    'size' => 'md',
+    'rounded' => false,
 ])
 
 @php
-    $sizeClasses = [
+    // Base classes for the input field
+    $baseClasses = 'w-full border focus:outline-none focus:ring-2 transition-colors duration-200';
+    
+    // Size classes
+    $sizeClasses = match ($size) {
+        'xs' => 'px-2.5 py-1.5 text-xs',
         'sm' => 'px-3 py-2 text-sm',
-        'md' => 'px-4 py-3 text-base',
-        'lg' => 'px-5 py-4 text-lg',
-    ];
-
-    $baseClasses = 'w-full border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-[#008800] focus:border-[#008800] dark:bg-gray-700 dark:text-white transition-colors duration-200';
-
+        'md' => 'px-4 py-2.5 text-base',
+        'lg' => 'px-5 py-3 text-base',
+        'xl' => 'px-6 py-3.5 text-lg',
+        default => 'px-4 py-2.5 text-base',
+    };
+    
+    // State classes (error, disabled, etc.)
+    $stateClasses = '';
+    
     if ($error) {
-        $baseClasses .= ' border-red-500 focus:ring-red-500 focus:border-red-500';
+        $stateClasses .= ' border-danger-500 focus:border-danger-500 focus:ring-danger-500';
+    } else {
+        $stateClasses .= ' border-neutral-300 dark:border-neutral-600 focus:border-primary-500 focus:ring-primary-500';
     }
-
+    
     if ($disabled) {
         $baseClasses .= ' opacity-60 cursor-not-allowed';
     }

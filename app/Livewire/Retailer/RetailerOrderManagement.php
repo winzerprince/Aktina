@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Retailer;
 
+use App\Models\Order;
 use App\Services\RetailerOrderService;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -56,21 +57,25 @@ class RetailerOrderManagement extends Component
         $retailerOrderService = app(RetailerOrderService::class);
         $user = auth()->user();
 
-        // Get orders with pagination
-        $orders = $retailerOrderService->getOrdersByStatus($user, $this->statusFilter ?: null);
+        // Build the query instead of getting paginated results
+        $query = Order::where('buyer_id', $user->id);
+
+        // Apply status filter
+        if ($this->statusFilter) {
+            $query->where('status', $this->statusFilter);
+        }
 
         // Apply search if needed
         if ($this->searchTerm) {
-            $orders->where(function ($query) {
-                $query->where('id', 'like', '%' . $this->searchTerm . '%')
-                    ->orWhereHas('orderItems.product', function ($q) {
-                        $q->where('name', 'like', '%' . $this->searchTerm . '%');
-                    });
+            $query->where(function ($subQuery) {
+                $subQuery->where('id', 'like', '%' . $this->searchTerm . '%');
+                // Note: Product search removed as items are stored as JSON
             });
         }
 
-        // Apply sorting
-        $orders->orderBy($this->sortField, $this->sortDirection);
+        // Apply sorting and pagination
+        $orders = $query->orderBy($this->sortField, $this->sortDirection)
+            ->paginate(10);
 
         // Get order statistics
         $orderStats = $retailerOrderService->getOrderStats($user);

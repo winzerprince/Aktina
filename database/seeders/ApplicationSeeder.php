@@ -10,12 +10,31 @@ class ApplicationSeeder extends Seeder
 {
     public function run(): void
     {
+        // First, create approved application for the test vendor user
+        $testVendorUser = \App\Models\User::where('email', 'vendor@gmail.com')->first();
+        if ($testVendorUser) {
+            $testVendor = Vendor::where('user_id', $testVendorUser->id)->first();
+            if ($testVendor) {
+                Application::factory()->approved()->processed()->create([
+                    'vendor_id' => $testVendor->id,
+                    'application_reference' => 'APP-TEST-001',
+                    'pdf_path' => 'storage/applications/test_vendor_approved.pdf',
+                    'processing_notes' => 'Test vendor application - automatically approved',
+                ]);
+            }
+        }
+
         // Get existing vendors to assign applications to some of them
         $vendors = Vendor::all();
 
         if ($vendors->count() > 0) {
             // Create applications for some vendors (not all vendors need applications)
             foreach ($vendors->take(15) as $vendor) {
+                // Skip the test vendor as it already has an application
+                if ($vendor->user_id == $testVendorUser?->id) {
+                    continue;
+                }
+                
                 if (rand(1, 10) <= 7) { // 70% chance of having an application
                     // Create some applications with processed PDFs
                     if (rand(1, 10) <= 6) { // 60% chance of being processed

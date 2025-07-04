@@ -14,7 +14,7 @@ class VendorSeeder extends Seeder
         $vendorUsers = User::where('role', 'vendor')->get();
 
         // Create vendors linked to existing users
-        foreach ($vendorUsers->take(10) as $user) {
+        foreach ($vendorUsers as $user) {
             Vendor::factory()->create(['user_id' => $user->id]);
         }
 

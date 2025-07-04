@@ -1,33 +1,75 @@
 @props([
-    'type' => 'info', // success, warning, danger, info
+    'type' => 'info', 
     'title' => null,
     'dismissible' => false,
     'icon' => true,
-    'size' => 'md', // sm, md, lg
+    'size' => 'md',
+    'outlined' => false,
+    'rounded' => false,
 ])
 
 @php
-    $typeConfig = [
-        'success' => [
-            'bg' => 'bg-gradient-to-r from-[#008800] to-[#30cf36]',
-            'border' => 'border-[#008800]',
-            'text' => 'text-white',
-            'icon' => 'check-circle'
-        ],
-        'warning' => [
-            'bg' => 'bg-gradient-to-r from-orange-500 to-yellow-400',
-            'border' => 'border-orange-500',
-            'text' => 'text-white',
-            'icon' => 'exclamation-triangle'
-        ],
-        'danger' => [
-            'bg' => 'bg-gradient-to-r from-red-600 to-red-400',
-            'border' => 'border-red-500',
-            'text' => 'text-white',
-            'icon' => 'exclamation-circle'
-        ],
-        'info' => [
-            'bg' => 'bg-gradient-to-r from-blue-600 to-blue-400',
+    if ($outlined) {
+        $typeConfig = [
+            'success' => [
+                'bg' => 'bg-success-50',
+                'border' => 'border border-success-500',
+                'text' => 'text-success-700',
+                'icon' => 'check-circle',
+                'iconColor' => 'text-success-500',
+            ],
+            'warning' => [
+                'bg' => 'bg-warning-50',
+                'border' => 'border border-warning-500',
+                'text' => 'text-warning-700',
+                'icon' => 'exclamation-triangle',
+                'iconColor' => 'text-warning-500',
+            ],
+            'danger' => [
+                'bg' => 'bg-danger-50',
+                'border' => 'border border-danger-500',
+                'text' => 'text-danger-700',
+                'icon' => 'exclamation-circle',
+                'iconColor' => 'text-danger-500',
+            ],
+            'info' => [
+                'bg' => 'bg-primary-50',
+                'border' => 'border border-primary-500',
+                'text' => 'text-primary-700',
+                'icon' => 'information-circle',
+                'iconColor' => 'text-primary-500',
+            ],
+        ];
+    } else {
+        $typeConfig = [
+            'success' => [
+                'bg' => 'bg-success-500',
+                'border' => 'border-success-600',
+                'text' => 'text-white',
+                'icon' => 'check-circle',
+                'iconColor' => 'text-white',
+            ],
+            'warning' => [
+                'bg' => 'bg-warning-500',
+                'border' => 'border-warning-600',
+                'text' => 'text-white',
+                'icon' => 'exclamation-triangle',
+                'iconColor' => 'text-white',
+            ],
+            'danger' => [
+                'bg' => 'bg-danger-500',
+                'border' => 'border-danger-600',
+                'text' => 'text-white',
+                'icon' => 'exclamation-circle',
+                'iconColor' => 'text-white',
+            ],
+            'info' => [
+                'bg' => 'bg-primary-500',
+                'border' => 'border-primary-600',
+                'text' => 'text-white',
+                'icon' => 'information-circle',
+                'iconColor' => 'text-white',
+            ],
             'border' => 'border-blue-500',
             'text' => 'text-white',
             'icon' => 'information-circle'
