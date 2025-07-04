@@ -149,6 +149,19 @@ class User extends Authenticatable
         return $this->hasMany(Order::class, 'seller_id');
     }
 
+    // Combined order relationships for convenience
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'buyer_id')
+            ->union($this->hasMany(Order::class, 'seller_id'));
+    }
+
+    public function resourceOrders()
+    {
+        return $this->hasMany(ResourceOrder::class, 'buyer_id')
+            ->union($this->hasMany(ResourceOrder::class, 'seller_id'));
+    }
+
     // Role checking methods
     public function isAdmin()
     {

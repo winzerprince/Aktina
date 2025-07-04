@@ -257,10 +257,12 @@ class HRService
 
     private function getOrdersHandledByUser(User $user): int
     {
-        $regularOrders = Order::where('user_id', $user->id)->count();
-        $resourceOrders = ResourceOrder::where('user_id', $user->id)->count();
+        $buyerOrders = Order::where('buyer_id', $user->id)->count();
+        $sellerOrders = Order::where('seller_id', $user->id)->count();
+        $resourceBuyerOrders = ResourceOrder::where('buyer_id', $user->id)->count();
+        $resourceSellerOrders = ResourceOrder::where('seller_id', $user->id)->count();
         
-        return $regularOrders + $resourceOrders;
+        return $buyerOrders + $sellerOrders + $resourceBuyerOrders + $resourceSellerOrders;
     }
 
     private function getAverageResponseTime(User $user): float
@@ -274,10 +276,14 @@ class HRService
         $totalOrders = $this->getOrdersHandledByUser($user);
         if ($totalOrders === 0) return 100;
 
-        $completedOrders = Order::where('user_id', $user->id)
-            ->whereIn('status', ['completed', 'delivered'])
+        $completedBuyerOrders = Order::where('buyer_id', $user->id)
+            ->whereIn('status', ['completed', 'complete'])
+            ->count();
+        $completedSellerOrders = Order::where('seller_id', $user->id)
+            ->whereIn('status', ['completed', 'complete'])
             ->count();
 
+        $completedOrders = $completedBuyerOrders + $completedSellerOrders;
         return round(($completedOrders / $totalOrders) * 100, 2);
     }
 
@@ -335,8 +341,8 @@ class HRService
     private function getEmployeeUtilizationRate(): float
     {
         $activeUsers = User::where('email_verified_at', '!=', null)->count();
-        $usersWithOrders = User::whereHas('orders')
-            ->orWhereHas('resourceOrders')
+        $usersWithOrders = User::whereHas('buyerOrders')
+            ->orWhereHas('sellerOrders')
             ->count();
 
         return $activeUsers > 0 ? round(($usersWithOrders / $activeUsers) * 100, 2) : 0;
