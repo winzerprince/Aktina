@@ -1,0 +1,109 @@
+
+  GET|HEAD   / ........................................................................................................................................ home
+  GET|HEAD   access-denied ................................................................................................................... access.denied
+  GET|HEAD   admin/alert-thresholds ................................................ admin.alert-thresholds › Admin\AdminDashboardController@alertThresholds
+  GET|HEAD   admin/analytics .................................................................... admin.analytics › Admin\AdminDashboardController@analytics
+  GET|HEAD   admin/applications ............................................................... admin.applications.index › Admin\ApplicationController@index
+  GET|HEAD   admin/applications/{application} ................................................... admin.applications.show › Admin\ApplicationController@show
+  POST       admin/applications/{application}/approve ..................................... admin.applications.approve › Admin\ApplicationController@approve
+  POST       admin/applications/{application}/complete-meeting ........... admin.applications.complete-meeting › Admin\ApplicationController@completeMeeting
+  POST       admin/applications/{application}/reject ........................................ admin.applications.reject › Admin\ApplicationController@reject
+  POST       admin/applications/{application}/schedule .................................. admin.applications.schedule › Admin\ApplicationController@schedule
+  GET|HEAD   admin/customer-insights ............................................. admin.customer-insights › Admin\AdminDashboardController@customerInsights
+  GET|HEAD   admin/important-metrics ............................................. admin.important-metrics › Admin\AdminDashboardController@importantMetrics
+  GET|HEAD   admin/monitoring ................................................................. admin.monitoring › Admin\AdminDashboardController@monitoring
+  GET|HEAD   admin/orders ............................................................................. admin.orders › Admin\AdminDashboardController@orders
+  GET|HEAD   admin/overview ....................................................................... admin.overview › Admin\AdminDashboardController@overview
+  GET|HEAD   admin/pending-signups ................................................... admin.pending-signups › Admin\AdminDashboardController@pendingSignups
+  GET|HEAD   admin/sales ................................................................................ admin.sales › Admin\AdminDashboardController@sales
+  GET|HEAD   admin/system/performance .......................................... admin.system.performance › Admin\AdminDashboardController@systemPerformance
+  GET|HEAD   admin/trends-and-predictions ............................... admin.trends-and-predictions › Admin\AdminDashboardController@trendsAndPredictions
+  GET|HEAD   admin/users ................................................................................ admin.users › Admin\AdminDashboardController@users
+  GET|HEAD   admin/vendors .......................................................................... admin.vendors › Admin\AdminDashboardController@vendors
+  GET|HEAD   admin/verification ........................................................... admin.verification › Admin\AdminDashboardController@verification
+  POST       api/callbacks/pdf-processing/{applicationId} ...................................................................... generated::IaFwoEG6JwFSTTli
+  GET|HEAD   api/user .......................................................................................................... generated::bJE37GdhMCiqVyTL
+  GET|HEAD   communication ................................................................................................................... communication
+  GET|HEAD   components-demo ............................................................................................................... components.demo
+  GET|HEAD   confirm-password ............................................................................................................. password.confirm
+  GET|HEAD   counter .................................................................................... generated::wGAC7wvhF6ffwECG › App\Livewire\Counter
+  GET|HEAD   dashboard ........................................................................................................................... dashboard
+  GET|HEAD   flux/editor.css ............................................ generated::ccC4EPUOMXirB24s › Flux\AssetManager@editorCss › AssetManager@editorCss
+  GET|HEAD   flux/editor.js ............................................... generated::QsSE9fyDOGudveEL › Flux\AssetManager@editorJs › AssetManager@editorJs
+  GET|HEAD   flux/editor.min.js ..................................... generated::rBSS5Ht5WUakwZmG › Flux\AssetManager@editorMinJs › AssetManager@editorMinJs
+  GET|HEAD   flux/flux.js ..................................................... generated::Ciyutwx3bQQYLg8l › Flux\AssetManager@fluxJs › AssetManager@fluxJs
+  GET|HEAD   flux/flux.min.js ........................................... generated::o8rE2ZBUeibgJC0h › Flux\AssetManager@fluxMinJs › AssetManager@fluxMinJs
+  GET|HEAD   forgot-password .............................................................................................................. password.request
+  GET|HEAD   hr_manager/ai-assistant ............................................................................................... hr_manager.AI_assistant
+  GET|HEAD   hr_manager/employees ................................................. hr_manager.employees › hr_manager\HrManagerDashboardController@employees
+  GET|HEAD   hr_manager/overview .................................................... hr_manager.overview › hr_manager\HrManagerDashboardController@overview
+  GET|HEAD   hr_manager/staff-performance ..................................................................................... hr_manager.staff_performance
+  GET|HEAD   hr_manager/workforce-analytics ................................................................................. hr_manager.workforce_analytics
+  GET|HEAD   livewire/livewire.js ................................ generated::D6XzuE7oAWI9Cjue › Livewire\Mechanisms › FrontendAssets@returnJavaScriptAsFile
+  GET|HEAD   livewire/livewire.min.js.map .......................................... generated::vt56C6iv4vnVrKJq › Livewire\Mechanisms › FrontendAssets@maps
+  GET|HEAD   livewire/preview-file/{filename} ..................................... livewire.preview-file › Livewire\Features › FilePreviewController@handle
+  POST       livewire/update ........................................................... livewire.update › Livewire\Mechanisms › HandleRequests@handleUpdate
+  POST       livewire/upload-file ................................................... livewire.upload-file › Livewire\Features › FileUploadController@handle
+  GET|HEAD   login ................................................................................................................................... login
+  POST       logout ................................................................................................... logout › App\Livewire\Actions\Logout
+  GET|HEAD   mary/spotlight ................................................................................................................. mary.spotlight
+  GET|HEAD   mary/toogle-sidebar ....................................................................................................... mary.toogle-sidebar
+  POST       mary/upload ....................................................................................................................... mary.upload
+  GET|HEAD   order-create .................................................................................... order.create › App\Livewire\Sales\OrderCreate
+  GET|HEAD   order-detail/{order} ............................................................................ order.detail › App\Livewire\Sales\OrderDetail
+  GET|HEAD   order-list .......................................................................................... order.list › App\Livewire\Sales\OrderList
+  GET|HEAD   orders ............................................................................................ orders.index › App\Livewire\Sales\OrderList
+  GET|HEAD   orders/create .................................................................................. orders.create › App\Livewire\Sales\OrderCreate
+  GET|HEAD   orders/{id} ...................................................................................... orders.show › App\Livewire\Sales\OrderDetail
+  GET|HEAD   production_manager/inventory ................. production_manager.inventory › production_manager\ProductionManagerDashboardController@inventory
+  GET|HEAD   production_manager/inventory-alerts ....................................................................... production_manager.inventory_alerts
+  GET|HEAD   production_manager/order-management ....................................................................... production_manager.order_management
+  GET|HEAD   production_manager/orders .......................... production_manager.orders › production_manager\ProductionManagerDashboardController@orders
+  GET|HEAD   production_manager/overview .................... production_manager.overview › production_manager\ProductionManagerDashboardController@overview
+  GET|HEAD   production_manager/production .............. production_manager.production › production_manager\ProductionManagerDashboardController@production
+  GET|HEAD   production_manager/production-metrics ................................................................... production_manager.production_metrics
+  GET|HEAD   production_manager/sales_tracking ........................................................................... production_manager.sales_tracking
+  GET|HEAD   register ............................................................................................................................. register
+  GET|HEAD   reset-password/{token} ......................................................................................................... password.reset
+  GET|HEAD   resource-order-create .......................................................... resource.order.create › App\Livewire\Sales\ResourceOrderCreate
+  GET|HEAD   resource-order-detail/{order} .................................................. resource.order.detail › App\Livewire\Sales\ResourceOrderDetail
+  GET|HEAD   resource-order-list ................................................................ resource.order.list › App\Livewire\Sales\ResourceOrderList
+  GET|HEAD   resource-orders .................................................................. resource-orders.index › App\Livewire\Sales\ResourceOrderList
+  GET|HEAD   resource-orders/create ........................................................ resource-orders.create › App\Livewire\Sales\ResourceOrderCreate
+  GET|HEAD   resource-orders/{id} ............................................................ resource-orders.show › App\Livewire\Sales\ResourceOrderDetail
+  GET|HEAD   retailer/inventory ........................................................ retailer.inventory › Retailer\RetailerDashboardController@inventory
+  GET|HEAD   retailer/order_placement ............................................................................................. retailer.order_placement
+  GET|HEAD   retailer/orders ................................................................. retailer.orders › Retailer\RetailerDashboardController@orders
+  GET|HEAD   retailer/overview ........................................................... retailer.overview › Retailer\RetailerDashboardController@overview
+  GET|HEAD   retailer/ratings .............................................................. retailer.ratings › Retailer\RetailerDashboardController@ratings
+  GET|HEAD   retailer/sales .................................................................... retailer.sales › Retailer\RetailerDashboardController@sales
+  GET|HEAD   retailer/sales-insights ............................................................................................... retailer.sales_insights
+  ANY        settings ................................................................ generated::H8awtowlQLCPvobX › Illuminate\Routing › RedirectController
+  GET|HEAD   settings/appearance ....................................................................................................... settings.appearance
+  GET|HEAD   settings/password ........................................................................................................... settings.password
+  GET|HEAD   settings/profile ............................................................................................................. settings.profile
+  GET|HEAD   storage/{path} .................................................................................................................. storage.local
+  GET|HEAD   supplier/delivery-metrics ........................................................................................... supplier.delivery_metrics
+  GET|HEAD   supplier/order-statistics ........................................................................................... supplier.order_statistics
+  GET|HEAD   supplier/orders ................................................................. supplier.orders › Supplier\SupplierDashboardController@orders
+  GET|HEAD   supplier/overview ........................................................... supplier.overview › Supplier\SupplierDashboardController@overview
+  GET|HEAD   supplier/resources ........................................................ supplier.resources › Supplier\SupplierDashboardController@resources
+  GET|HEAD   up ................................................................................................................ generated::TBIgRgGEy2xYKPED
+  GET|HEAD   vendor/ai-assistant ....................................................................................................... vendor.AI_assistant
+  GET|HEAD   vendor/inventory ................................................................ vendor.inventory › Vendor\VendorDashboardController@inventory
+  GET|HEAD   vendor/order-management ............................................................................................... vendor.order_management
+  GET|HEAD   vendor/orders ......................................................................... vendor.orders › Vendor\VendorDashboardController@orders
+  GET|HEAD   vendor/overview ................................................................... vendor.overview › Vendor\VendorDashboardController@overview
+  GET|HEAD   vendor/retailers ................................................................ vendor.retailers › Vendor\VendorDashboardController@retailers
+  GET|HEAD   vendor/sales ............................................................................ vendor.sales › Vendor\VendorDashboardController@sales
+  GET|HEAD   verification/general ..................................................................................................... verification.general
+  GET|HEAD   verification/hr-manager ............................................................................................... verification.hr-manager
+  GET|HEAD   verification/production-manager ............................................................................... verification.production-manager
+  GET|HEAD   verification/retailer ................................................................................................... verification.retailer
+  GET|HEAD   verification/supplier ................................................................................................... verification.supplier
+  GET|HEAD   verification/vendor ....................................................................................................... verification.vendor
+  GET|HEAD   verify-email .............................................................................................................. verification.notice
+  GET|HEAD   verify-email/{id}/{hash} ..................................................................... verification.verify › Auth\VerifyEmailController
+
+                                                                                                                                        Showing [105] routes
+

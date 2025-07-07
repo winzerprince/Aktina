@@ -19,7 +19,7 @@ class AdminDashboardOverview extends Component
     public $timeRange = '30d';
     public $loading = false;
     public $refreshInterval = 15000; // 15 seconds for enhanced real-time updates
-    
+
     // Stats
     public $totalUsers = 0;
     public $totalOrders = 0;
@@ -81,7 +81,7 @@ class AdminDashboardOverview extends Component
     public function loadDashboardData()
     {
         $cacheKey = "admin_dashboard_overview_{$this->timeRange}";
-        
+
         $data = Cache::remember($cacheKey, 300, function () { // 5 minute cache
             return $this->generateDashboardData();
         });
@@ -123,7 +123,7 @@ class AdminDashboardOverview extends Component
     private function getOrderTrends($period): array
     {
         $startDate = now()->sub($period);
-        
+
         $orders = Order::select(
             DB::raw('DATE(created_at) as date'),
             DB::raw('COUNT(*) as count'),
@@ -144,7 +144,7 @@ class AdminDashboardOverview extends Component
     private function getUserGrowth($period): array
     {
         $startDate = now()->sub($period);
-        
+
         $users = User::select(
             DB::raw('DATE(created_at) as date'),
             DB::raw('COUNT(*) as count')
@@ -163,7 +163,7 @@ class AdminDashboardOverview extends Component
     private function getRevenueChart($period): array
     {
         $startDate = now()->sub($period);
-        
+
         $revenue = Order::select(
             DB::raw('DATE(created_at) as date'),
             DB::raw('SUM(CASE WHEN status = "completed" THEN price ELSE 0 END) as completed'),
@@ -213,7 +213,7 @@ class AdminDashboardOverview extends Component
             $start = microtime(true);
             DB::select('SELECT 1');
             $responseTime = round((microtime(true) - $start) * 1000, 2);
-            
+
             return [
                 'status' => 'healthy',
                 'response_time' => $responseTime,
@@ -235,7 +235,7 @@ class AdminDashboardOverview extends Component
             Cache::put($testKey, 'test', 10);
             $result = Cache::get($testKey);
             Cache::forget($testKey);
-            
+
             return [
                 'status' => $result === 'test' ? 'healthy' : 'warning',
                 'message' => $result === 'test' ? 'Cache is working normally' : 'Cache may have issues'
@@ -254,11 +254,11 @@ class AdminDashboardOverview extends Component
             $diskSpace = disk_free_space(storage_path());
             $totalSpace = disk_total_space(storage_path());
             $usagePercentage = round((($totalSpace - $diskSpace) / $totalSpace) * 100, 2);
-            
+
             $status = 'healthy';
             if ($usagePercentage > 90) $status = 'error';
             elseif ($usagePercentage > 80) $status = 'warning';
-            
+
             return [
                 'status' => $status,
                 'usage_percentage' => $usagePercentage,
@@ -354,12 +354,12 @@ class AdminDashboardOverview extends Component
         $inventoryData = $this->realtimeService->getRealtimeInventoryData();
         $this->lowStockAlerts = $inventoryData['alerts'] ?? [];
         $this->lastUpdated = now()->format('H:i:s');
-        
+
         // Update key metrics with real-time data
         $this->totalUsers = $this->realtimeMetrics['total_users'];
         $this->pendingOrders = $this->realtimeMetrics['active_orders'];
         $this->recentActivities = $this->realtimeMetrics['recent_activities'];
-        
+
         $this->dispatch('realtimeDataUpdated', $this->realtimeMetrics);
     }
 
