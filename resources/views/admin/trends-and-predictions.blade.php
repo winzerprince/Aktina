@@ -70,6 +70,12 @@
             <div id="forecasting-chart" class="h-80"></div>
         </div>
 
+        <!-- Customer Segmentation -->
+        <livewire:customer-segmentation />
+
+        <!-- Sales Prediction -->
+        <livewire:sales-prediction />
+
         <!-- Trend Analysis -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Market Trends -->

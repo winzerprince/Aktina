@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:80"
+    depends_on:
+      - ml-service
+    environment:
+      ML_MICROSERVICE_URL: http://ml-service:8000
+
+  ml-service:
+    build:
+      context: ./microservices/python-ml
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./microservices/python-ml/models:/app/models

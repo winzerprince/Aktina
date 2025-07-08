@@ -1,0 +1,6 @@
+id,male_female_ratio,city,urban_rural_classification,customer_age_class,customer_income_bracket,customer_education_level,business_type,annual_revenue,employee_count,years_in_business,total_sales
+1,0.8,New York,urban,adult,high,high,Electronics,500000,50,10,15000
+2,1.2,Chicago,suburban,youth,medium,mid,Clothing,200000,15,5,8000
+3,0.9,Rural Town,rural,adult,low,low,Grocery,50000,3,2,3000
+4,1.1,Los Angeles,urban,youth,high,high,Technology,750000,100,7,25000
+5,0.7,Boston,suburban,adult,medium,high,Health,350000,40,12,12000

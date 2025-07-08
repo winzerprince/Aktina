@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'ml_microservice' => [
+        'url' => env('ML_MICROSERVICE_URL', 'http://localhost:8000'),
+        'timeout' => env('ML_MICROSERVICE_TIMEOUT', 30),
+    ],
+
 ];
