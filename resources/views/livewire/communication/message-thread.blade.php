@@ -136,7 +136,8 @@
                                 placeholder="Type your message..."
                                 rows="2"
                                 class="block w-full border-gray-300 dark:border-gray-500 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white text-gray-900 dark:bg-gray-700 dark:text-gray-200 placeholder-gray-500 dark:placeholder-gray-400 resize-none @error('newMessage') border-red-300 dark:border-red-500 @enderror"
-                                @keydown.ctrl.enter="$wire.sendMessage()"></textarea>
+                                @keydown.enter.prevent="$event.shiftKey || $wire.sendMessage()"
+                                @keydown.shift.enter.window.prevent></textarea>
                         @error('newMessage')
                             <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
@@ -156,7 +157,7 @@
                 </div>
 
                 <p class="text-xs text-gray-500 dark:text-gray-400">
-                    Press Ctrl+Enter to send • Max file size: 10MB
+                    Press Enter to send • Use Shift+Enter for new line • Max file size: 10MB
                 </p>
             </form>
         </div>

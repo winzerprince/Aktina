@@ -218,21 +218,23 @@ class MessageThread extends Component
      */
     private function transformMessagesToArray($paginatedMessages)
     {
-        return $paginatedMessages->items() ? collect($paginatedMessages->items())->map(function ($message) {
-            return [
-                'id' => $message->id,
-                'content' => $message->content,
-                'sender_id' => $message->sender_id,
-                'created_at' => $message->created_at,
-                'files' => $message->files ? $message->files->map(function ($file) {
-                    return [
-                        'id' => $file->id,
-                        'original_name' => $file->original_name,
-                        'file_path' => $file->file_path,
-                    ];
-                })->toArray() : []
-            ];
-        })->toArray() : [];
+        return $paginatedMessages->items() ? collect($paginatedMessages->items())
+            ->sortBy('created_at') // Ensure messages are sorted by creation time (oldest first)
+            ->map(function ($message) {
+                return [
+                    'id' => $message->id,
+                    'content' => $message->content,
+                    'sender_id' => $message->sender_id,
+                    'created_at' => $message->created_at,
+                    'files' => $message->files ? $message->files->map(function ($file) {
+                        return [
+                            'id' => $file->id,
+                            'original_name' => $file->original_name,
+                            'file_path' => $file->file_path,
+                        ];
+                    })->toArray() : []
+                ];
+            })->values()->toArray() : [];
     }
 
     public function render()

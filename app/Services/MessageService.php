@@ -6,9 +6,11 @@ use App\Interfaces\Repositories\MessageRepositoryInterface;
 use App\Interfaces\Services\ConversationServiceInterface;
 use App\Interfaces\Services\MessageServiceInterface;
 use App\Models\User;
+use App\Models\MessageFile;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class MessageService implements MessageServiceInterface
 {
@@ -172,5 +174,26 @@ class MessageService implements MessageServiceInterface
     public function addMessageFile(int $messageId, UploadedFile $file)
     {
         return $this->uploadFile($file, $messageId);
+    }
+
+    /**
+     * Download a message file attachment
+     */
+    public function downloadMessageFile(int $fileId): ?StreamedResponse
+    {
+        $file = MessageFile::find($fileId);
+
+        if (!$file) {
+            return null;
+        }
+
+        if (!Storage::disk('public')->exists($file->file_path)) {
+            return null;
+        }
+
+        return Storage::disk('public')->download(
+            $file->file_path,
+            $file->original_name
+        );
     }
 }

@@ -18,7 +18,7 @@ class MessageRepository implements MessageRepositoryInterface
     {
         return Message::where('conversation_id', $conversationId)
             ->with(['sender', 'files'])
-            ->orderBy('created_at', 'desc')
+            ->orderBy('created_at', 'asc')  // Changed to ascending order to show oldest messages first
             ->paginate($perPage, ['*'], 'page', $page);
     }
 

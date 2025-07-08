@@ -28,4 +28,6 @@ interface MessageServiceInterface
     public function createMessage(array $data);
 
     public function addMessageFile(int $messageId, UploadedFile $file);
+
+    public function downloadMessageFile(int $fileId);
 }
