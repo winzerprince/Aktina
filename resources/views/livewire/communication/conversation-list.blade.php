@@ -1,8 +1,8 @@
 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
     <div class="flex items-center justify-between mb-6">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Conversations</h3>
-        <button wire:click="loadConversations" 
-                class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        <button wire:click="loadConversations"
+                class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-500 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
             </svg>
@@ -26,11 +26,11 @@
                 <div class="space-y-2">
                     @foreach($availableUsers as $user)
                     <button wire:click="startNewConversation({{ $user['id'] }})"
-                            class="w-full text-left p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            class="w-full text-left p-3 border border-gray-200 dark:border-gray-500 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
                                 <div class="w-8 h-8 bg-indigo-100 dark:bg-indigo-900 rounded-full flex items-center justify-center">
-                                    <span class="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                                    <span class="text-sm font-medium text-indigo-600 dark:text-indigo-300">
                                         {{ substr($user['name'], 0, 1) }}
                                     </span>
                                 </div>
@@ -48,20 +48,29 @@
     </div>
 
     <!-- Conversation List -->
-    <div class="space-y-2">
+    <div class="space-y-2" wire:loading.class="opacity-50" wire:target="loadConversations">
+        <!-- Loading indicator -->
+        <div wire:loading wire:target="loadConversations" class="flex justify-center py-4">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-500"></div>
+            <span class="ml-2 text-sm text-gray-500 dark:text-gray-300">Refreshing conversations...</span>
+        </div>
+
         @if(empty($conversations))
             <div class="text-center py-8">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                 </svg>
-                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">No conversations yet</p>
-                <p class="text-xs text-gray-400 dark:text-gray-500">Start a new conversation to begin messaging</p>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-300">No conversations yet</p>
+                <p class="text-xs text-gray-400 dark:text-gray-400">Start a new conversation to begin messaging</p>
             </div>
         @else
             @foreach($conversations as $conversation)
-            <div wire:click="selectConversation({{ $conversation['id'] }})"
-                 class="p-4 border border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 {{ $selectedConversationId == $conversation['id'] ? 'ring-2 ring-indigo-500 bg-indigo-50 dark:bg-indigo-900/20' : '' }}">
-                
+            <div x-data="{}"
+                 x-on:click.prevent="$wire.selectConversation({{ $conversation['id'] }})"
+                 class="p-4 border border-gray-200 dark:border-gray-500 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 {{ $selectedConversationId == $conversation['id'] ? 'ring-2 ring-indigo-500 bg-indigo-50 dark:bg-indigo-900/30' : '' }}"
+                 x-on:click="$event.preventDefault()"
+                 wire:key="conversation-{{ $conversation['id'] }}">
+
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
@@ -73,26 +82,26 @@
                         </div>
                         <div class="ml-3">
                             <p class="text-sm font-medium text-gray-900 dark:text-white">
-                                {{ $conversation['other_participant']['name'] ?? 'Unknown User' }}
+                                {{ $conversation['other_participant']['name'] ?? 'Chat' }}
                             </p>
                             <p class="text-xs text-gray-500 dark:text-gray-400">
                                 {{ ucfirst($conversation['other_participant']['role'] ?? '') }} - {{ $conversation['other_participant']['company_name'] ?? '' }}
                             </p>
                             @if(isset($conversation['last_message']))
-                            <p class="text-xs text-gray-600 dark:text-gray-400 mt-1 truncate">
+                            <p class="text-xs text-gray-600 dark:text-gray-300 mt-1 truncate">
                                 {{ Str::limit($conversation['last_message']['content'] ?? '', 50) }}
                             </p>
                             @endif
                         </div>
                     </div>
-                    
+
                     <div class="flex flex-col items-end space-y-1">
                         @if(isset($conversation['last_message']))
                         <span class="text-xs text-gray-500 dark:text-gray-400">
                             {{ \Carbon\Carbon::parse($conversation['last_message']['created_at'])->diffForHumans() }}
                         </span>
                         @endif
-                        
+
                         @if(isset($conversation['unread_count']) && $conversation['unread_count'] > 0)
                         <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-500 rounded-full">
                             {{ $conversation['unread_count'] }}

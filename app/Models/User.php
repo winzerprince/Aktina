@@ -72,12 +72,12 @@ class User extends Authenticatable
 
     public function conversationsAsUser1()
     {
-        return $this->hasMany(Conversation::class, 'user1_id');
+        return $this->hasMany(Conversation::class, 'user_one_id');
     }
 
     public function conversationsAsUser2()
     {
-        return $this->hasMany(Conversation::class, 'user2_id');
+        return $this->hasMany(Conversation::class, 'user_two_id');
     }
 
     // Inventory relationships

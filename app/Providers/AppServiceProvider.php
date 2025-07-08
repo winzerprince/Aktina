@@ -10,6 +10,16 @@ use App\Interfaces\Services\ResourceOrderServiceInterface;
 use App\Services\ResourceOrderService;
 use App\Interfaces\Repositories\ResourceOrderRepositoryInterface;
 use App\Repositories\ResourceOrderRepository;
+use App\Interfaces\Services\CommunicationPermissionServiceInterface;
+use App\Services\CommunicationPermissionService;
+use App\Interfaces\Services\ConversationServiceInterface;
+use App\Services\ConversationService;
+use App\Interfaces\Services\MessageServiceInterface;
+use App\Services\MessageService;
+use App\Interfaces\Repositories\ConversationRepositoryInterface;
+use App\Repositories\ConversationRepository;
+use App\Interfaces\Repositories\MessageRepositoryInterface;
+use App\Repositories\MessageRepository;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,10 +32,15 @@ class AppServiceProvider extends ServiceProvider
         // Bind Repository Interfaces
         $this->app->bind(OrderRepositoryInterface::class, OrderRepository::class);
         $this->app->bind(ResourceOrderRepositoryInterface::class, ResourceOrderRepository::class);
+        $this->app->bind(ConversationRepositoryInterface::class, ConversationRepository::class);
+        $this->app->bind(MessageRepositoryInterface::class, MessageRepository::class);
 
         // Bind Service Interfaces
         $this->app->bind(OrderServiceInterface::class, OrderService::class);
         $this->app->bind(ResourceOrderServiceInterface::class, ResourceOrderService::class);
+        $this->app->bind(CommunicationPermissionServiceInterface::class, CommunicationPermissionService::class);
+        $this->app->bind(ConversationServiceInterface::class, ConversationService::class);
+        $this->app->bind(MessageServiceInterface::class, MessageService::class);
 
         // Register additional services
         $this->app->singleton(\App\Services\RetailerOrderService::class);

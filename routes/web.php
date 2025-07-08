@@ -50,6 +50,11 @@ Route::middleware(['auth', 'verified', 'role.verified'])->group(function () {
     Route::get('/resource-orders', ResourceOrderList::class)->name('resource-orders.index');
     Route::get('/resource-orders/create', ResourceOrderCreate::class)->name('resource-orders.create');
     Route::get('/resource-orders/{id}', ResourceOrderDetail::class)->name('resource-orders.show');
+
+    // Communications
+    Route::get('/communications', function () {
+        return view('communication');
+    })->name('communications.index');
 });
 
 // Route::view('orders', 'dashboard')

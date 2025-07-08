@@ -12,36 +12,36 @@ class ConversationRepository implements ConversationRepositoryInterface
     {
         return Conversation::create($data);
     }
-    
+
     public function findByUsers(User $user1, User $user2): ?Conversation
     {
         return Conversation::where(function ($query) use ($user1, $user2) {
-            $query->where('user1_id', $user1->id)->where('user2_id', $user2->id);
+            $query->where('user_one_id', $user1->id)->where('user_two_id', $user2->id);
         })->orWhere(function ($query) use ($user1, $user2) {
-            $query->where('user1_id', $user2->id)->where('user2_id', $user1->id);
+            $query->where('user_one_id', $user2->id)->where('user_two_id', $user1->id);
         })->first();
     }
-    
+
     public function findById(int $conversationId): ?Conversation
     {
-        return Conversation::with(['user1', 'user2', 'messages'])->find($conversationId);
+        return Conversation::with(['userOne', 'userTwo', 'messages'])->find($conversationId);
     }
-    
+
     public function getUserConversations(User $user, int $page = 1, int $perPage = 20)
     {
-        return Conversation::where('user1_id', $user->id)
-            ->orWhere('user2_id', $user->id)
-            ->with(['user1', 'user2'])
+        return Conversation::where('user_one_id', $user->id)
+            ->orWhere('user_two_id', $user->id)
+            ->with(['userOne', 'userTwo'])
             ->withCount(['messages'])
             ->orderBy('last_message_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
     }
-    
+
     public function update(int $conversationId, array $data): bool
     {
         return Conversation::where('id', $conversationId)->update($data);
     }
-    
+
     public function delete(int $conversationId): bool
     {
         $conversation = Conversation::find($conversationId);
@@ -55,7 +55,7 @@ class ConversationRepository implements ConversationRepositoryInterface
         }
         return false;
     }
-    
+
     public function updateLastMessage(int $conversationId): void
     {
         $conversation = Conversation::find($conversationId);
