@@ -8,9 +8,34 @@ services:
     ports:
       - "8000:80"
     depends_on:
+      - mysql
       - ml-service
+      - java-service
     environment:
       ML_MICROSERVICE_URL: http://ml-service:8000
+      JAVA_MICROSERVICE_URL: http://java-service:8080
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: sakina
+      DB_USERNAME: laravel
+      DB_PASSWORD: laravel123
+
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: sakina
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: laravel123
+      MYSQL_ROOT_PASSWORD: root123
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   ml-service:
     build:
@@ -20,3 +45,15 @@ services:
       - "8001:8000"
     volumes:
       - ./microservices/python-ml/models:/app/models
+
+  java-service:
+    build:
+      context: ./microservices/java-server
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8080"
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:
