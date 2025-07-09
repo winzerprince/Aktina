@@ -1,4 +1,4 @@
-<x-layouts.app>
+<x-layouts.app :title="_('Production')">
     <div class="space-y-6">
         <!-- Page Header -->
         <div class="bg-white rounded-lg shadow p-6">

@@ -1,4 +1,4 @@
-<x-layouts.app>
+<x-layouts.app :title="_('Orders')">
     <div class="space-y-6">
         <div class="flex justify-between items-center">
             <h1 class="text-2xl font-bold">Order Management</h1>

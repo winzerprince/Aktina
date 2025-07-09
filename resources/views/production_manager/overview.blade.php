@@ -1,4 +1,4 @@
-<x-layouts.app>
+<x-layouts.app :title="_('Overview')">
     <div class="space-y-6">
         <!-- Production Dashboard Overview -->
         <livewire:production-manager.production-dashboard />
