@@ -9,7 +9,15 @@ use App\Interfaces\Services\OrderServiceInterface;
 use App\Interfaces\Repositories\OrderRepositoryInterface;
 use App\Notifications\OrderCreated;
 use App\Notifications\OrderAccepted;
+use App\Notifications\OrderRejected;
+use App\Notifications\OrderCancelled;
+use App\Notifications\OrderProcessing;
+use App\Notifications\OrderPartiallyFulfilled;
+use App\Notifications\OrderFulfilled;
+use App\Notifications\OrderShipped;
+use App\Notifications\OrderDelivered;
 use App\Notifications\OrderCompleted;
+use App\Notifications\OrderReturned;
 use App\Notifications\LowStockAlert;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
@@ -110,6 +118,81 @@ class OrderService implements OrderServiceInterface
     }
 
     /**
+     * Reject an order
+     */
+    public function rejectOrder(int $orderId, string $reason = null): bool
+    {
+        DB::beginTransaction();
+
+        try {
+            $order = $this->getOrderById($orderId);
+
+            if (!$order || !$order->canBeRejected()) {
+                throw new \Exception('Order cannot be rejected at this stage');
+            }
+
+            $additionalData = [];
+            if ($reason) {
+                $additionalData['rejection_reason'] = $reason;
+            }
+
+            // Update the order status
+            $success = $this->orderRepository->updateOrderStatus(
+                $orderId,
+                Order::STATUS_REJECTED,
+                $additionalData
+            );
+
+            if ($success) {
+                // Send notification
+                $this->sendOrderNotification($order, 'rejected');
+
+                DB::commit();
+                return true;
+            }
+
+            throw new \Exception('Failed to update order status');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to reject order: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Cancel an order
+     */
+    public function cancelOrder(int $orderId): bool
+    {
+        DB::beginTransaction();
+
+        try {
+            $order = $this->getOrderById($orderId);
+
+            if (!$order || !$order->canBeCancelled()) {
+                throw new \Exception('Order cannot be cancelled at this stage');
+            }
+
+            // Update the order status
+            $success = $this->orderRepository->updateOrderStatus($orderId, Order::STATUS_CANCELLED);
+
+            if ($success) {
+                // Send notification
+                $this->sendOrderNotification($order, 'cancelled');
+
+                DB::commit();
+                return true;
+            }
+
+            throw new \Exception('Failed to update order status');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to cancel order: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Complete an order
      */
     public function completeOrder(int $orderId): bool
@@ -117,6 +200,12 @@ class OrderService implements OrderServiceInterface
         DB::beginTransaction();
 
         try {
+            $order = $this->getOrderById($orderId);
+
+            if (!$order || !$order->canBeCompleted()) {
+                throw new \Exception('Order cannot be completed at this stage');
+            }
+
             // Update the order status
             $success = $this->orderRepository->updateOrderStatus($orderId, Order::STATUS_COMPLETE);
 
@@ -125,7 +214,6 @@ class OrderService implements OrderServiceInterface
                 $this->orderRepository->updateProductOwnership($orderId);
 
                 // Release employees assigned to this order
-                $order = $this->getOrderById($orderId);
                 if ($order) {
                     foreach ($order->employees as $employee) {
                         $employee->release();
@@ -245,9 +333,42 @@ class OrderService implements OrderServiceInterface
                     $order->buyer->notify(new OrderAccepted($order));
                     break;
 
+                case 'rejected':
+                    $order->buyer->notify(new OrderRejected($order));
+                    break;
+
+                case 'cancelled':
+                    $order->seller->notify(new OrderCancelled($order));
+                    break;
+
+                case 'processing':
+                    $order->buyer->notify(new OrderProcessing($order));
+                    break;
+
+                case 'partially_fulfilled':
+                    $order->buyer->notify(new OrderPartiallyFulfilled($order));
+                    break;
+
+                case 'fulfilled':
+                    $order->buyer->notify(new OrderFulfilled($order));
+                    break;
+
+                case 'shipped':
+                    $order->buyer->notify(new OrderShipped($order));
+                    break;
+
+                case 'delivered':
+                    $order->seller->notify(new OrderDelivered($order));
+                    $order->buyer->notify(new OrderDelivered($order));
+                    break;
+
                 case 'completed':
                     $order->seller->notify(new OrderCompleted($order));
                     $order->buyer->notify(new OrderCompleted($order));
+                    break;
+
+                case 'returned':
+                    $order->seller->notify(new OrderReturned($order));
                     break;
 
                 case 'low_stock':
@@ -272,64 +393,64 @@ class OrderService implements OrderServiceInterface
             ->limit($limit)
             ->get();
     }
-    
+
     // Production Manager specific methods
     public function getFulfillmentRate($timeframe)
     {
         $totalOrders = Order::where('created_at', '>=', $timeframe)->count();
         $fulfilledOrders = Order::where('created_at', '>=', $timeframe)
             ->whereIn('status', ['complete', 'completed'])->count();
-        
+
         return $totalOrders > 0 ? ($fulfilledOrders / $totalOrders) * 100 : 0;
     }
-    
+
     public function getAverageFulfillmentTime($timeframe)
     {
         $orders = Order::where('created_at', '>=', $timeframe)
             ->whereNotNull('completed_at')
             ->select('created_at', 'completed_at')
             ->get();
-        
+
         if ($orders->isEmpty()) {
             return 0;
         }
-        
+
         $totalHours = $orders->sum(function($order) {
             return $order->created_at->diffInHours($order->completed_at);
         });
-        
+
         return round($totalHours / $orders->count(), 1);
     }
-    
+
     public function getOnTimeDeliveryRate($timeframe)
     {
         $totalDelivered = Order::where('created_at', '>=', $timeframe)
             ->whereNotNull('completed_at')->count();
-            
+
         $onTimeDelivered = Order::where('created_at', '>=', $timeframe)
             ->whereNotNull('completed_at')
             ->whereNotNull('expected_delivery_date')
             ->whereRaw('completed_at <= expected_delivery_date')
             ->count();
-        
+
         return $totalDelivered > 0 ? ($onTimeDelivered / $totalDelivered) * 100 : 0;
     }
-    
+
     public function getPendingOrdersCount()
     {
         return Order::where('status', 'pending')->count();
     }
-    
+
     public function getCompletedTodayCount()
     {
         return Order::whereDate('completed_at', today())->count();
     }
-    
+
     public function getFulfillmentTrend($timeframe)
     {
         $days = abs(intval(now()->diffInDays($timeframe)));
         $groupBy = $days <= 7 ? '%Y-%m-%d' : '%Y-%m';
-        
+
         return Order::where('created_at', '>=', $timeframe)
             ->selectRaw("DATE_FORMAT(created_at, '{$groupBy}') as period")
             ->selectRaw('COUNT(*) as total_orders')
@@ -342,7 +463,7 @@ class OrderService implements OrderServiceInterface
                 return [$item->period => round($rate, 1)];
             });
     }
-    
+
     public function getRecentOrdersForProduction($limit = 20)
     {
         return Order::with(['buyer', 'seller'])
@@ -350,5 +471,297 @@ class OrderService implements OrderServiceInterface
             ->orderBy('created_at', 'desc')
             ->limit($limit)
             ->get();
+    }
+
+    /**
+     * Process an order (move to processing state)
+     */
+    public function processOrder(int $orderId): bool
+    {
+        DB::beginTransaction();
+
+        try {
+            $order = $this->getOrderById($orderId);
+
+            if (!$order || !$order->canBeProcessed()) {
+                throw new \Exception('Order cannot be processed at this stage');
+            }
+
+            // Update the order status
+            $success = $this->orderRepository->updateOrderStatus($orderId, Order::STATUS_PROCESSING);
+
+            if ($success) {
+                // Send notification
+                $this->sendOrderNotification($order, 'processing');
+
+                DB::commit();
+                return true;
+            }
+
+            throw new \Exception('Failed to update order status');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to process order: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Fulfill an order (prepare for shipping)
+     */
+    public function fulfillOrder(int $orderId): bool
+    {
+        DB::beginTransaction();
+
+        try {
+            $order = $this->getOrderById($orderId);
+
+            if (!$order || !$order->canBeFulfilled()) {
+                throw new \Exception('Order cannot be fulfilled at this stage');
+            }
+
+            // Check stock availability
+            $items = $order->getItemsAsArray();
+            $stockCheck = $this->checkStockAvailability($items);
+
+            // Verify all items are available
+            $allAvailable = true;
+            foreach ($stockCheck as $item) {
+                if (!$item['in_stock'] || $item['available'] < $item['requested']) {
+                    $allAvailable = false;
+                    break;
+                }
+            }
+
+            if (!$allAvailable) {
+                throw new \Exception('Cannot fulfill order - some items are out of stock');
+            }
+
+            // Update the order status
+            $success = $this->orderRepository->updateOrderStatus($orderId, Order::STATUS_FULFILLED);
+
+            if ($success) {
+                // Update fulfillment data
+                $fulfillmentData = [
+                    'fulfillment_data' => [
+                        'fulfilled_at' => now()->toIso8601String(),
+                        'fulfilled_items' => $items,
+                    ]
+                ];
+
+                $this->orderRepository->updateOrderStatus($orderId, Order::STATUS_FULFILLED, $fulfillmentData);
+
+                // Send notification
+                $this->sendOrderNotification($order, 'fulfilled');
+
+                DB::commit();
+                return true;
+            }
+
+            throw new \Exception('Failed to update order status');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to fulfill order: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Partially fulfill an order
+     */
+    public function partiallyFulfillOrder(int $orderId, array $fulfilledItems): bool
+    {
+        DB::beginTransaction();
+
+        try {
+            $order = $this->getOrderById($orderId);
+
+            if (!$order || !$order->canBeFulfilled()) {
+                throw new \Exception('Order cannot be partially fulfilled at this stage');
+            }
+
+            // Validate fulfilled items against order items
+            $orderItems = $order->getItemsAsArray();
+            $validItems = true;
+
+            foreach ($fulfilledItems as $fulfilledItem) {
+                $found = false;
+                foreach ($orderItems as $orderItem) {
+                    if ($fulfilledItem['product_id'] == $orderItem['product_id']) {
+                        if ($fulfilledItem['quantity'] > $orderItem['quantity']) {
+                            $validItems = false;
+                        }
+                        $found = true;
+                        break;
+                    }
+                }
+
+                if (!$found) {
+                    $validItems = false;
+                    break;
+                }
+            }
+
+            if (!$validItems) {
+                throw new \Exception('Invalid fulfilled items - quantities do not match order');
+            }
+
+            // Update the order status
+            $success = $this->orderRepository->updateOrderStatus($orderId, Order::STATUS_PARTIALLY_FULFILLED);
+
+            if ($success) {
+                // Update fulfillment data
+                $fulfillmentData = [
+                    'fulfillment_data' => [
+                        'partially_fulfilled_at' => now()->toIso8601String(),
+                        'fulfilled_items' => $fulfilledItems,
+                    ]
+                ];
+
+                $this->orderRepository->updateOrderStatus($orderId, Order::STATUS_PARTIALLY_FULFILLED, $fulfillmentData);
+
+                // Send notification
+                $this->sendOrderNotification($order, 'partially_fulfilled');
+
+                DB::commit();
+                return true;
+            }
+
+            throw new \Exception('Failed to update order status');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to partially fulfill order: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Ship an order
+     */
+    public function shipOrder(int $orderId, array $shippingDetails = []): bool
+    {
+        DB::beginTransaction();
+
+        try {
+            $order = $this->getOrderById($orderId);
+
+            if (!$order || !$order->canBeShipped()) {
+                throw new \Exception('Order cannot be shipped at this stage');
+            }
+
+            // Validate shipping details
+            if (empty($shippingDetails['tracking_number'])) {
+                throw new \Exception('Tracking number is required for shipping');
+            }
+
+            // Prepare additional data
+            $additionalData = [
+                'tracking_number' => $shippingDetails['tracking_number'],
+                'shipping_carrier' => $shippingDetails['shipping_carrier'] ?? 'Default Carrier',
+            ];
+
+            // Add estimated delivery if provided
+            if (!empty($shippingDetails['estimated_delivery'])) {
+                $additionalData['estimated_delivery'] = $shippingDetails['estimated_delivery'];
+            }
+
+            // Update the order status
+            $success = $this->orderRepository->updateOrderStatus($orderId, Order::STATUS_SHIPPED, $additionalData);
+
+            if ($success) {
+                // Send notification
+                $this->sendOrderNotification($order, 'shipped');
+
+                DB::commit();
+                return true;
+            }
+
+            throw new \Exception('Failed to update order status');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to ship order: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Mark an order as delivered
+     */
+    public function deliverOrder(int $orderId): bool
+    {
+        DB::beginTransaction();
+
+        try {
+            $order = $this->getOrderById($orderId);
+
+            if (!$order || !$order->canBeDelivered()) {
+                throw new \Exception('Order cannot be marked as delivered at this stage');
+            }
+
+            // Update the order status
+            $success = $this->orderRepository->updateOrderStatus($orderId, Order::STATUS_DELIVERED);
+
+            if ($success) {
+                $additionalData = [
+                    'delivered_at' => now(),
+                ];
+
+                $this->orderRepository->updateOrderStatus($orderId, Order::STATUS_DELIVERED, $additionalData);
+
+                // Send notification
+                $this->sendOrderNotification($order, 'delivered');
+
+                DB::commit();
+                return true;
+            }
+
+            throw new \Exception('Failed to update order status');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to mark order as delivered: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Process a return for an order
+     */
+    public function returnOrder(int $orderId, string $reason = null): bool
+    {
+        DB::beginTransaction();
+
+        try {
+            $order = $this->getOrderById($orderId);
+
+            if (!$order || !$order->canBeReturned()) {
+                throw new \Exception('Order cannot be returned at this stage');
+            }
+
+            // Prepare additional data
+            $additionalData = [
+                'returned_at' => now(),
+            ];
+
+            if ($reason) {
+                $additionalData['return_reason'] = $reason;
+            }
+
+            // Update the order status
+            $success = $this->orderRepository->updateOrderStatus($orderId, Order::STATUS_RETURNED, $additionalData);
+
+            if ($success) {
+                // Send notification
+                $this->sendOrderNotification($order, 'returned');
+
+                DB::commit();
+                return true;
+            }
+
+            throw new \Exception('Failed to update order status');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to process order return: ' . $e->getMessage());
+            return false;
+        }
     }
 }

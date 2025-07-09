@@ -30,14 +30,20 @@ class Order extends Model
         'is_backorder' => 'boolean',
     ];
 
-    public const STATUS_PENDING = 'pending';
-    public const STATUS_ACCEPTED = 'accepted';
-    public const STATUS_COMPLETE = 'complete';
-    public const STATUS_REJECTED = 'rejected';
-    public const STATUS_IN_TRANSIT = 'in_transit';
-    public const STATUS_SHIPPED = 'shipped';
-    public const STATUS_PARTIALLY_FULFILLED = 'partially_fulfilled';
-    public const STATUS_FULFILLMENT_FAILED = 'fulfillment_failed';
+    // Order status constants
+    public const STATUS_PENDING = 'pending';             // Initial state when order is created
+    public const STATUS_ACCEPTED = 'accepted';           // Order accepted by seller
+    public const STATUS_REJECTED = 'rejected';           // Order rejected by seller
+    public const STATUS_PROCESSING = 'processing';       // Order is being processed/prepared
+    public const STATUS_PARTIALLY_FULFILLED = 'partially_fulfilled'; // Some items fulfilled
+    public const STATUS_FULFILLED = 'fulfilled';         // All items prepared for shipping
+    public const STATUS_SHIPPED = 'shipped';             // Order has been shipped
+    public const STATUS_IN_TRANSIT = 'in_transit';       // Order is on the way
+    public const STATUS_DELIVERED = 'delivered';         // Order has been delivered
+    public const STATUS_COMPLETE = 'complete';           // Order process is complete
+    public const STATUS_CANCELLED = 'cancelled';         // Order was cancelled
+    public const STATUS_RETURNED = 'returned';           // Order was returned
+    public const STATUS_FULFILLMENT_FAILED = 'fulfillment_failed'; // Fulfillment process failed
 
     public function buyer()
     {
@@ -148,10 +154,15 @@ class Order extends Model
         return match($this->status) {
             self::STATUS_PENDING => 'yellow',
             self::STATUS_ACCEPTED => 'blue',
-            self::STATUS_IN_TRANSIT, self::STATUS_SHIPPED => 'indigo',
+            self::STATUS_PROCESSING => 'sky',
+            self::STATUS_PARTIALLY_FULFILLED => 'orange',
+            self::STATUS_FULFILLED => 'cyan',
+            self::STATUS_SHIPPED, self::STATUS_IN_TRANSIT => 'indigo',
+            self::STATUS_DELIVERED => 'emerald',
             self::STATUS_COMPLETE => 'green',
             self::STATUS_REJECTED, self::STATUS_FULFILLMENT_FAILED => 'red',
-            self::STATUS_PARTIALLY_FULFILLED => 'orange',
+            self::STATUS_CANCELLED => 'rose',
+            self::STATUS_RETURNED => 'purple',
             default => 'gray'
         };
     }
@@ -176,14 +187,56 @@ class Order extends Model
         return $this->status === self::STATUS_PENDING;
     }
 
-    public function canBeFulfilled(): bool
+    public function canBeCancelled(): bool
+    {
+        return in_array($this->status, [
+            self::STATUS_PENDING,
+            self::STATUS_ACCEPTED,
+            self::STATUS_PROCESSING
+        ]);
+    }
+
+    public function canBeProcessed(): bool
     {
         return $this->status === self::STATUS_ACCEPTED;
     }
 
+    public function canBeFulfilled(): bool
+    {
+        return in_array($this->status, [
+            self::STATUS_ACCEPTED,
+            self::STATUS_PROCESSING,
+            self::STATUS_PARTIALLY_FULFILLED
+        ]);
+    }
+
     public function canBeShipped(): bool
     {
-        return in_array($this->status, [self::STATUS_ACCEPTED, self::STATUS_PARTIALLY_FULFILLED]);
+        return in_array($this->status, [
+            self::STATUS_FULFILLED,
+            self::STATUS_PARTIALLY_FULFILLED
+        ]);
+    }
+
+    public function canBeDelivered(): bool
+    {
+        return in_array($this->status, [
+            self::STATUS_SHIPPED,
+            self::STATUS_IN_TRANSIT
+        ]);
+    }
+
+    public function canBeCompleted(): bool
+    {
+        return $this->status === self::STATUS_DELIVERED;
+    }
+
+    public function canBeReturned(): bool
+    {
+        return in_array($this->status, [
+            self::STATUS_DELIVERED,
+            self::STATUS_COMPLETE
+        ]);
     }
 
     public function getTotalAmountAttribute(): float

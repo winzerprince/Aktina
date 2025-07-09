@@ -3,7 +3,7 @@
 namespace App\Livewire\Vendor;
 
 use App\Models\Order;
-use App\Services\VendorSalesService;
+use App\Interfaces\Services\VendorSalesServiceInterface;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\On;
@@ -19,6 +19,7 @@ class VendorOrderManagement extends Component
     public $sortDirection = 'desc';
     public $selectedOrders = [];
     public $showOrderDetails = false;
+    public $showOrderFulfillment = false;
     public $selectedOrder = null;
 
     protected $queryString = ['search', 'statusFilter', 'dateRange'];
@@ -70,15 +71,36 @@ class VendorOrderManagement extends Component
     public function closeOrderDetails()
     {
         $this->showOrderDetails = false;
+        $this->showOrderFulfillment = false;
         $this->selectedOrder = null;
+    }
+
+    public function openOrderFulfillment($orderId)
+    {
+        $this->showOrderDetails = false;
+        $this->showOrderFulfillment = true;
+        $this->selectedOrder = $orderId;
     }
 
     public function updateOrderStatus($orderId, $status)
     {
         try {
+            $vendorSalesService = app(VendorSalesServiceInterface::class);
             $order = Order::find($orderId);
-            if ($order) {
-                $order->update(['status' => $status]);
+
+            if (!$order || $order->seller_id != auth()->id()) {
+                session()->flash('error', 'Order not found or access denied');
+                return;
+            }
+
+            if (!$vendorSalesService->canUpdateOrderStatus($order, $status)) {
+                session()->flash('error', 'Invalid status transition. Please use the fulfillment wizard for proper status updates.');
+                return;
+            }
+
+            $success = $vendorSalesService->processOrderStatusUpdate($orderId, $status, auth()->id());
+
+            if ($success) {
                 $this->dispatch('order-updated');
                 session()->flash('success', 'Order status updated successfully');
             }
@@ -95,12 +117,36 @@ class VendorOrderManagement extends Component
                 return;
             }
 
-            Order::whereIn('id', $this->selectedOrders)
-                ->update(['status' => $status]);
+            $vendorSalesService = app(VendorSalesServiceInterface::class);
+            $vendorId = auth()->id();
+            $successCount = 0;
+
+            // Process each order individually to validate status transitions
+            foreach ($this->selectedOrders as $orderId) {
+                try {
+                    $order = Order::find($orderId);
+
+                    // Skip if order doesn't belong to this vendor or status transition is invalid
+                    if (!$order || $order->seller_id != $vendorId || !$vendorSalesService->canUpdateOrderStatus($order, $status)) {
+                        continue;
+                    }
+
+                    $success = $vendorSalesService->processOrderStatusUpdate($orderId, $status, $vendorId);
+                    if ($success) $successCount++;
+                } catch (\Exception $e) {
+                    // Log individual failures but continue processing other orders
+                    \Log::warning("Failed to update order #{$orderId}: " . $e->getMessage());
+                }
+            }
 
             $this->selectedOrders = [];
             $this->dispatch('order-updated');
-            session()->flash('success', 'Selected orders updated successfully');
+
+            if ($successCount > 0) {
+                session()->flash('success', "{$successCount} orders updated successfully");
+            } else {
+                session()->flash('error', 'No orders were updated. Please check status transition rules.');
+            }
         } catch (\Exception $e) {
             session()->flash('error', 'Failed to update orders: ' . $e->getMessage());
         }
@@ -110,15 +156,15 @@ class VendorOrderManagement extends Component
     {
         try {
             $orders = $this->getOrdersQuery()->get();
-            
+
             $filename = 'vendor_orders_' . now()->format('Y_m_d') . '.csv';
             $headers = ['order_id', 'customer', 'status', 'price', 'items_count', 'created_at'];
-            
+
             $csv = $orders->map(function ($order) {
                 // Count items from JSON
                 $items = is_string($order->items) ? json_decode($order->items, true) : $order->items;
                 $itemsCount = is_array($items) ? count($items) : 0;
-                
+
                 return [
                     $order->id,
                     $order->buyer->name,
@@ -178,7 +224,7 @@ class VendorOrderManagement extends Component
     {
         $vendorId = auth()->id();
         $baseQuery = Order::where('seller_id', $vendorId);
-        
+
         if ($this->dateRange !== 'all') {
             $days = (int) $this->dateRange;
             $baseQuery->where('created_at', '>=', now()->subDays($days));
@@ -197,8 +243,8 @@ class VendorOrderManagement extends Component
     public function getOrderMetrics()
     {
         $vendorId = auth()->id();
-        $vendorSalesService = new VendorSalesService();
-        
+        $vendorSalesService = app(VendorSalesServiceInterface::class);
+
         try {
             $startDate = now()->subDays(30);
             return [
@@ -222,7 +268,7 @@ class VendorOrderManagement extends Component
         $totalOrders = Order::where('seller_id', $vendorId)->count();
         $fulfilledOrders = Order::where('seller_id', $vendorId)
             ->whereIn('status', ['complete', 'delivered'])->count();
-        
+
         return $totalOrders > 0 ? ($fulfilledOrders / $totalOrders) * 100 : 0;
     }
 
@@ -232,10 +278,22 @@ class VendorOrderManagement extends Component
         $statusCounts = $this->getOrderStatusCounts();
         $metrics = $this->getOrderMetrics();
 
+        // Get valid next statuses for the first selected order (for bulk actions)
+        $validBulkStatuses = [];
+        if (!empty($this->selectedOrders) && count($this->selectedOrders) > 0) {
+            $firstOrderId = reset($this->selectedOrders);
+            $order = Order::find($firstOrderId);
+            if ($order) {
+                $vendorSalesService = app(VendorSalesServiceInterface::class);
+                $validBulkStatuses = $vendorSalesService->getValidNextStatuses($order);
+            }
+        }
+
         return view('livewire.vendor.vendor-order-management', [
             'orders' => $orders,
             'statusCounts' => $statusCounts,
             'metrics' => $metrics,
+            'validBulkStatuses' => $validBulkStatuses,
         ]);
     }
 }

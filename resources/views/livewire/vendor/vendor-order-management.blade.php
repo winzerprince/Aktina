@@ -89,28 +89,39 @@
         </div>
     </div>
 
-    <!-- Filters and Actions -->
+    <!-- Enhanced Filters and Actions -->
     <div class="bg-white rounded-lg shadow p-6">
         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0">
-            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
-                <div>
-                    <input type="text" 
-                           wire:model.live.debounce.300ms="search" 
-                           placeholder="Search orders..." 
-                           class="border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 flex-1">
+                <!-- Search Input -->
+                <div class="relative flex-1 min-w-0">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <input type="text"
+                           wire:model.live.debounce.300ms="search"
+                           placeholder="Search orders by ID, buyer, or product..."
+                           class="pl-10 pr-4 py-3 w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200">
                 </div>
-                <div>
-                    <select wire:model.live="statusFilter" class="border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
-                        <option value="all">All Status</option>
+
+                <!-- Status Filter -->
+                <div class="w-full sm:w-48">
+                    <select wire:model.live="statusFilter" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200">
+                        <option value="all">All Statuses</option>
                         <option value="pending">Pending</option>
+                        <option value="accepted">Accepted</option>
                         <option value="processing">Processing</option>
                         <option value="shipped">Shipped</option>
                         <option value="delivered">Delivered</option>
                         <option value="cancelled">Cancelled</option>
                     </select>
                 </div>
-                <div>
-                    <select wire:model.live="dateRange" class="border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+
+                <!-- Date Range Filter -->
+                <div class="w-full sm:w-48">
+                    <select wire:model.live="dateRange" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200">
                         <option value="7">Last 7 days</option>
                         <option value="30">Last 30 days</option>
                         <option value="90">Last 90 days</option>
@@ -118,21 +129,66 @@
                     </select>
                 </div>
             </div>
-            
-            <div class="flex space-x-2">
+
+            <!-- Action Buttons and Bulk Operations -->
+            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full lg:w-auto">
                 @if(!empty($selectedOrders))
+                    <!-- Bulk Actions -->
                     <div class="flex space-x-2">
-                        <button wire:click="bulkUpdateStatus('processing')" 
-                                class="bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 text-sm">
-                            Mark Processing
-                        </button>
-                        <button wire:click="bulkUpdateStatus('shipped')" 
-                                class="bg-indigo-600 text-white px-3 py-2 rounded-md hover:bg-indigo-700 text-sm">
-                            Mark Shipped
+                        <select id="bulkStatusAction"
+                                class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                            <option value="">Select Action</option>
+                            @foreach($validBulkStatuses as $status => $label)
+                                <option value="{{ $status }}">{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        <button onclick="updateBulkStatus()"
+                                class="flex items-center justify-center px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-sm font-medium transition-colors duration-200">
+                            Apply
                         </button>
                     </div>
                 @endif
-                <button wire:click="exportOrders" 
+
+                <!-- Regular Action Buttons -->
+                <button
+                    wire:click="clearFilters"
+                    class="flex items-center justify-center px-4 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                >
+                    <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    Reset
+                </button>
+
+                <button
+                    wire:click="exportOrders"
+                    class="flex items-center justify-center px-4 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
+                >
+                    <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
+                    </svg>
+                    Export
+                </button>
+
+                <!-- Bulk Action Script -->
+                <script>
+                    function updateBulkStatus() {
+                        const status = document.getElementById('bulkStatusAction').value;
+                        if (status && confirm('Are you sure you want to update the selected orders?')) {
+                            Livewire.dispatch('updateBulkStatus', { status: status });
+                        }
+                    }
+                    document.addEventListener('livewire:init', () => {
+                        Livewire.on('updateBulkStatus', (data) => {
+                            @this.bulkUpdateStatus(data.status);
+                        });
+                    });
+                </script>
+            </div>
+        </div>
+    </div>
+                @endif
+                <button wire:click="exportOrders"
                         class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
                     Export
                 </button>
@@ -147,11 +203,11 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-6 py-3 text-left">
-                            <input type="checkbox" 
-                                   wire:model.live="selectAll" 
+                            <input type="checkbox"
+                                   wire:model.live="selectAll"
                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" 
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                             wire:click="sortBy('id')">
                             Order ID
                             @if($sortBy === 'id')
@@ -160,7 +216,7 @@
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" 
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                             wire:click="sortBy('total_amount')">
                             Total
                             @if($sortBy === 'total_amount')
@@ -168,7 +224,7 @@
                             @endif
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" 
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                             wire:click="sortBy('created_at')">
                             Date
                             @if($sortBy === 'created_at')
@@ -182,9 +238,9 @@
                     @forelse($orders as $order)
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <input type="checkbox" 
-                                       wire:model.live="selectedOrders" 
-                                       value="{{ $order->id }}" 
+                                <input type="checkbox"
+                                       wire:model.live="selectedOrders"
+                                       value="{{ $order->id }}"
                                        class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -218,22 +274,24 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $order->created_at->format('M j, Y') }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                <button wire:click="viewOrderDetails({{ $order->id }})" 
-                                        class="text-blue-600 hover:text-blue-900">
-                                    View
-                                </button>
-                                @if($order->status === 'pending')
-                                    <button wire:click="updateOrderStatus({{ $order->id }}, 'processing')" 
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex space-x-2">
+                                    <button wire:click="viewOrderDetails({{ $order->id }})"
+                                            class="text-blue-600 hover:text-blue-900">
+                                        View
+                                    </button>
+                                    <button wire:click="openOrderFulfillment({{ $order->id }})"
                                             class="text-green-600 hover:text-green-900">
-                                        Process
+                                        Fulfill
                                     </button>
-                                @elseif($order->status === 'processing')
-                                    <button wire:click="updateOrderStatus({{ $order->id }}, 'shipped')" 
-                                            class="text-indigo-600 hover:text-indigo-900">
-                                        Ship
-                                    </button>
-                                @endif
+                                    @if($order->status === 'pending')
+                                        <button wire:click="updateOrderStatus({{ $order->id }}, 'cancelled')"
+                                                class="text-red-600 hover:text-red-900"
+                                                onclick="confirm('Are you sure you want to cancel this order?') || event.stopImmediatePropagation()">
+                                            Cancel
+                                        </button>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @empty
@@ -244,7 +302,7 @@
                 </tbody>
             </table>
         </div>
-        
+
         <div class="bg-white px-4 py-3 border-t border-gray-200">
             {{ $orders->links() }}
         </div>
@@ -262,7 +320,7 @@
                         </svg>
                     </button>
                 </div>
-                
+
                 <div class="space-y-4">
                     <!-- Customer Information -->
                     <div class="bg-gray-50 p-4 rounded-lg">
@@ -304,6 +362,26 @@
                             </table>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Order Fulfillment Wizard Modal -->
+    @if($showOrderFulfillment && $selectedOrder)
+        <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-2/3 shadow-lg rounded-md bg-white">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">Order Fulfillment</h3>
+                    <button wire:click="closeOrderDetails" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div>
+                    @livewire('vendor.vendor-order-fulfillment', ['orderId' => $selectedOrder], key('fulfill-' . $selectedOrder))
                 </div>
             </div>
         </div>

@@ -27,7 +27,7 @@ interface OrderRepositoryInterface
     /**
      * Update order status
      */
-    public function updateOrderStatus(int $orderId, string $status): bool;
+    public function updateOrderStatus(int $orderId, string $status, array $additionalData = []): bool;
 
     /**
      * Get orders by buyer
@@ -68,4 +68,29 @@ interface OrderRepositoryInterface
      * Get production managers user IDs for caching
      */
     public function getProductionManagerUserIds(): array;
+
+    /**
+     * Get orders with a specific status created after a certain date
+     */
+    public function getRecentOrdersByStatus(string $status, Carbon $afterDate): Collection;
+
+    /**
+     * Get orders that can be fulfilled (based on available inventory)
+     */
+    public function getFulfillableOrders(): Collection;
+
+    /**
+     * Get orders that need attention (late, at risk, etc.)
+     */
+    public function getOrdersNeedingAttention(): Collection;
+
+    /**
+     * Get order status timeline (all status changes with timestamps)
+     */
+    public function getOrderStatusTimeline(int $orderId): array;
+
+    /**
+     * Search orders with various filters
+     */
+    public function searchOrders(array $filters = []): Collection;
 }

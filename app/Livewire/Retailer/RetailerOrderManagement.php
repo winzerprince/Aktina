@@ -15,6 +15,7 @@ class RetailerOrderManagement extends Component
     public $searchTerm = '';
     public $sortField = 'created_at';
     public $sortDirection = 'desc';
+    public $showOrderCreation = false;
 
     protected $queryString = [
         'statusFilter' => ['except' => ''],
@@ -22,6 +23,8 @@ class RetailerOrderManagement extends Component
         'sortField' => ['except' => 'created_at'],
         'sortDirection' => ['except' => 'desc'],
     ];
+
+    protected $listeners = ['orderCreated' => 'handleOrderCreated'];
 
     public function mount()
     {
@@ -50,6 +53,20 @@ class RetailerOrderManagement extends Component
         $this->statusFilter = '';
         $this->searchTerm = '';
         $this->resetPage();
+    }
+
+    // Handle new order creation
+    public function toggleOrderCreation()
+    {
+        $this->showOrderCreation = !$this->showOrderCreation;
+    }
+
+    public function handleOrderCreated($orderId)
+    {
+        $this->showOrderCreation = false;
+        $this->statusFilter = 'pending';
+        $this->resetPage();
+        session()->flash('message', "Order #{$orderId} created successfully!");
     }
 
     public function render()

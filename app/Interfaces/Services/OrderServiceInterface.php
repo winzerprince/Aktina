@@ -30,9 +30,49 @@ interface OrderServiceInterface
     public function acceptOrder(int $orderId): bool;
 
     /**
+     * Reject an order
+     */
+    public function rejectOrder(int $orderId, string $reason = null): bool;
+
+    /**
+     * Cancel an order
+     */
+    public function cancelOrder(int $orderId): bool;
+
+    /**
+     * Process an order (move to processing state)
+     */
+    public function processOrder(int $orderId): bool;
+
+    /**
+     * Fulfill an order (prepare for shipping)
+     */
+    public function fulfillOrder(int $orderId): bool;
+
+    /**
+     * Partially fulfill an order
+     */
+    public function partiallyFulfillOrder(int $orderId, array $fulfilledItems): bool;
+
+    /**
+     * Ship an order
+     */
+    public function shipOrder(int $orderId, array $shippingDetails = []): bool;
+
+    /**
+     * Mark an order as delivered
+     */
+    public function deliverOrder(int $orderId): bool;
+
+    /**
      * Complete an order
      */
     public function completeOrder(int $orderId): bool;
+
+    /**
+     * Process a return for an order
+     */
+    public function returnOrder(int $orderId, string $reason = null): bool;
 
     /**
      * Check stock availability for order
