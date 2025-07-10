@@ -187,14 +187,6 @@
             </div>
         </div>
     </div>
-                @endif
-                <button wire:click="exportOrders"
-                        class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
-                    Export
-                </button>
-            </div>
-        </div>
-    </div>
 
     <!-- Orders Table -->
     <div class="bg-white rounded-lg shadow overflow-hidden">

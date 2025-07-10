@@ -88,16 +88,16 @@ class OrderService implements OrderServiceInterface
             $success = $this->orderRepository->updateOrderStatus($orderId, Order::STATUS_ACCEPTED);
 
             if ($success) {
-                // Select employees for the order
+                // Try to select employees for the order, but don't fail if none available
                 $employees = $this->selectAvailableEmployees();
 
-                if (empty($employees)) {
-                    throw new \Exception('No employees available to fulfill the order');
+                if (!empty($employees)) {
+                    // Assign employees to the order if available
+                    $employeeIds = array_column($employees, 'id');
+                    $this->orderRepository->assignEmployeesToOrder($orderId, $employeeIds);
                 }
-
-                // Assign employees to the order
-                $employeeIds = array_column($employees, 'id');
-                $this->orderRepository->assignEmployeesToOrder($orderId, $employeeIds);
+                // Note: We can still accept the order even if no employees are immediately available
+                // Employees can be assigned later through the management interface
 
                 // Send notification
                 $order = $this->getOrderById($orderId);
@@ -256,6 +256,40 @@ class OrderService implements OrderServiceInterface
                                     ->toArray();
 
         return $availableEmployees;
+    }
+
+    /**
+     * Assign employees to an order
+     */
+    public function assignEmployeesToOrder(int $orderId, array $employeeIds): bool
+    {
+        DB::beginTransaction();
+
+        try {
+            $order = $this->getOrderById($orderId);
+
+            if (!$order) {
+                throw new \Exception('Order not found');
+            }
+
+            if ($order->status !== Order::STATUS_ACCEPTED && $order->status !== Order::STATUS_PENDING) {
+                throw new \Exception('Order cannot have employees assigned in its current status');
+            }
+
+            // Assign employees through repository
+            $success = $this->orderRepository->assignEmployeesToOrder($orderId, $employeeIds);
+
+            if ($success) {
+                DB::commit();
+                return true;
+            }
+
+            throw new \Exception('Failed to assign employees to order');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to assign employees to order: ' . $e->getMessage());
+            return false;
+        }
     }
 
     /**

@@ -233,7 +233,13 @@ class Order extends Model
 
     public function canBeCompleted(): bool
     {
-        return $this->status === self::STATUS_DELIVERED;
+        return in_array($this->status, [
+            self::STATUS_ACCEPTED,
+            self::STATUS_PROCESSING,
+            self::STATUS_FULFILLED,
+            self::STATUS_SHIPPED,
+            self::STATUS_DELIVERED
+        ]);
     }
 
     public function canBeReturned(): bool

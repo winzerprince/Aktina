@@ -20,6 +20,8 @@ use App\Interfaces\Repositories\ConversationRepositoryInterface;
 use App\Repositories\ConversationRepository;
 use App\Interfaces\Repositories\MessageRepositoryInterface;
 use App\Repositories\MessageRepository;
+use App\Interfaces\Services\VendorSalesServiceInterface;
+use App\Services\VendorSalesService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -41,6 +43,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(CommunicationPermissionServiceInterface::class, CommunicationPermissionService::class);
         $this->app->bind(ConversationServiceInterface::class, ConversationService::class);
         $this->app->bind(MessageServiceInterface::class, MessageService::class);
+        $this->app->bind(VendorSalesServiceInterface::class, VendorSalesService::class);
 
         // Register additional services
         $this->app->singleton(\App\Services\RetailerOrderService::class);

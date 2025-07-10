@@ -17,6 +17,7 @@ class Product extends Model
     protected $casts = [
         'msrp' => 'decimal:2',
         'specifications' => 'array',
+        'company_quantities' => 'array',
     ];
 
     public function inventoryItems()
@@ -25,13 +26,32 @@ class Product extends Model
         if (!$this->bom) {
             return collect();
         }
-        
+
         return $this->bom->resources;
     }
 
-    public function owner()
+    public function getTotalQuantityAttribute()
     {
-        return $this->belongsTo(User::class, 'owner_id');
+        if (!$this->company_quantities) {
+            return 0;
+        }
+
+        return collect($this->company_quantities)->sum('quantity');
+    }
+
+    public function getCompanyQuantity($companyName)
+    {
+        return $this->company_quantities[$companyName]['quantity'] ?? 0;
+    }
+
+    public function setCompanyQuantity($companyName, $quantity)
+    {
+        $quantities = $this->company_quantities ?? [];
+        $quantities[$companyName] = [
+            'quantity' => $quantity,
+            'updated_at' => now()->toISOString()
+        ];
+        $this->company_quantities = $quantities;
     }
 
     public function bom()

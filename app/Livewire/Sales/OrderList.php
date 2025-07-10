@@ -21,6 +21,16 @@ class OrderList extends Component
 
     protected $queryString = ['searchTerm', 'statusFilter', 'dateFilter'];
 
+    public function success($message)
+    {
+        session()->flash('success', $message);
+    }
+
+    public function error($message)
+    {
+        session()->flash('error', $message);
+    }
+
     public function mount()
     {
         $this->startDate = Carbon::now()->subMonth()->format('Y-m-d');

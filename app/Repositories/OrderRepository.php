@@ -53,7 +53,7 @@ class OrderRepository implements OrderRepositoryInterface
             $oldStatus = $order->status;
             $order->status = $status;
 
-            // Update status-specific timestamps
+            // Update status-specific timestamps (only for fields that exist)
             switch ($status) {
                 case Order::STATUS_ACCEPTED:
                     $order->approved_at = now();
@@ -67,18 +67,6 @@ class OrderRepository implements OrderRepositoryInterface
                 case Order::STATUS_PROCESSING:
                     $order->fulfillment_started_at = now();
                     break;
-                case Order::STATUS_PARTIALLY_FULFILLED:
-                    $order->partially_fulfilled_at = now();
-                    if (isset($additionalData['fulfillment_data'])) {
-                        $order->fulfillment_data = $additionalData['fulfillment_data'];
-                    }
-                    break;
-                case Order::STATUS_FULFILLED:
-                    $order->fulfilled_at = now();
-                    if (isset($additionalData['fulfillment_data'])) {
-                        $order->fulfillment_data = $additionalData['fulfillment_data'];
-                    }
-                    break;
                 case Order::STATUS_SHIPPED:
                     $order->shipped_at = now();
                     if (isset($additionalData['tracking_number'])) {
@@ -91,26 +79,8 @@ class OrderRepository implements OrderRepositoryInterface
                         $order->estimated_delivery = $additionalData['estimated_delivery'];
                     }
                     break;
-                case Order::STATUS_IN_TRANSIT:
-                    $order->in_transit_at = now();
-                    break;
-                case Order::STATUS_DELIVERED:
-                    $order->delivered_at = now();
-                    break;
                 case Order::STATUS_COMPLETE:
                     $order->completed_at = now();
-                    break;
-                case Order::STATUS_CANCELLED:
-                    $order->cancelled_at = now();
-                    if (isset($additionalData['cancellation_reason'])) {
-                        $order->cancellation_reason = $additionalData['cancellation_reason'];
-                    }
-                    break;
-                case Order::STATUS_RETURNED:
-                    $order->returned_at = now();
-                    if (isset($additionalData['return_reason'])) {
-                        $order->return_reason = $additionalData['return_reason'];
-                    }
                     break;
                 case Order::STATUS_FULFILLMENT_FAILED:
                     $order->fulfillment_failed_at = now();
@@ -120,27 +90,15 @@ class OrderRepository implements OrderRepositoryInterface
                     break;
             }
 
-            // Update any additional fields
+            // Update any additional fields (only for fields that exist)
             foreach ($additionalData as $key => $value) {
-                if (in_array($key, ['notes', 'delivery_address', 'expected_delivery_date', 'fulfillment_data', 'tracking_info'])) {
+                if (in_array($key, ['notes', 'delivery_address', 'expected_delivery_date', 'fulfillment_data'])) {
                     $order->{$key} = $value;
                 }
             }
 
-            // Track status change in history if it's a different status
-            if ($oldStatus !== $status) {
-                $statusHistory = $order->status_history ?? [];
-                $statusHistory[] = [
-                    'from' => $oldStatus,
-                    'to' => $status,
-                    'timestamp' => now()->toIso8601String(),
-                    'user_id' => $additionalData['user_id'] ?? null
-                ];
-                $order->status_history = $statusHistory;
-
-                // Clear any cached data related to this order
-                $this->clearOrderCache($orderId);
-            }
+            // Clear any cached data related to this order
+            $this->clearOrderCache($orderId);
 
             return $order->save();
         } catch (\Exception $e) {

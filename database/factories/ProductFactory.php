@@ -155,7 +155,12 @@ class ProductFactory extends Factory
             'category' => $selectedProduct['category'],
             'specifications' => $selectedProduct['specifications'],
             'target_market' => $selectedProduct['target_market'],
-            'owner_id' => User::factory(),
+            'company_quantities' => [
+                'Aktina' => [
+                    'quantity' => $this->faker->numberBetween(50, 500),
+                    'updated_at' => now()->toISOString()
+                ]
+            ],
         ];
     }
 
@@ -182,13 +187,20 @@ class ProductFactory extends Factory
     }
 
     /**
-     * Set the product's owner.
+     * Set company quantities for the product.
      */
-    public function ownedBy($userId): static
+    public function withCompanyQuantities($quantities): static
     {
-        return $this->state(function (array $attributes) use ($userId) {
+        return $this->state(function (array $attributes) use ($quantities) {
+            $companyQuantities = [];
+            foreach ($quantities as $company => $quantity) {
+                $companyQuantities[$company] = [
+                    'quantity' => $quantity,
+                    'updated_at' => now()->toISOString()
+                ];
+            }
             return [
-                'owner_id' => $userId,
+                'company_quantities' => $companyQuantities,
             ];
         });
     }

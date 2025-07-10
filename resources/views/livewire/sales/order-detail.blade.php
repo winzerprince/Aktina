@@ -1,4 +1,35 @@
 <div class="p-6 bg-white rounded-lg shadow-md">
+    <!-- Flash Messages -->
+    @if(session()->has('success'))
+        <div class="mb-6 bg-green-50 border-l-4 border-green-400 p-4 rounded-md">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-green-700">{{ session('success') }}</p>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if(session()->has('error'))
+        <div class="mb-6 bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-red-700">{{ session('error') }}</p>
+                </div>
+            </div>
+        </div>
+    @endif
+
     @if ($order)
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold">Order #{{ $order->id }}</h2>
@@ -89,13 +120,15 @@
                             <tr class="hover:bg-gray-50">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     @php
-                                        $product = \App\Models\Product::find($item['product_id'] ?? 0);
+                                        $productId = intval($item['product_id'] ?? 0);
+                                        $product = \App\Models\Product::find($productId);
+                                        $price = $product ? $product->msrp : 0;
                                     @endphp
                                     {{ $product ? $product->name : 'Unknown Product' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $item['quantity'] }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${{ number_format($item['price'] ?? 0, 2) }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${{ number_format(($item['quantity'] * ($item['price'] ?? 0)), 2) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${{ number_format($price, 2) }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${{ number_format(($item['quantity'] * $price), 2) }}</td>
                             </tr>
                         @endforeach
 
@@ -147,7 +180,7 @@
         @endif
 
         <!-- Employee Assignment -->
-        @if ($order->status === 'pending')
+        @if ($order->status === 'pending' || $order->status === 'accepted')
             <div class="mb-6">
                 <h3 class="font-semibold text-lg mb-4">Assign Employees</h3>
 
@@ -172,6 +205,16 @@
                             </div>
                         @endforeach
                     </div>
+
+                    @if(count($selectedEmployees) > 0)
+                        <div class="flex justify-end">
+                            <button wire:click="assignEmployees" wire:loading.attr="disabled"
+                                    class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 transition-colors duration-200">
+                                <span wire:loading.remove>Assign Selected Employees</span>
+                                <span wire:loading>Assigning...</span>
+                            </button>
+                        </div>
+                    @endif
                 @else
                     <div class="border-l-4 border-yellow-400 bg-yellow-50 p-4 rounded-md">
                         <div class="flex">

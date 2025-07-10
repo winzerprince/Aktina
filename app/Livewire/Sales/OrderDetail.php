@@ -46,7 +46,7 @@ class OrderDetail extends Component
 
     public function loadAvailableEmployees()
     {
-        if ($this->order && $this->order->status === Order::STATUS_PENDING) {
+        if ($this->order && ($this->order->status === Order::STATUS_PENDING || $this->order->status === Order::STATUS_ACCEPTED)) {
             $this->availableEmployees = Employee::where('status', Employee::STATUS_AVAILABLE)
                                       ->where('current_activity', Employee::ACTIVITY_NONE)
                                       ->get()
@@ -63,11 +63,6 @@ class OrderDetail extends Component
 
     public function acceptOrder()
     {
-        if (empty($this->selectedEmployees)) {
-            $this->error('Please select at least one employee to manage this order');
-            return;
-        }
-
         try {
             $orderService = app(OrderServiceInterface::class);
             $result = $orderService->acceptOrder($this->orderId);
@@ -78,6 +73,30 @@ class OrderDetail extends Component
                 $this->loadAvailableEmployees();
             } else {
                 $this->error('Failed to accept order.');
+            }
+        } catch (\Exception $e) {
+            $this->error('Error: ' . $e->getMessage());
+        }
+    }
+
+    public function assignEmployees()
+    {
+        if (empty($this->selectedEmployees)) {
+            $this->error('Please select at least one employee to assign');
+            return;
+        }
+
+        try {
+            $orderService = app(OrderServiceInterface::class);
+            $result = $orderService->assignEmployeesToOrder($this->orderId, $this->selectedEmployees);
+
+            if ($result) {
+                $this->success('Employees assigned successfully!');
+                $this->selectedEmployees = []; // Clear selection
+                $this->loadOrder();
+                $this->loadAvailableEmployees();
+            } else {
+                $this->error('Failed to assign employees.');
             }
         } catch (\Exception $e) {
             $this->error('Error: ' . $e->getMessage());

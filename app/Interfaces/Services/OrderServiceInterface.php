@@ -85,6 +85,11 @@ interface OrderServiceInterface
     public function selectAvailableEmployees(int $count = 4): array;
 
     /**
+     * Assign employees to an order
+     */
+    public function assignEmployeesToOrder(int $orderId, array $employeeIds): bool;
+
+    /**
      * Get orders by user (buyer or seller)
      */
     public function getOrdersByUser(User $user): Collection;

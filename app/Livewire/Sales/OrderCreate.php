@@ -17,19 +17,38 @@ class OrderCreate extends Component
 
     public $selectedBuyer = null;
     public $selectedSeller = null;
-    public $selectedItems = [
-        ['product_id' => '', 'quantity' => 1, 'price' => 0]
-    ];
+    public $selectedItems = [];
 
     public $totalPrice = 0;
     public $stockLevels = [];
+    public $isVendor = false;
+    public $isFieldsLocked = false;
 
     public function mount()
     {
+        $currentUser = auth()->user();
+
+        // Check if current user is a vendor
+        $this->isVendor = $currentUser && $currentUser->role === 'vendor';
+
+        if ($this->isVendor) {
+            // For vendors: auto-fill buyer with vendor's company and lock fields
+            $this->selectedBuyer = $currentUser->id;
+            $this->isFieldsLocked = true;
+
+            // Auto-select Aktina seller (first Aktina user found)
+            $aktinaUser = User::whereIn('role', ['admin', 'production_manager'])
+                             ->where('company_name', 'Aktina')
+                             ->first();
+            if ($aktinaUser) {
+                $this->selectedSeller = $aktinaUser->id;
+            }
+        }
+
         // Get buyers (retailers and vendors)
         $this->buyers = User::whereIn('role', ['retailer', 'vendor'])->get();
 
-        // Get sellers (admin, production managers)
+        // Get sellers (admin, production managers from Aktina)
         $this->sellers = User::whereIn('role', ['admin', 'production_manager'])
                          ->where('company_name', 'Aktina')
                          ->get();
@@ -39,6 +58,13 @@ class OrderCreate extends Component
                                  ->distinct()
                                  ->orderBy('name')
                                  ->get();
+
+        // Initialize with one empty item
+        $this->selectedItems = [
+            ['product_id' => '', 'quantity' => 1, 'price' => 0]
+        ];
+
+        $this->calculateTotal();
     }
 
     public function addItem()
@@ -63,24 +89,43 @@ class OrderCreate extends Component
         $this->checkStockLevels();
     }
 
+    public function updatedSelectedBuyer()
+    {
+        // Prevent vendors from changing buyer field
+        if ($this->isVendor && $this->isFieldsLocked) {
+            $this->selectedBuyer = auth()->user()->id;
+        }
+    }
+
+    public function updatedSelectedSeller()
+    {
+        // Prevent vendors from changing seller field
+        if ($this->isVendor && $this->isFieldsLocked) {
+            $aktinaUser = User::whereIn('role', ['admin', 'production_manager'])
+                             ->where('company_name', 'Aktina')
+                             ->first();
+            if ($aktinaUser) {
+                $this->selectedSeller = $aktinaUser->id;
+            }
+        }
+    }
+
     public function calculateTotal()
     {
         $this->totalPrice = 0;
-        foreach ($this->selectedItems as $item) {
+        foreach ($this->selectedItems as &$item) {
             if (isset($item['product_id']) && !empty($item['product_id'])) {
                 $product = Product::find($item['product_id']);
                 if ($product) {
-                    // Use msrp instead of price
-                    $itemPrice = $product->msrp * $item['quantity'];
-                    $this->totalPrice += $itemPrice;
-
-                    // Update the price in the item for display
-                    foreach ($this->selectedItems as $key => $selectedItem) {
-                        if ($selectedItem['product_id'] == $item['product_id']) {
-                            $this->selectedItems[$key]['price'] = $product->msrp;
-                        }
-                    }
+                    // Set the unit price
+                    $item['price'] = $product->msrp;
+                    // Calculate line total
+                    $lineTotal = $product->msrp * ($item['quantity'] ?? 1);
+                    $this->totalPrice += $lineTotal;
                 }
+            } else {
+                // Reset price if no product selected
+                $item['price'] = 0;
             }
         }
     }
@@ -170,6 +215,8 @@ class OrderCreate extends Component
             'buyerOptions' => $this->buyers,
             'sellerOptions' => $this->sellers,
             'productOptions' => $this->products,
+            'isVendor' => $this->isVendor,
+            'isFieldsLocked' => $this->isFieldsLocked,
         ]);
     }
 }
