@@ -307,7 +307,7 @@
                             </td>
                             <td class="py-3 px-4 whitespace-nowrap text-sm">
                                 <div class="flex items-center space-x-2">
-                                    <button wire:click="viewOrderDetails({{ $order->id }})" class="text-indigo-600 hover:text-indigo-900" title="View Details">
+                                    <button wire:click="showOrderDetails({{ $order->id }})" class="text-indigo-600 hover:text-indigo-900" title="View Details">
                                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
@@ -357,67 +357,13 @@
         </div>
     </div>
 
-    <!-- Order Details Modal -->
-    @if ($showOrderDetails && $selectedOrder)
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 overflow-y-auto z-50 flex items-center justify-center">
-            <div class="bg-white rounded-lg shadow-xl max-w-6xl w-full mx-4 my-6">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-lg font-medium text-gray-900">Order #{{ $selectedOrder->id }} Details</h3>
-                        <button wire:click="closeOrderDetails" class="text-gray-400 hover:text-gray-500">
-                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="px-6 py-4 max-h-96 overflow-y-auto">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Order Info -->
-                        <div>
-                            <h4 class="text-md font-medium text-gray-900 mb-2">Order Information</h4>
-                            <dl class="grid grid-cols-1 gap-2">
-                                <div class="py-2 grid grid-cols-3 gap-4">
-                                    <dt class="text-sm font-medium text-gray-500">Order ID:</dt>
-                                    <dd class="text-sm text-gray-900 col-span-2">#{{ $selectedOrder->id }}</dd>
-                                </div>
-                                <div class="py-2 grid grid-cols-3 gap-4">
-                                    <dt class="text-sm font-medium text-gray-500">Created Date:</dt>
-                                    <dd class="text-sm text-gray-900 col-span-2">{{ $selectedOrder->created_at->format('M d, Y h:i A') }}</dd>
-                                </div>
-                                <div class="py-2 grid grid-cols-3 gap-4">
-                                    <dt class="text-sm font-medium text-gray-500">Status:</dt>
-                                    <dd class="text-sm col-span-2">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-{{ $selectedOrder->getStatusColor() }}-100 text-{{ $selectedOrder->getStatusColor() }}-800">
-                                            {{ ucfirst(str_replace('_', ' ', $selectedOrder->status)) }}
-                                        </span>
-                                    </dd>
-                                </div>
-                                <div class="py-2 grid grid-cols-3 gap-4">
-                                    <dt class="text-sm font-medium text-gray-500">Buyer:</dt>
-                                    <dd class="text-sm text-gray-900 col-span-2">{{ $selectedOrder->buyer->name }}</dd>
-                                </div>
-                                <div class="py-2 grid grid-cols-3 gap-4">
-                                    <dt class="text-sm font-medium text-gray-500">Total Items:</dt>
-                                    <dd class="text-sm text-gray-900 col-span-2">{{ $selectedOrder->orderItems->count() }}</dd>
-                                </div>
-                                @if (!empty($selectedOrder->metadata['production_schedule']))
-                                <div class="py-2 grid grid-cols-3 gap-4">
-                                    <dt class="text-sm font-medium text-gray-500">Production Date:</dt>
-                                    <dd class="text-sm text-gray-900 col-span-2">{{ $selectedOrder->metadata['production_schedule']['scheduled_date'] }}</dd>
-                                </div>
-                                <div class="py-2 grid grid-cols-3 gap-4">
-                                    <dt class="text-sm font-medium text-gray-500">Priority:</dt>
-                                    <dd class="text-sm text-gray-900 col-span-2">{{ ucfirst($selectedOrder->metadata['production_schedule']['priority']) }}</dd>
-                                </div>
-                                @endif
-                            </dl>
-                        </div>
-
-                        <!-- Items -->
-                        <div>
-                            <h4 class="text-md font-medium text-gray-900 mb-2">Order Items</h4>
+    <!-- Order Detail Modal Component -->
+    <x-shared.order-detail-modal
+        :show="$showOrderDetails"
+        :order="$selectedOrder"
+        role="production_manager"
+        :allowActions="true"
+    />
                             <div class="overflow-y-auto max-h-60">
                                 <table class="min-w-full divide-y divide-gray-200">
                                     <thead class="bg-gray-50">

@@ -110,7 +110,7 @@ class ProductionOrderManagement extends Component
         }
     }
 
-    public function viewOrderDetails($orderId)
+    public function showOrderDetails($orderId)
     {
         $this->selectedOrder = Order::with(['buyer', 'orderItems', 'orderItems.product'])
             ->findOrFail($orderId);
@@ -371,6 +371,32 @@ class ProductionOrderManagement extends Component
         // Implementation for exporting orders to CSV
         // This would typically generate and return a file download
         $this->successMessage = 'Orders exported successfully';
+    }
+
+    // Action methods for order detail modal
+    public function startProduction($orderId)
+    {
+        try {
+            $productionService = app(ProductionOrderServiceInterface::class);
+            $result = $productionService->startProduction($orderId);
+
+            if ($result['success']) {
+                $this->successMessage = $result['message'];
+                $this->refreshSelectedOrder();
+            } else {
+                $this->errorMessage = $result['message'];
+            }
+        } catch (\Exception $e) {
+            $this->errorMessage = 'Failed to start production: ' . $e->getMessage();
+        }
+    }
+
+    private function refreshSelectedOrder()
+    {
+        if ($this->selectedOrder) {
+            $this->selectedOrder = Order::with(['orderItems.product', 'buyer'])
+                ->find($this->selectedOrder->id);
+        }
     }
 
     public function render()

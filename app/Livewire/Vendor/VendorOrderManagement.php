@@ -61,7 +61,7 @@ class VendorOrderManagement extends Component
         $this->resetPage();
     }
 
-    public function viewOrderDetails($orderId)
+    public function showOrderDetails($orderId)
     {
         $this->selectedOrder = Order::with(['buyer', 'seller'])
             ->find($orderId);
@@ -295,5 +295,55 @@ class VendorOrderManagement extends Component
             'metrics' => $metrics,
             'validBulkStatuses' => $validBulkStatuses,
         ]);
+    }
+
+    // Action methods for order detail modal
+    public function confirmOrder($orderId)
+    {
+        try {
+            $vendorSalesService = app(VendorSalesServiceInterface::class);
+            $result = $vendorSalesService->updateOrderStatus($orderId, Order::STATUS_ACCEPTED);
+
+            if ($result['success']) {
+                session()->flash('message', $result['message']);
+                $this->refreshSelectedOrder();
+            } else {
+                session()->flash('error', $result['message']);
+            }
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to confirm order: ' . $e->getMessage());
+        }
+    }
+
+    public function rejectOrder($orderId)
+    {
+        try {
+            $vendorSalesService = app(VendorSalesServiceInterface::class);
+            $result = $vendorSalesService->updateOrderStatus($orderId, Order::STATUS_REJECTED);
+
+            if ($result['success']) {
+                session()->flash('message', $result['message']);
+                $this->refreshSelectedOrder();
+            } else {
+                session()->flash('error', $result['message']);
+            }
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to reject order: ' . $e->getMessage());
+        }
+    }
+
+    public function showOrderFulfillment($orderId)
+    {
+        $this->selectedOrder = Order::find($orderId);
+        $this->showOrderFulfillment = true;
+        $this->closeOrderDetails();
+    }
+
+    private function refreshSelectedOrder()
+    {
+        if ($this->selectedOrder) {
+            $this->selectedOrder = Order::with(['orderItems.product', 'buyer'])
+                ->find($this->selectedOrder->id);
+        }
     }
 }

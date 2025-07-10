@@ -348,7 +348,7 @@
                                 <div class="flex items-center space-x-3">
                                     <!-- View Order Button -->
                                     <button
-                                        wire:click="viewOrder({{ $order->id }})"
+                                        wire:click="showOrderDetails({{ $order->id }})"
                                         class="group relative text-blue-600 hover:text-blue-800 transition-colors duration-200"
                                         title="View order details"
                                     >
@@ -510,4 +510,12 @@
         </div>
     </div>
     @endif
+
+    <!-- Order Detail Modal Component -->
+    <x-shared.order-detail-modal
+        :show="$showOrderDetails"
+        :order="$selectedOrder"
+        role="retailer"
+        :allowActions="true"
+    />
 </div>

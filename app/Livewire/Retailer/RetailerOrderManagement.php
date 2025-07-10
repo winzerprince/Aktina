@@ -13,9 +13,14 @@ class RetailerOrderManagement extends Component
 
     public $statusFilter = '';
     public $searchTerm = '';
+    public $dateFilter = '';
     public $sortField = 'created_at';
     public $sortDirection = 'desc';
     public $showOrderCreation = false;
+
+    // Order Detail Modal Properties
+    public $showOrderDetails = false;
+    public $selectedOrder = null;
 
     protected $queryString = [
         'statusFilter' => ['except' => ''],
@@ -67,6 +72,42 @@ class RetailerOrderManagement extends Component
         $this->statusFilter = 'pending';
         $this->resetPage();
         session()->flash('message', "Order #{$orderId} created successfully!");
+    }
+
+    // Order Detail Modal Methods
+    public function showOrderDetails($orderId)
+    {
+        $this->selectedOrder = Order::with(['orderItems.product', 'buyer'])
+            ->where('id', $orderId)
+            ->where('buyer_id', auth()->id())
+            ->first();
+
+        if ($this->selectedOrder) {
+            $this->showOrderDetails = true;
+        }
+    }
+
+    public function closeOrderDetails()
+    {
+        $this->showOrderDetails = false;
+        $this->selectedOrder = null;
+    }
+
+    public function cancelOrder($orderId)
+    {
+        try {
+            $retailerOrderService = app(RetailerOrderService::class);
+            $result = $retailerOrderService->cancelOrder($orderId);
+
+            if ($result['success']) {
+                $this->closeOrderDetails();
+                session()->flash('message', $result['message']);
+            } else {
+                session()->flash('error', $result['message']);
+            }
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to cancel order: ' . $e->getMessage());
+        }
     }
 
     public function render()

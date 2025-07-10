@@ -276,7 +276,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex space-x-2">
-                                    <button wire:click="viewOrderDetails({{ $order->id }})"
+                                    <button wire:click="showOrderDetails({{ $order->id }})"
                                             class="text-blue-600 hover:text-blue-900">
                                         View
                                     </button>
@@ -308,64 +308,13 @@
         </div>
     </div>
 
-    <!-- Order Details Modal -->
-    @if($showOrderDetails && $selectedOrder)
-        <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-medium text-gray-900">Order #{{ $selectedOrder->id }} Details</h3>
-                    <button wire:click="closeOrderDetails" class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                </div>
-
-                <div class="space-y-4">
-                    <!-- Customer Information -->
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <h4 class="font-medium text-gray-900 mb-2">Customer Information</h4>
-                        <p class="text-sm text-gray-600">Name: {{ $selectedOrder->user->name }}</p>
-                        <p class="text-sm text-gray-600">Email: {{ $selectedOrder->user->email }}</p>
-                        <p class="text-sm text-gray-600">Order Date: {{ $selectedOrder->created_at->format('M j, Y H:i') }}</p>
-                    </div>
-
-                    <!-- Order Items -->
-                    <div>
-                        <h4 class="font-medium text-gray-900 mb-2">Order Items</h4>
-                        <div class="border rounded-lg overflow-hidden">
-                            <table class="min-w-full">
-                                <thead class="bg-gray-50">
-                                    <tr>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Quantity</th>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
-                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Subtotal</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-gray-200">
-                                    @foreach($selectedOrder->orderItems as $item)
-                                        <tr>
-                                            <td class="px-4 py-2 text-sm text-gray-900">{{ $item->product->name }}</td>
-                                            <td class="px-4 py-2 text-sm text-gray-900">{{ $item->quantity }}</td>
-                                            <td class="px-4 py-2 text-sm text-gray-900">${{ number_format($item->price, 2) }}</td>
-                                            <td class="px-4 py-2 text-sm text-gray-900">${{ number_format($item->quantity * $item->price, 2) }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                                <tfoot class="bg-gray-50">
-                                    <tr>
-                                        <td colspan="3" class="px-4 py-2 text-sm font-medium text-gray-900 text-right">Total:</td>
-                                        <td class="px-4 py-2 text-sm font-medium text-gray-900">${{ number_format($selectedOrder->total_amount, 2) }}</td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif
+    <!-- Order Detail Modal Component -->
+    <x-shared.order-detail-modal
+        :show="$showOrderDetails"
+        :order="$selectedOrder"
+        role="vendor"
+        :allowActions="true"
+    />
 
     <!-- Order Fulfillment Wizard Modal -->
     @if($showOrderFulfillment && $selectedOrder)

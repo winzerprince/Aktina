@@ -167,6 +167,11 @@ class Order extends Model
         };
     }
 
+    public function getStatusColor(): string
+    {
+        return $this->getStatusColorAttribute();
+    }
+
     public function getFormattedStatusAttribute(): string
     {
         return ucwords(str_replace('_', ' ', $this->status));
