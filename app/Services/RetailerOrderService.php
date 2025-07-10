@@ -53,7 +53,7 @@ class RetailerOrderService implements RetailerOrderServiceInterface
             ->get();
     }
 
-    public function getOrdersByStatus(User $retailer, string $status = null)
+    public function getOrdersByStatus(User $retailer, ?string $status = null): LengthAwarePaginator
     {
         $query = Order::where('buyer_id', $retailer->id);
 

@@ -427,9 +427,6 @@
                                     </button>
                                     @endif
                                 </div>
-                                        </button>
-                                    @endif
-                                </div>
                             </td>
                         </tr>
                     @empty

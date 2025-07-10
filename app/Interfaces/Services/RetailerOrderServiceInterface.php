@@ -22,7 +22,7 @@ interface RetailerOrderServiceInterface
     /**
      * Get orders for a retailer filtered by status
      */
-    public function getOrdersByStatus(User $retailer, string $status = null): LengthAwarePaginator;
+    public function getOrdersByStatus(User $retailer, ?string $status = null): LengthAwarePaginator;
 
     /**
      * Get order trends over time for a retailer
