@@ -93,7 +93,10 @@
                 <div>
                     <h3 class="font-semibold text-lg mb-2">Customer Information</h3>
                     <div class="space-y-2">
-                        <p><span class="font-medium">Name:</span> {{ $order->buyer->name ?? 'N/A' }}</p>
+                        <p><span class="font-medium">Company:</span>
+                            <span class="font-semibold">{{ $order->getBuyerCompanyDisplay() }}</span>
+                        </p>
+                        <p><span class="font-medium">Contact:</span> {{ $order->buyer->name ?? 'N/A' }}</p>
                         <p><span class="font-medium">Email:</span> {{ $order->buyer->email ?? 'N/A' }}</p>
                         <p><span class="font-medium">Phone:</span> {{ $order->buyer->phone ?? 'N/A' }}</p>
                         <p><span class="font-medium">Type:</span> {{ $order->buyer->role ?? 'N/A' }}</p>

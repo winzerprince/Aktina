@@ -39,6 +39,18 @@ class Application extends Model
         return $this->hasMany(RetailerListing::class);
     }
 
+    public function connectedRetailers()
+    {
+        return $this->hasManyThrough(
+            User::class,
+            RetailerListing::class,
+            'application_id', // Foreign key on retailer_listings table
+            'id', // Foreign key on users table
+            'id', // Local key on applications table
+            'retailer_id' // Local key on retailer_listings table
+        )->where('role', 'retailer');
+    }
+
     public function getStatus()
     {
         return $this->status;

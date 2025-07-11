@@ -5,6 +5,8 @@ namespace App\Livewire\Sales;
 use App\Interfaces\Services\OrderServiceInterface;
 use App\Models\Product;
 use App\Models\User;
+use App\Services\ProductInventoryService;
+use App\Services\OrderProcessingService;
 use Livewire\Component;
 
 class OrderCreate extends Component
@@ -132,9 +134,33 @@ class OrderCreate extends Component
 
     public function checkStockLevels()
     {
-        $items = $this->cleanupItems($this->selectedItems);
-        $orderService = app(OrderServiceInterface::class);
-        $this->stockLevels = $orderService->checkStockAvailability($items);
+        $this->stockLevels = [];
+
+        foreach ($this->selectedItems as $item) {
+            if (!empty($item['product_id']) && $item['quantity'] > 0) {
+                $product = Product::find($item['product_id']);
+                $seller = User::find($this->selectedSeller);
+
+                if ($product && $seller) {
+                    $inventoryService = app(ProductInventoryService::class);
+                    $availableQuantity = $inventoryService->getCompanyQuantity($product, $seller->company_name);
+                    $hasStock = $inventoryService->hasSufficientQuantity($product, $seller->company_name, $item['quantity']);
+
+                    // Define warning threshold (e.g., warn if stock falls below 20% of requested or below 10 units)
+                    $warningThreshold = max(10, $item['quantity'] * 0.2);
+                    $hasWarning = !$hasStock ? false : ($availableQuantity <= $warningThreshold);
+
+                    $this->stockLevels[] = [
+                        'product_id' => $item['product_id'],
+                        'available' => $availableQuantity,
+                        'requested' => $item['quantity'],
+                        'in_stock' => $hasStock,
+                        'has_warning' => $hasWarning,
+                        'product_name' => $product->name
+                    ];
+                }
+            }
+        }
     }
 
     private function cleanupItems($items)
@@ -187,6 +213,7 @@ class OrderCreate extends Component
 
         try {
             $orderService = app(OrderServiceInterface::class);
+            $orderProcessingService = app(OrderProcessingService::class);
 
             $orderData = [
                 'buyer_id' => $this->selectedBuyer,
@@ -196,10 +223,21 @@ class OrderCreate extends Component
                 'status' => 'pending',
             ];
 
+            // Create the order first
             $order = $orderService->processNewOrder($orderData);
 
             if ($order) {
-                session()->flash('success', 'Order created successfully!');
+                // Validate inventory before processing
+                $validationErrors = $orderProcessingService->validateOrder($order);
+                if (!empty($validationErrors)) {
+                    session()->flash('error', 'Inventory validation failed: ' . implode(', ', $validationErrors));
+                    return;
+                }
+
+                // Process inventory transfer
+                $orderProcessingService->processOrder($order);
+
+                session()->flash('success', 'Order created and inventory updated successfully!');
                 return redirect()->route('orders.show', $order->id);
             } else {
                 session()->flash('error', 'Failed to create order.');

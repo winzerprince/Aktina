@@ -209,9 +209,9 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
-                            wire:click="sortBy('total_amount')">
+                            wire:click="sortBy('price')">
                             Total
-                            @if($sortBy === 'total_amount')
+                            @if($sortBy === 'price')
                                 <span class="ml-1">{{ $sortDirection === 'asc' ? '↑' : '↓' }}</span>
                             @endif
                         </th>
@@ -239,14 +239,14 @@
                                 #{{ $order->id }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">{{ $order->user->name }}</div>
-                                <div class="text-sm text-gray-500">{{ $order->user->email }}</div>
+                                <div class="text-sm font-medium text-gray-900">{{ $order->buyer->name ?? 'N/A' }}</div>
+                                <div class="text-sm text-gray-500">{{ $order->buyer->email ?? 'N/A' }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $order->order_items_count }} items
+                                {{ $order->items_count }} items
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                ${{ number_format($order->total_amount, 2) }}
+                                ${{ number_format($order->price, 2) }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @php

@@ -215,8 +215,6 @@ class OrderRepository implements OrderRepositoryInterface
     {
         $results = [];
 
-        // In a real implementation, this would check against an inventory table
-        // For now, we'll simulate it by checking if the product exists
         foreach ($items as $item) {
             $productId = $item['product_id'] ?? null;
             $quantity = $item['quantity'] ?? 0;
@@ -224,16 +222,31 @@ class OrderRepository implements OrderRepositoryInterface
             if ($productId) {
                 $product = Product::find($productId);
 
-                // This is a placeholder - in a real system, we would check against actual inventory
-                $inStock = $product ? true : false;
-                $hasWarning = $product && $quantity > 10; // Just an example threshold
+                if (!$product) {
+                    $results[] = [
+                        'product_id' => $productId,
+                        'in_stock' => false,
+                        'has_warning' => false,
+                        'requested' => $quantity,
+                        'available' => 0,
+                    ];
+                    continue;
+                }
+
+                // For vendors, check their company's inventory
+                $currentUser = auth()->user();
+                $companyName = $currentUser->company_name ?? '';
+                $availableQuantity = $product->getCompanyQuantity($companyName);
+
+                $inStock = $availableQuantity >= $quantity;
+                $hasWarning = $availableQuantity > 0 && $availableQuantity < $quantity;
 
                 $results[] = [
                     'product_id' => $productId,
                     'in_stock' => $inStock,
                     'has_warning' => $hasWarning,
                     'requested' => $quantity,
-                    'available' => $inStock ? $quantity : 0, // Placeholder
+                    'available' => $availableQuantity,
                 ];
             }
         }

@@ -11,7 +11,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // Create specific test users with exact credentials as requested
-        
+
         // 1. Admin user
         User::factory()->create([
             'name' => 'admin',
@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
             'role' => 'admin',
             'verified' => true,
             'email_verified_at' => now(),
-            'company_name' => 'Aktina Technologies',
+            'company_name' => 'Aktina',
             'address' => json_encode(['street' => '1 Admin Street', 'city' => 'Admin City', 'zip' => '00001']),
         ]);
 
@@ -68,7 +68,7 @@ class UserSeeder extends Seeder
             'role' => 'production_manager',
             'verified' => true,
             'email_verified_at' => now(),
-            'company_name' => 'Production Company',
+            'company_name' => 'Aktina',
             'address' => json_encode(['street' => '1 Production Street', 'city' => 'Production City', 'zip' => '00005']),
         ]);
 
@@ -80,7 +80,7 @@ class UserSeeder extends Seeder
             'role' => 'hr_manager',
             'verified' => true,
             'email_verified_at' => now(),
-            'company_name' => 'HR Company',
+            'company_name' => 'Aktina',
             'address' => json_encode(['street' => '1 HR Street', 'city' => 'HR City', 'zip' => '00006']),
         ]);
 

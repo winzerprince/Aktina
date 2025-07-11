@@ -25,4 +25,4 @@ Route::post('/callbacks/pdf-processing/{applicationId}', function (Request $requ
     }
 
     return response()->json(['status' => 'processed']);
-})->middleware('throttle:60,1');
+})->middleware('throttle:600,1');

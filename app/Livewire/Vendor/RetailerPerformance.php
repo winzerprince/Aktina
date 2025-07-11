@@ -3,6 +3,7 @@
 namespace App\Livewire\Vendor;
 
 use App\Services\RetailerAnalyticsService;
+use App\Services\VendorRetailerService;
 use Livewire\Component;
 use Livewire\Attributes\On;
 
@@ -12,23 +13,46 @@ class RetailerPerformance extends Component
     public $performanceMetrics = [];
     public $orderFrequency = [];
     public $growthTrends = [];
+    public $connectedRetailers = [];
+    public $connectionSummary = [];
     public $selectedMetric = 'revenue';
     public $timeFrame = 6;
+    public $vendorId;
 
     public function mount()
     {
+        // Get current vendor's ID
+        $this->vendorId = auth()->user()->vendor?->id;
+
+        if (!$this->vendorId) {
+            session()->flash('error', 'Vendor profile not found');
+            return;
+        }
+
         $this->loadAnalyticsData();
     }
 
     #[On('refresh-analytics')]
     public function loadAnalyticsData()
     {
+        if (!$this->vendorId) {
+            return;
+        }
+
         $retailerService = new RetailerAnalyticsService();
+        $vendorRetailerService = new VendorRetailerService();
 
         try {
-            $this->topRetailers = $retailerService->getTopRetailers(15)->toArray();
-            $this->performanceMetrics = $retailerService->getRetailerPerformanceMetrics();
-            $this->orderFrequency = $retailerService->getRetailerOrderFrequency()->toArray();
+            // Load vendor-specific data
+            $this->connectedRetailers = $vendorRetailerService->getConnectedRetailers($this->vendorId)->toArray();
+            $this->connectionSummary = $vendorRetailerService->getConnectionSummary($this->vendorId);
+            $this->topRetailers = $vendorRetailerService->getTopRetailersForVendor($this->vendorId, 15)->toArray();
+
+            // Use vendor-specific analytics methods
+            $this->performanceMetrics = $retailerService->getRetailerPerformanceMetricsForVendor($this->vendorId);
+            $this->orderFrequency = $retailerService->getRetailerOrderFrequencyForVendor($this->vendorId)->toArray();
+
+            // Keep general growth trends for now (can be vendor-specific later if needed)
             $this->growthTrends = $retailerService->getRetailerGrowthTrends($this->timeFrame);
         } catch (\Exception $e) {
             session()->flash('error', 'Failed to load retailer analytics: ' . $e->getMessage());
@@ -59,9 +83,9 @@ class RetailerPerformance extends Component
     public function exportRetailerData()
     {
         try {
-            $filename = 'retailer_performance_' . now()->format('Y_m_d') . '.csv';
+            $filename = 'connected_retailers_' . now()->format('Y_m_d') . '.csv';
             $data = collect($this->topRetailers);
-            
+
             $headers = ['name', 'email', 'total_orders', 'total_revenue', 'average_order_value'];
             $csv = $data->map(function ($retailer) {
                 return [
@@ -73,7 +97,7 @@ class RetailerPerformance extends Component
                 ];
             });
 
-            session()->flash('success', 'Retailer data exported successfully');
+            session()->flash('success', 'Connected retailer data exported successfully');
             $this->dispatch('download-csv', [
                 'filename' => $filename,
                 'headers' => $headers,
@@ -84,17 +108,41 @@ class RetailerPerformance extends Component
         }
     }
 
+    public function getConnectionSummaryData()
+    {
+        $summary = $this->connectionSummary;
+
+        return [
+            'series' => array_values($summary),
+            'labels' => array_map('ucfirst', array_keys($summary)),
+        ];
+    }
+
+    public function getVendorMetricsData()
+    {
+        $metrics = $this->performanceMetrics;
+
+        return [
+            'total_connected' => $metrics['total_retailers'] ?? 0,
+            'active_retailers' => $metrics['active_retailers'] ?? 0,
+            'active_percentage' => round($metrics['active_percentage'] ?? 0, 1),
+            'avg_orders' => $metrics['average_orders_per_retailer'] ?? 0,
+            'retention_rate' => round($metrics['retailer_retention_rate'] ?? 0, 1),
+        ];
+    }
+
     public function getRetailerPerformanceChartData()
     {
+        // Use vendor-specific growth trends if available
         return [
             'series' => [
                 [
-                    'name' => 'New Retailers',
-                    'data' => collect($this->growthTrends)->pluck('new_retailers')->toArray(),
+                    'name' => 'Connected Retailers',
+                    'data' => collect($this->growthTrends)->pluck('active_retailers')->toArray(),
                 ],
                 [
-                    'name' => 'Active Retailers',
-                    'data' => collect($this->growthTrends)->pluck('active_retailers')->toArray(),
+                    'name' => 'Total Orders',
+                    'data' => collect($this->growthTrends)->pluck('total_orders')->toArray(),
                 ],
             ],
             'categories' => collect($this->growthTrends)->pluck('month')->toArray(),
@@ -103,6 +151,13 @@ class RetailerPerformance extends Component
 
     public function getOrderFrequencyChartData()
     {
+        if (empty($this->orderFrequency)) {
+            return [
+                'series' => [],
+                'labels' => [],
+            ];
+        }
+
         $frequencyGroups = collect($this->orderFrequency)
             ->groupBy('frequency_category')
             ->map(function ($group) {
@@ -113,6 +168,17 @@ class RetailerPerformance extends Component
             'series' => $frequencyGroups->values()->toArray(),
             'labels' => $frequencyGroups->keys()->toArray(),
         ];
+    }
+
+    public function refreshData()
+    {
+        $this->loadAnalyticsData();
+        session()->flash('success', 'Retailer data refreshed successfully');
+    }
+
+    public function hasConnectedRetailers()
+    {
+        return !empty($this->connectedRetailers);
     }
 
     public function render()

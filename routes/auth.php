@@ -24,7 +24,7 @@ Route::middleware('auth')->group(function () {
         ->name('verification.notice');
 
     Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
-        ->middleware(['signed', 'throttle:6,1'])
+        ->middleware(['signed', 'throttle:60,1'])
         ->name('verification.verify');
 
     Volt::route('confirm-password', 'auth.confirm-password')

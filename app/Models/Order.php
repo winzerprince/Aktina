@@ -225,33 +225,52 @@ class Order extends Model
 
     public function canBeDelivered(): bool
     {
-        return in_array($this->status, [
-            self::STATUS_SHIPPED,
-            self::STATUS_IN_TRANSIT
-        ]);
+        return $this->status === self::STATUS_IN_TRANSIT;
     }
 
-    public function canBeCompleted(): bool
+    /**
+     * Get buyer company name for display
+     */
+    public function getBuyerCompanyAttribute(): string
     {
-        return in_array($this->status, [
-            self::STATUS_ACCEPTED,
-            self::STATUS_PROCESSING,
-            self::STATUS_FULFILLED,
-            self::STATUS_SHIPPED,
-            self::STATUS_DELIVERED
-        ]);
+        return $this->buyer->company_name ?? 'Unknown Company';
     }
 
-    public function canBeReturned(): bool
+    /**
+     * Get seller company name for display
+     */
+    public function getSellerCompanyAttribute(): string
     {
-        return in_array($this->status, [
-            self::STATUS_DELIVERED,
-            self::STATUS_COMPLETE
-        ]);
+        return $this->seller->company_name ?? 'Unknown Company';
     }
 
-    public function getTotalAmountAttribute(): float
+    /**
+     * Get formatted buyer display (company + individual)
+     */
+    public function getBuyerDisplayAttribute(): string
     {
-        return $this->price;
+        $company = $this->buyer_company;
+        $individual = $this->buyer->name ?? 'Unknown';
+        return "{$company} ({$individual})";
+    }
+
+    /**
+     * Get formatted seller display (company + individual)
+     */
+    public function getSellerDisplayAttribute(): string
+    {
+        $company = $this->seller_company;
+        $individual = $this->seller->name ?? 'Unknown';
+        return "{$company} ({$individual})";
+    }
+
+    public function getBuyerCompanyDisplay()
+    {
+        return $this->buyer?->company_name ?? 'No Company';
+    }
+
+    public function getSellerCompanyDisplay()
+    {
+        return $this->seller?->company_name ?? 'Aktina';
     }
 }

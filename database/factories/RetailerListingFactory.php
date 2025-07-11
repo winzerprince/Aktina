@@ -17,8 +17,12 @@ class RetailerListingFactory extends Factory
      * @return array<string, mixed>
      */    public function definition(): array
     {
+        // Get a random retailer user to connect to
+        $retailerUser = \App\Models\User::where('role', 'retailer')->inRandomOrder()->first();
+
         return [
-            'retailer_email' => $this->faker->unique()->safeEmail(),
+            'retailer_email' => $retailerUser ? $retailerUser->email : $this->faker->unique()->safeEmail(),
+            'retailer_id' => $retailerUser?->id,
             'application_id' => Application::factory(),
         ];
     }
@@ -30,6 +34,17 @@ class RetailerListingFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'application_id' => $applicationId,
+        ]);
+    }
+
+    /**
+     * Indicate that the listing is for a specific retailer.
+     */
+    public function forRetailer($retailerUser): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'retailer_email' => $retailerUser->email,
+            'retailer_id' => $retailerUser->id,
         ]);
     }
 }

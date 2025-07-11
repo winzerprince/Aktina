@@ -17,7 +17,7 @@ class OrderList extends Component
     public $selectedOrder = null;
     public $showCreateModal = false;
     public $showEditModal = false;
-    
+
     // Order Form Data
     public $buyer_id = '';
     public $seller_id = '';
@@ -30,7 +30,7 @@ class OrderList extends Component
         'quantity' => 1,
         'unit_price' => 0
     ];
-    
+
     // Filters
     public $statusFilter = 'all';
     public $userFilter = '';
@@ -56,10 +56,6 @@ class OrderList extends Component
         'items.*.quantity' => 'required|integer|min:1',
         'items.*.unit_price' => 'required|numeric|min:0'
     ];
-
-    public function __construct(
-        private EnhancedOrderService $orderService
-    ) {}
 
     public function boot(EnhancedOrderService $orderService)
     {
@@ -89,9 +85,9 @@ class OrderList extends Component
     public function viewOrder($orderId)
     {
         $this->selectedOrder = Order::with([
-            'buyer', 
-            'seller', 
-            'approver', 
+            'buyer',
+            'seller',
+            'approver',
             'assignedWarehouse'
         ])->findOrFail($orderId);
     }
@@ -116,13 +112,13 @@ class OrderList extends Component
     public function showEditOrderModal($orderId)
     {
         $order = Order::findOrFail($orderId);
-        
+
         // Only allow editing pending orders
-        if ($order->status !== 'pending') {
+        if ($order->status !== Order::STATUS_PENDING) {
             session()->flash('error', 'Only pending orders can be edited.');
             return;
         }
-        
+
         // Load order data into form
         $this->selectedOrder = $order;
         $this->buyer_id = $order->buyer_id;
@@ -131,7 +127,7 @@ class OrderList extends Component
         $this->expected_delivery_date = $order->expected_delivery_date?->format('Y-m-d');
         $this->notes = $order->notes;
         $this->items = $order->items ?? [];
-        
+
         $this->showEditModal = true;
     }
 
@@ -151,7 +147,7 @@ class OrderList extends Component
         ]);
 
         $resource = Resource::find($this->newItem['resource_id']);
-        
+
         $this->items[] = [
             'resource_id' => $this->newItem['resource_id'],
             'resource_name' => $resource->name,
@@ -188,11 +184,11 @@ class OrderList extends Component
             ];
 
             $order = $this->orderService->createOrder($orderData);
-            
+
             session()->flash('success', "Order #{$order->id} created successfully.");
             $this->emit('orderCreated');
             $this->closeCreateModal();
-            
+
         } catch (\Exception $e) {
             session()->flash('error', 'Failed to create order: ' . $e->getMessage());
         }
@@ -213,11 +209,11 @@ class OrderList extends Component
                 'notes' => $this->notes,
                 'items' => $this->items
             ]);
-            
+
             session()->flash('success', "Order #{$this->selectedOrder->id} updated successfully.");
             $this->emit('orderUpdated');
             $this->closeEditModal();
-            
+
         } catch (\Exception $e) {
             session()->flash('error', 'Failed to update order: ' . $e->getMessage());
         }
@@ -226,7 +222,7 @@ class OrderList extends Component
     public function deleteOrder($orderId)
     {
         $order = Order::findOrFail($orderId);
-        
+
         // Only allow deletion of pending orders
         if ($order->status !== 'pending') {
             session()->flash('error', 'Only pending orders can be deleted.');
@@ -237,7 +233,7 @@ class OrderList extends Component
             $order->delete();
             session()->flash('success', "Order #{$orderId} deleted successfully.");
             $this->closeOrderModal();
-            
+
         } catch (\Exception $e) {
             session()->flash('error', 'Failed to delete order: ' . $e->getMessage());
         }
@@ -272,7 +268,7 @@ class OrderList extends Component
     public function getOrdersProperty()
     {
         $user = Auth::user();
-        
+
         $query = Order::with(['buyer', 'seller', 'approver'])
             ->when($this->statusFilter && $this->statusFilter !== 'all', function ($q) {
                 $q->where('status', $this->statusFilter);
@@ -300,7 +296,7 @@ class OrderList extends Component
             });
 
         // Role-based filtering
-        if (!$user->hasRole(['admin', 'production_manager'])) {
+        if (!($user->isAdmin() || $user->isProductionManager())) {
             $query->where(function ($q) use ($user) {
                 $q->where('buyer_id', $user->id)
                   ->orWhere('seller_id', $user->id);
@@ -317,12 +313,25 @@ class OrderList extends Component
 
     public function getResourcesProperty()
     {
-        return Resource::select('id', 'name', 'category', 'unit_price')->get();
+        return Resource::select('id', 'name', 'category', 'unit_cost')->get();
     }
 
     public function getTotalValueProperty()
     {
         return collect($this->items)->sum('total_price');
+    }
+
+    public function getStatusColor($status)
+    {
+        return match($status) {
+            'pending' => 'bg-yellow-100 text-yellow-800',
+            'accepted' => 'bg-blue-100 text-blue-800',
+            'processing' => 'bg-indigo-100 text-indigo-800',
+            'shipped' => 'bg-purple-100 text-purple-800',
+            'completed' => 'bg-green-100 text-green-800',
+            'rejected' => 'bg-red-100 text-red-800',
+            default => 'bg-gray-100 text-gray-800'
+        };
     }
 
     public function render()

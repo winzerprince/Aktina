@@ -39,6 +39,15 @@ class Product extends Model
         return collect($this->company_quantities)->sum('quantity');
     }
 
+    public function getTotalQuantity()
+    {
+        if (!$this->company_quantities) {
+            return 0;
+        }
+
+        return collect($this->company_quantities)->sum('quantity');
+    }
+
     public function getCompanyQuantity($companyName)
     {
         return $this->company_quantities[$companyName]['quantity'] ?? 0;

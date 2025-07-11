@@ -24,6 +24,7 @@ class UserFactory extends Factory
     public function definition(): array
     {
         $roles = ['admin', 'supplier', 'vendor', 'retailer', 'production_manager', 'hr_manager'];
+        $role = fake()->randomElement($roles);
 
         return [
             'name' => fake()->name(),
@@ -32,7 +33,7 @@ class UserFactory extends Factory
             'password' => static::$password ??= Hash::make('password'),
             'verified' => fake()->boolean(70), // 70% chance of being verified
             'is_verified' => fake()->boolean(70), // 70% chance of being verified
-            'company_name' => fake()->optional(0.8)->company(), // 80% chance of having a company name
+            'company_name' => $this->generateCompanyName($role),
             'address' => json_encode([
                 'street' => fake()->streetAddress(),
                 'city' => fake()->city(),
@@ -41,8 +42,49 @@ class UserFactory extends Factory
                 'country' => fake()->countryCode()
             ]),
             'remember_token' => Str::random(10),
-            'role' => fake()->randomElement($roles),
+            'role' => $role,
         ];
+    }
+
+    /**
+     * Generate realistic company name based on role.
+     */
+    private function generateCompanyName(string $role): string
+    {
+        return match($role) {
+            'admin', 'production_manager', 'hr_manager' => 'Aktina',
+            'vendor' => fake()->randomElement([
+                'TechVendor Inc',
+                'ElectronicsHub Ltd',
+                'DigitalSupply Co',
+                'SmartTech Distribution',
+                'GadgetWorld Corp',
+                'TechMart Solutions',
+                'ElectroTrade Ltd',
+                'DeviceVendor Inc'
+            ]),
+            'retailer' => fake()->randomElement([
+                'MegaStore Chain',
+                'LocalTech Shop',
+                'ElectroMart',
+                'TechPlus Retail',
+                'DigitalStore Inc',
+                'SmartShop Ltd',
+                'GadgetRetail Co',
+                'TechOutlet Corp'
+            ]),
+            'supplier' => fake()->randomElement([
+                'ComponentSupply Corp',
+                'RawMaterials Ltd',
+                'ElectroComponents Inc',
+                'TechParts Supply',
+                'MaterialSource Co',
+                'ComponentHub Ltd',
+                'SupplyChain Corp',
+                'PartsVendor Inc'
+            ]),
+            default => fake()->company(),
+        };
     }
 
     /**
@@ -62,6 +104,7 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'role' => $role,
+            'company_name' => $this->generateCompanyName($role),
         ]);
     }
 

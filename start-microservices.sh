@@ -8,13 +8,7 @@ pkill -f "uvicorn app:app" 2>/dev/null || true
 pkill -f "spring-boot:run" 2>/dev/null || true
 
 # Start MySQL if it's not running (this depends on your local MySQL setup)
-echo "Checking if MySQL is running..."
-if ! pgrep mysqld > /dev/null; then
-    echo "MySQL is not running. Starting MySQL..."
-    sudo service mysql start
-    # Wait for MySQL to start
-    sleep 5
-fi
+
 
 # Start Python ML service
 echo "Starting Python ML microservice on port 8001..."

@@ -42,25 +42,25 @@ class RouteServiceProvider extends ServiceProvider
     protected function configureRateLimiting(): void
     {
         RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+            return Limit::perMinute(600)->by($request->user()?->id ?: $request->ip());
         });
 
         RateLimiter::for('file-upload', function (Request $request) {
-            return Limit::perHour(3)->by($request->user()?->id ?: $request->ip())
+            return Limit::perHour(1000)->by($request->user()?->id ?: $request->ip())
                 ->response(function () {
                     return response('Too many file upload attempts. Please try again later.', 429);
                 });
         });
 
         RateLimiter::for('verification-form', function (Request $request) {
-            return Limit::perMinute(5)->by($request->user()?->id ?: $request->ip())
+            return Limit::perMinute(100)->by($request->user()?->id ?: $request->ip())
                 ->response(function () {
                     return response('Too many form submissions. Please slow down.', 429);
                 });
         });
 
         RateLimiter::for('admin-actions', function (Request $request) {
-            return Limit::perMinute(30)->by($request->user()?->id ?: $request->ip())
+            return Limit::perMinute(300)->by($request->user()?->id ?: $request->ip())
                 ->response(function () {
                     return response('Too many admin actions. Please slow down.', 429);
                 });

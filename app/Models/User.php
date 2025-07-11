@@ -133,6 +133,26 @@ class User extends Authenticatable
         return $this->hasOne(Retailer::class);
     }
 
+    public function retailerListings()
+    {
+        return $this->hasMany(RetailerListing::class, 'retailer_id');
+    }
+
+    public function vendorConnections()
+    {
+        return $this->hasManyThrough(
+            Vendor::class,
+            Application::class,
+            'id', // Foreign key on applications table (through retailer_listings)
+            'id', // Foreign key on vendors table
+            'id', // Local key on users table
+            'vendor_id' // Local key on applications table
+        )->join('retailer_listings', 'applications.id', '=', 'retailer_listings.application_id')
+         ->where('retailer_listings.retailer_id', $this->id)
+         ->select('vendors.*')
+         ->distinct();
+    }
+
     // Order relationships
     public function buyerOrders()
     {

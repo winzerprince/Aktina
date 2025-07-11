@@ -90,8 +90,8 @@
                                     <div class="block w-full pl-3 pr-10 py-3 text-base border-gray-300 bg-gray-50 rounded-lg">
                                         @foreach($buyerOptions as $buyer)
                                             @if($buyer->id == $selectedBuyer)
-                                                {{ $buyer->name }} ({{ ucfirst($buyer->role) }})
-                                                @if($buyer->company_name) - {{ $buyer->company_name }} @endif
+                                                <span class="font-semibold">{{ $buyer->company_name ?? 'No Company' }}</span>
+                                                <span class="text-gray-600 text-sm ml-2">({{ $buyer->name }}, {{ ucfirst($buyer->role) }})</span>
                                             @endif
                                         @endforeach
                                     </div>
@@ -103,8 +103,7 @@
                                             <option value="">Select a buyer...</option>
                                             @foreach($buyerOptions as $buyer)
                                                 <option value="{{ $buyer->id }}">
-                                                    {{ $buyer->name }} ({{ ucfirst($buyer->role) }})
-                                                    @if($buyer->company_name) - {{ $buyer->company_name }} @endif
+                                                    <span class="font-medium">{{ $buyer->company_name ?? 'No Company' }}</span> - {{ $buyer->name }} ({{ ucfirst($buyer->role) }})
                                                 </option>
                                             @endforeach
                                         </select>
@@ -133,8 +132,8 @@
                                     <div class="block w-full pl-3 pr-10 py-3 text-base border-gray-300 bg-gray-50 rounded-lg">
                                         @foreach($sellerOptions as $seller)
                                             @if($seller->id == $selectedSeller)
-                                                {{ $seller->name }} ({{ ucfirst($seller->role) }})
-                                                @if($seller->company_name) - {{ $seller->company_name }} @endif
+                                                <span class="font-semibold">{{ $seller->company_name ?? 'Aktina' }}</span>
+                                                <span class="text-gray-600 text-sm ml-2">({{ $seller->name }}, {{ ucfirst($seller->role) }})</span>
                                             @endif
                                         @endforeach
                                     </div>
@@ -146,8 +145,7 @@
                                             <option value="">Select a seller...</option>
                                             @foreach($sellerOptions as $seller)
                                                 <option value="{{ $seller->id }}">
-                                                    {{ $seller->name }} ({{ ucfirst($seller->role) }})
-                                                    @if($seller->company_name) - {{ $seller->company_name }} @endif
+                                                    <span class="font-medium">{{ $seller->company_name ?? 'Aktina' }}</span> - {{ $seller->name }} ({{ ucfirst($seller->role) }})
                                                 </option>
                                             @endforeach
                                         </select>
@@ -158,19 +156,6 @@
                                         </div>
                                     </div>
                                 @endif
-                                @error('selectedSeller')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
-                        </div>
-                                        @endforeach
-                                    </select>
-                                    <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </div>
-                                </div>
                                 @error('selectedSeller')
                                     <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                 @enderror
@@ -303,7 +288,7 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                @elseif($stockCheck['has_warning'])
+                                                @elseif(isset($stockCheck['has_warning']) && $stockCheck['has_warning'])
                                                     <div class="mt-4 border-l-4 border-yellow-400 bg-yellow-50 p-4 rounded-md">
                                                         <div class="flex">
                                                             <div class="flex-shrink-0">

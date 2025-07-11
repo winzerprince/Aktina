@@ -70,7 +70,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
      */
     protected function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 100)) {
             return;
         }
 
@@ -100,19 +100,19 @@ new #[Layout('components.layouts.auth')] class extends Component {
         .input-focus {
             transition: all 0.3s ease;
         }
-        
+
         .input-focus:focus {
             transform: translateY(-2px);
             box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.2);
         }
-        
+
         .btn-gradient {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
         }
-        
+
         .btn-gradient::before {
             content: '';
             position: absolute;
@@ -123,25 +123,25 @@ new #[Layout('components.layouts.auth')] class extends Component {
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
             transition: left 0.5s;
         }
-        
+
         .btn-gradient:hover::before {
             left: 100%;
         }
-        
+
         .btn-gradient:hover {
             transform: translateY(-2px);
             box-shadow: 0 15px 35px -5px rgba(16, 185, 129, 0.4);
         }
-        
+
         .form-group {
             animation: fadeInUp 0.6s ease-out;
         }
-        
+
         .form-group:nth-child(1) { animation-delay: 0.1s; }
         .form-group:nth-child(2) { animation-delay: 0.2s; }
         .form-group:nth-child(3) { animation-delay: 0.3s; }
         .form-group:nth-child(4) { animation-delay: 0.4s; }
-        
+
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -152,17 +152,17 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 transform: translateY(0);
             }
         }
-        
+
         .checkbox-custom {
             position: relative;
             cursor: pointer;
         }
-        
+
         .checkbox-custom input[type="checkbox"] {
             opacity: 0;
             position: absolute;
         }
-        
+
         .checkbox-custom .checkmark {
             position: absolute;
             top: 0;
@@ -174,22 +174,22 @@ new #[Layout('components.layouts.auth')] class extends Component {
             border: 2px solid #d1d5db;
             transition: all 0.3s ease;
         }
-        
+
         .checkbox-custom input[type="checkbox"]:checked ~ .checkmark {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             border-color: #10b981;
         }
-        
+
         .checkbox-custom .checkmark:after {
             content: "";
             position: absolute;
             display: none;
         }
-        
+
         .checkbox-custom input[type="checkbox"]:checked ~ .checkmark:after {
             display: block;
         }
-        
+
         .checkbox-custom .checkmark:after {
             left: 7px;
             top: 3px;
@@ -246,7 +246,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
                     {{ __('Password') }}
                 </label>
                 @if (Route::has('password.request'))
-                    <a href="{{ route('password.request') }}" 
+                    <a href="{{ route('password.request') }}"
                        class="text-sm text-orange-600 hover:text-orange-500 transition-colors"
                        wire:navigate>
                         {{ __('Forgot password?') }}
@@ -296,7 +296,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
         <div class="mt-8 text-center">
             <p class="text-sm text-gray-600 dark:text-gray-400">
                 {{ __("Don't have an account?") }}
-                <a href="{{ route('register') }}" 
+                <a href="{{ route('register') }}"
                    class="font-medium text-blue-600 hover:text-blue-500 transition-colors ml-1"
                    wire:navigate>
                     {{ __('Create one now') }}
