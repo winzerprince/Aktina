@@ -179,7 +179,7 @@
                                 </div>
                                 <div class="flex justify-between items-center py-2 border-b border-gray-100">
                                     <dt class="text-sm font-medium text-gray-500">Total Amount</dt>
-                                    <dd class="text-lg font-bold text-green-600">${{ number_format($order->total_amount, 2) }}</dd>
+                                    <dd class="text-lg font-bold text-green-600">${{ number_format($order->price, 2) }}</dd>
                                 </div>
                                 @if($order->metadata && isset($order->metadata['priority']))
                                 <div class="flex justify-between items-center py-2 border-b border-gray-100">
@@ -243,7 +243,10 @@
                             <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                             </svg>
-                            Order Items ({{ $order->orderItems->count() }} items)
+                            @php
+                                $items = $order->getItemsAsArray();
+                            @endphp
+                            Order Items ({{ count($items) }} items)
                         </h4>
 
                         <div class="overflow-x-auto">
@@ -257,7 +260,10 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-100">
-                                    @foreach($order->orderItems as $item)
+                                    @foreach($items as $item)
+                                        @php
+                                            $product = App\Models\Product::find($item['product_id'] ?? null);
+                                        @endphp
                                         <tr class="hover:bg-gray-50 transition-colors duration-150">
                                             <td class="py-4 px-4">
                                                 <div class="flex items-center">
@@ -267,23 +273,23 @@
                                                         </svg>
                                                     </div>
                                                     <div>
-                                                        <p class="text-sm font-medium text-gray-900">{{ $item->product->name }}</p>
-                                                        @if($item->product->sku)
-                                                            <p class="text-xs text-gray-500">SKU: {{ $item->product->sku }}</p>
+                                                        <p class="text-sm font-medium text-gray-900">{{ $product ? $product->name : 'Product #' . ($item['product_id'] ?? 'Unknown') }}</p>
+                                                        @if($product && $product->sku)
+                                                            <p class="text-xs text-gray-500">SKU: {{ $product->sku }}</p>
                                                         @endif
                                                     </div>
                                                 </div>
                                             </td>
                                             <td class="py-4 px-4 text-center">
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                                    {{ $item->quantity }}
+                                                    {{ $item['quantity'] ?? 0 }}
                                                 </span>
                                             </td>
                                             <td class="py-4 px-4 text-right text-sm font-medium text-gray-900">
-                                                ${{ number_format($item->price, 2) }}
+                                                ${{ number_format($item['unit_price'] ?? 0, 2) }}
                                             </td>
                                             <td class="py-4 px-4 text-right text-sm font-bold text-gray-900">
-                                                ${{ number_format($item->quantity * $item->price, 2) }}
+                                                ${{ number_format(($item['quantity'] ?? 0) * ($item['unit_price'] ?? 0), 2) }}
                                             </td>
                                         </tr>
                                     @endforeach
@@ -292,7 +298,7 @@
                                     <tr class="border-t-2 border-gray-200 bg-gray-50">
                                         <td colspan="3" class="py-4 px-4 text-right text-lg font-bold text-gray-900">Total:</td>
                                         <td class="py-4 px-4 text-right text-xl font-bold text-green-600">
-                                            ${{ number_format($order->total_amount, 2) }}
+                                            ${{ number_format($order->price, 2) }}
                                         </td>
                                     </tr>
                                 </tfoot>

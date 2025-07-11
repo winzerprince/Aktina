@@ -266,10 +266,10 @@
                             </div>
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Items</th>
-                        <th wire:click="sortBy('total_amount')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                        <th wire:click="sortBy('price')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
                             <div class="flex items-center space-x-1">
                                 <span>Total</span>
-                                @if($sortField === 'total_amount')
+                                @if($sortField === 'price')
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         @if($sortDirection === 'asc')
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
@@ -308,16 +308,25 @@
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-500">
                                 <div class="max-w-xs">
-                                    @foreach($order->orderItems->take(2) as $item)
-                                        <div class="truncate">{{ $item->product->name }} ({{ $item->quantity }})</div>
+                                    @php
+                                        $items = $order->getItemsAsArray();
+                                        $itemsToShow = array_slice($items, 0, 2);
+                                    @endphp
+                                    @foreach($itemsToShow as $item)
+                                        @php
+                                            $product = App\Models\Product::find($item['product_id'] ?? null);
+                                        @endphp
+                                        <div class="truncate">
+                                            {{ $product ? $product->name : 'Product #' . ($item['product_id'] ?? 'Unknown') }} ({{ $item['quantity'] ?? 0 }})
+                                        </div>
                                     @endforeach
-                                    @if($order->orderItems->count() > 2)
-                                        <div class="text-gray-400">+{{ $order->orderItems->count() - 2 }} more items</div>
+                                    @if(count($items) > 2)
+                                        <div class="text-gray-400">+{{ count($items) - 2 }} more items</div>
                                     @endif
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                ${{ number_format($order->total_amount, 2) }}
+                                ${{ number_format($order->price, 2) }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
