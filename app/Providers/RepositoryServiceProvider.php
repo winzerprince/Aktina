@@ -16,6 +16,7 @@ use App\Interfaces\Repositories\EnhancedOrderRepositoryInterface;
 use App\Interfaces\Services\SalesAnalyticsServiceInterface;
 use App\Interfaces\Services\VerificationServiceInterface;
 use App\Interfaces\Services\ApplicationServiceInterface;
+use App\Interfaces\Services\VendorApplicationServiceInterface;
 use App\Interfaces\Services\MessageServiceInterface;
 use App\Interfaces\Services\ConversationServiceInterface;
 use App\Interfaces\Services\WarehouseServiceInterface;
@@ -26,6 +27,7 @@ use App\Interfaces\Services\MetricsServiceInterface;
 use App\Interfaces\Services\ReportServiceInterface;
 use App\Interfaces\Services\EnhancedOrderServiceInterface;
 use App\Interfaces\Services\AlertEnhancementServiceInterface;
+use App\Interfaces\Services\UserManagementServiceInterface;
 use App\Repositories\SalesRepository;
 use App\Repositories\ApplicationRepository;
 use App\Repositories\MessageRepository;
@@ -40,6 +42,7 @@ use App\Repositories\EnhancedOrderRepository;
 use App\Services\SalesAnalyticsService;
 use App\Services\VerificationService;
 use App\Services\ApplicationService;
+use App\Services\VendorApplicationService;
 use App\Services\MessageService;
 use App\Services\ConversationService;
 use App\Services\WarehouseService;
@@ -50,6 +53,7 @@ use App\Services\AnalyticsService;
 use App\Services\MetricsService;
 use App\Services\ReportService;
 use App\Services\EnhancedOrderService;
+use App\Services\UserManagementService;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -132,6 +136,16 @@ class RepositoryServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(
+            VendorApplicationServiceInterface::class,
+            VendorApplicationService::class
+        );
+
+        $this->app->bind(
+            UserManagementServiceInterface::class,
+            UserManagementService::class
+        );
+
+        $this->app->bind(
             MessageServiceInterface::class,
             MessageService::class
         );
@@ -180,7 +194,7 @@ class RepositoryServiceProvider extends ServiceProvider
             AlertEnhancementServiceInterface::class,
             AlertEnhancementService::class
         );
-        
+
         // Bind additional services
         $this->app->singleton(
             \App\Services\FileValidationService::class

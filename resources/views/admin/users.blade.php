@@ -5,5 +5,9 @@
         </x-slot:middle>
     </x-header>
 
+    <!-- User Management Table -->
+    <div class="mt-6">
+        @livewire('admin.user-management-table')
+    </div>
 
 </x-layouts.app>
